@@ -41,7 +41,7 @@ namespace F1SYS.VsGitToolsPackage
                     }
                     fileChangeService.AdviseDirChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
                     lastMinotorFolder = monitorFolder;
-                    Debug.WriteLine("==== Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
+                    // Debug.WriteLine("==== Start Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
                 }
             }
             catch (Exception ex)
@@ -58,7 +58,7 @@ namespace F1SYS.VsGitToolsPackage
             {
                 IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
                 fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
-                Debug.WriteLine("==== Stop Monitoring: " + _vsIVsFileChangeEventsCookie.ToString());
+                // Debug.WriteLine("==== Stop Monitoring: " + _vsIVsFileChangeEventsCookie.ToString());
                 _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
                 lastMinotorFolder = "";
             }
@@ -204,6 +204,7 @@ namespace F1SYS.VsGitToolsPackage
 
         public int DirectoryChanged(string pszDirectory)
         {
+            // Debug.WriteLine("==== DirectoryChanged: " + pszDirectory); 
             NeedRefresh = true;
             return VSConstants.S_OK;
         }
@@ -212,36 +213,38 @@ namespace F1SYS.VsGitToolsPackage
         {
             return VSConstants.S_OK;
         }
-
         #endregion
 
         #region Refresh
 
         internal bool NeedRefresh, NoRefresh;
-        internal DateTime lastTimeRefresh = DateTime.Now.AddDays(-1);
         internal DateTime nextTimeRefresh = DateTime.Now;
 
-        internal void Refresh()
+        internal void OnIdle()
         {
             if (NeedRefresh && !NoRefresh)
             {
                 double delta = DateTime.Now.Subtract(nextTimeRefresh).TotalMilliseconds;
                 if (delta > 200)
                 {
-                    Debug.WriteLine("==== UpdateNodesGlyphs: " + delta.ToString());
+                    //Debug.WriteLine("==== OnIdle: " + delta.ToString());
 
                     //Stopwatch stopwatch = new Stopwatch();
                     //stopwatch.Start();
 
                     NoRefresh = true;
+                    NeedRefresh = false;
+
                     CloseRepository();
                     OpenRepository();
-                    //RefreshToolWindows();
+                    
+                    RefreshToolWindows();
 
                     NoRefresh = false;
                     NeedRefresh = false;
 
                     nextTimeRefresh = DateTime.Now; //important !!
+
                     //stopwatch.Stop();
                     //Debug.WriteLine("++++ UpdateNodesGlyphs: " + stopwatch.ElapsedMilliseconds);
                 }
@@ -249,6 +252,13 @@ namespace F1SYS.VsGitToolsPackage
 
         }
 
+        private void RefreshToolWindows()
+        {
+            var window = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
+            if (window != null) window.Refresh(package.repository);
+        }
+
         #endregion
+
     }
 }

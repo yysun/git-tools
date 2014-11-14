@@ -149,24 +149,18 @@ namespace F1SYS.VsGitToolsPackage
             }
 
             _OnIdleEvent.RegisterForIdleTimeCallbacks(GetGlobalService(typeof(SOleComponentManager)) as IOleComponentManager);
-            _OnIdleEvent.OnIdleEvent += new OnIdleEvent(this.Refresh);
+            _OnIdleEvent.OnIdleEvent += new OnIdleEvent(service.OnIdle);
         }
 
         protected override void Dispose(bool disposing)
         {
             Debug.WriteLine(String.Format(CultureInfo.CurrentUICulture, "Entering Dispose() of: {0}", this.ToString()));
 
-            _OnIdleEvent.OnIdleEvent -= new OnIdleEvent(this.Refresh);
+            _OnIdleEvent.OnIdleEvent -= new OnIdleEvent(service.OnIdle);
             _OnIdleEvent.UnRegisterForIdleTimeCallbacks();
 
             base.Dispose(disposing);
         }
-
-        private void Refresh()
-        {
-            service.Refresh();
-        }
-
         #endregion
 
         #region menu commands
@@ -178,9 +172,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void OnGitBashCommand(object sender, EventArgs e)
         {
-            var gitBashPath = GitSccOptions.Current.GitBashPath;
-            gitBashPath = gitBashPath.Replace("git.exe", "sh.exe");
-            RunDetatched("cmd.exe", string.Format("/c \"{0}\" --login -i", gitBashPath));
+            GitBash.OpenGitBash(this.CurrentGitWorkingDirectory);
         }
 
         private void OnGitExtensionCommand(object sender, EventArgs e)
@@ -310,6 +302,7 @@ namespace F1SYS.VsGitToolsPackage
 
                 case PkgCmdIDList.icmdSccCommandEditIgnore:
                     if (IsSolutionGitControlled) cmdf |= OLECMDF.OLECMDF_ENABLED;
+                    else cmdf = cmdf | OLECMDF.OLECMDF_INVISIBLE;
                     break;
 
                 case PkgCmdIDList.icmdSccCommandHistory:
@@ -318,6 +311,7 @@ namespace F1SYS.VsGitToolsPackage
                 case PkgCmdIDList.icmdPendingChangesCommit:
                 case PkgCmdIDList.icmdPendingChangesCommitToBranch:
                     if (GitBash.Exists && IsSolutionGitControlled) cmdf |= OLECMDF.OLECMDF_ENABLED;
+                    else cmdf = cmdf | OLECMDF.OLECMDF_INVISIBLE;
                     break;
 
                 case PkgCmdIDList.icmdSccCommandAbout:
@@ -330,7 +324,8 @@ namespace F1SYS.VsGitToolsPackage
                     if (repository!=null && !IsSolutionGitControlled)
                         cmdf |= OLECMDF.OLECMDF_ENABLED;
                     else
-                        cmdf = cmdf & ~(OLECMDF.OLECMDF_ENABLED);
+                        //cmdf = cmdf & ~(OLECMDF.OLECMDF_ENABLED);
+                        cmdf = cmdf | OLECMDF.OLECMDF_INVISIBLE;
                     break;
 
                 default:
@@ -380,21 +375,6 @@ namespace F1SYS.VsGitToolsPackage
         #endregion
 
         #region Run Command
-        //internal void RunCommand(string cmd, string args)
-        //{
-        //    var pinfo = new ProcessStartInfo(cmd)
-        //    {
-        //        Arguments = args,
-        //        CreateNoWindow = true,
-        //        RedirectStandardError = true,
-        //        RedirectStandardOutput = true,
-        //        UseShellExecute = false,
-        //        WorkingDirectory = CurrentGitWorkingDirectory
-        //    };
-
-        //    Process.Start(pinfo);
-        //}
-
         internal void RunDetatched(string cmd, string arguments)
         {
             using (Process process = new Process())

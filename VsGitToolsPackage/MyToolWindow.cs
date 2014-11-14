@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 
 namespace F1SYS.VsGitToolsPackage
 {
@@ -238,5 +239,12 @@ namespace F1SYS.VsGitToolsPackage
         {
             _BufferAdapter.InitializeContent(message, message.Length);
         }
+
+        internal void Refresh(GitRepository gitRepository)
+        {
+            Debug.WriteLine("VS Git Tools - Refresh Git Changes Tool Windows ");
+            //throw new NotImplementedException();
+        }
+
     }
 }

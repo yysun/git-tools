@@ -13,6 +13,7 @@ namespace GitScc
         public static bool UseUTF8FileNames { get; set; }
 
         private static string gitExePath;
+        
         public static string GitExePath
         {
             get { return gitExePath; }

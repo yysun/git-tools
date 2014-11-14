@@ -20,7 +20,6 @@
   <!--This header contains the command ids for the menus provided by the shell. -->
   <Extern href="vsshlids.h"/>
 
-
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
   <Commands package="guidVsGitToolsPackagePkg">
@@ -120,7 +119,6 @@
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
 
-     
       <Button guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandInit" priority="0x0101" type="Button">
         <Parent guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenuGroup"/>
         <Icon guid="guidImages" id="iconGitInit" />
@@ -188,7 +186,7 @@
       </Button>
 
       <!-- buttons on pending changes tool window's tool bar -->
-      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesCommit" priority="0x0000" type="Button">
+      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesCommit" priority="0x0002" type="Button">
         <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup"/>
         <Icon guid="guidImages" id="iconGitBash" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -199,7 +197,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesAmend" priority="0x0001" type="Button">
+      <!--<Button guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesAmend" priority="0x0001" type="Button">
         <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup"/>
         <Icon guid="guidImages" id="iconGitBash" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -208,9 +206,9 @@
         <Strings>
           <ButtonText>Amend Last Commit</ButtonText>
         </Strings>
-      </Button>
+      </Button>-->
 
-      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesCommitToBranch" priority="0x0005" type="Button">
+      <!--<Button guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesCommitToBranch" priority="0x0005" type="Button">
         <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup"/>
         <Icon guid="guidSccProviderImageSwitch" id="1" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -219,7 +217,7 @@
         <Strings>
           <ButtonText>Switch Branch</ButtonText>
         </Strings>
-      </Button>
+      </Button>-->
 
       <Button guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandEditIgnore" priority="0x0006" type="Button">
         <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup"/>
@@ -314,7 +312,10 @@
       <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS0"/>
     </CommandPlacement>
 
-
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandInit" priority="0x0001">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup"/>
+    </CommandPlacement>
+    
     <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandGitBash" priority="0x0008">
       <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup"/>
     </CommandPlacement>
