@@ -75,12 +75,12 @@ namespace F1SYS.VsGitToolsPackage
            _Control.OnSettings();
         }
 
-        internal void Refresh(GitRepository gitRepository)
+        internal void Refresh(VsGitToolsService vsGitToolsService, GitRepository gitRepository)
         {
             Debug.WriteLine("VS Git Tools - Refresh Git Changes Tool Windows ");
 
             hasFileSaved(); //just a reminder, refresh anyway
-            //_Control.Refresh(gitRepository);
+            _Control.Refresh(vsGitToolsService, gitRepository);
         }
 
         internal bool hasFileSaved()
@@ -264,5 +264,6 @@ namespace F1SYS.VsGitToolsPackage
         {
             _BufferAdapter.InitializeContent(message, message.Length);
         }
+
     }
 }
