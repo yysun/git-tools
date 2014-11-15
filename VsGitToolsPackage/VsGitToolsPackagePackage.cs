@@ -104,6 +104,10 @@ namespace F1SYS.VsGitToolsPackage
                 MenuCommand menu = new MenuCommand(new EventHandler(OnGitBashCommand), cmd);
                 mcs.AddCommand(menu);
 
+                cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesRefresh);
+                menu = new MenuCommand(new EventHandler(OnRefreshCommand), cmd);
+                mcs.AddCommand(menu);
+
                 cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandGitExtension);
                 menu = new MenuCommand(new EventHandler(OnGitExtensionCommand), cmd);
                 mcs.AddCommand(menu);
@@ -164,6 +168,11 @@ namespace F1SYS.VsGitToolsPackage
         #endregion
 
         #region menu commands
+
+        private void OnRefreshCommand(object sender, EventArgs e)
+        {
+            GetToolWindowPane<MyToolWindow>().Refresh(service, repository);
+        }
 
         private void OnInitCommand(object sender, EventArgs e)
         {
