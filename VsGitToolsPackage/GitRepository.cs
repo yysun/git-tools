@@ -162,7 +162,7 @@ namespace F1SYS.VsGitToolsPackage
                     return tmpFileName;
                 }
 
-                GitRun(string.Format("diff HEAD -- \"{0}\" > \"{1}\"", fileName, tmpFileName));
+                GitBash.RunCmd(string.Format("diff HEAD -- \"{0}\" > \"{1}\"", fileName, tmpFileName), WorkingDirectory);
             }
             catch (Exception ex)
             {
