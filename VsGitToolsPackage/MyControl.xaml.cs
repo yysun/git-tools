@@ -252,7 +252,7 @@ namespace F1SYS.VsGitToolsPackage
                 ShowStatusMessage("");
 
                 var changed = tracker.ChangedFiles;
-                this.label3.Content = string.Format("Changed files: ({0}) +{1} ~{2} -{3} !{4}", tracker.CurrentBranch,
+                this.label3.Content = string.Format("Changed files:  +{0} ~{1} -{2} !{3}",
                     changed.Where(f => f.Status == GitFileStatus.New || f.Status == GitFileStatus.Added).Count(),
                     changed.Where(f => f.Status == GitFileStatus.Modified || f.Status == GitFileStatus.Staged).Count(),
                     changed.Where(f => f.Status == GitFileStatus.Deleted || f.Status == GitFileStatus.Removed).Count(),
@@ -261,6 +261,7 @@ namespace F1SYS.VsGitToolsPackage
             catch (Exception ex)
             {
                 ShowStatusMessage(ex.Message);
+                this.DiffEditor.Content = ex.Message;
             }
             this.dataGrid1.EndInit();
 
