@@ -39,7 +39,7 @@ namespace F1SYS.VsGitToolsPackage
     [Guid(GuidList.guidVsGitToolsPackagePkgString)]
     public sealed class VsGitToolsPackagePackage : Package, IOleCommandTarget
     {
-        private SccOnIdleEvent _OnIdleEvent = new SccOnIdleEvent();
+        //private SccOnIdleEvent _OnIdleEvent = new SccOnIdleEvent();
         private VsGitToolsService service;
 
         /// <summary>
@@ -148,16 +148,16 @@ namespace F1SYS.VsGitToolsPackage
 
             }
 
-            _OnIdleEvent.RegisterForIdleTimeCallbacks(GetGlobalService(typeof(SOleComponentManager)) as IOleComponentManager);
-            _OnIdleEvent.OnIdleEvent += new OnIdleEvent(service.OnIdle);
+            //_OnIdleEvent.RegisterForIdleTimeCallbacks(GetGlobalService(typeof(SOleComponentManager)) as IOleComponentManager);
+            //_OnIdleEvent.OnIdleEvent += new OnIdleEvent(service.OnIdle);
         }
 
         protected override void Dispose(bool disposing)
         {
             Debug.WriteLine(String.Format(CultureInfo.CurrentUICulture, "Entering Dispose() of: {0}", this.ToString()));
 
-            _OnIdleEvent.OnIdleEvent -= new OnIdleEvent(service.OnIdle);
-            _OnIdleEvent.UnRegisterForIdleTimeCallbacks();
+            //_OnIdleEvent.OnIdleEvent -= new OnIdleEvent(service.OnIdle);
+            //_OnIdleEvent.UnRegisterForIdleTimeCallbacks();
 
             base.Dispose(disposing);
         }

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace F1SYS.VsGitToolsPackage
@@ -20,7 +21,7 @@ namespace F1SYS.VsGitToolsPackage
         private uint _vsSolutionEventsCookie, _vsIVsFileChangeEventsCookie, _vsIVsUpdateSolutionEventsCookie;
         private string lastMinotorFolder = "";
 
-        private VsGitToolsPackagePackage package;
+        internal VsGitToolsPackagePackage package;
 
         private void OpenRepository()
         {
@@ -204,7 +205,6 @@ namespace F1SYS.VsGitToolsPackage
 
         public int DirectoryChanged(string pszDirectory)
         {
-            // Debug.WriteLine("==== DirectoryChanged: " + pszDirectory); 
             NeedRefresh = true;
             return VSConstants.S_OK;
         }
@@ -217,10 +217,31 @@ namespace F1SYS.VsGitToolsPackage
 
         #region Refresh
 
-        internal bool NeedRefresh, NoRefresh;
-        internal DateTime nextTimeRefresh = DateTime.Now;
+        internal bool needRefresh, noRefresh;
 
-        internal void OnIdle()
+        internal bool NeedRefresh
+        {
+            get { return needRefresh; }
+            set
+            {
+                needRefresh = !noRefresh && value;
+                if (needRefresh) Refresh();
+            }
+        }
+
+        internal bool NoRefresh
+        {
+            get { return noRefresh; }
+            set
+            {
+                noRefresh = value;
+                nextTimeRefresh = DateTime.Now.AddMilliseconds(888);
+            }
+        }
+
+        private DateTime nextTimeRefresh = DateTime.Now;
+
+        internal void Refresh()
         {
             if (NeedRefresh && !NoRefresh)
             {
@@ -237,25 +258,24 @@ namespace F1SYS.VsGitToolsPackage
 
                     CloseRepository();
                     OpenRepository();
-                    
+
                     RefreshToolWindows();
 
-                    NoRefresh = false;
-                    NeedRefresh = false;
+                    //NeedRefresh = false;
 
-                    nextTimeRefresh = DateTime.Now; //important !!
+                    //NoRefresh = false;
+                    //nextTimeRefresh = DateTime.Now; //important !!
 
                     //stopwatch.Stop();
                     //Debug.WriteLine("++++ UpdateNodesGlyphs: " + stopwatch.ElapsedMilliseconds);
                 }
             }
-
         }
 
         private void RefreshToolWindows()
         {
             var window = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
-            if (window != null) window.Refresh(package.repository);
+            if (window != null) window.Refresh(this, package.repository);
         }
 
         #endregion
