@@ -29,7 +29,6 @@ namespace F1SYS.VsGitToolsPackage
         GitRepository tracker;
         VsGitToolsService service;
 
-
         private MyToolWindow toolWindow;
         private IVsTextView textView;
         private string[] diffLines;
@@ -108,22 +107,18 @@ namespace F1SYS.VsGitToolsPackage
                 {
                     if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
                     {
-                        Action action = () => this.DiffEditor.Content = "File is too big to display: " + fileName;
-                        Dispatcher.Invoke(action);
+                        this.DiffEditor.Content = "File is too big to display: " + fileName;
                     }
                     else
                     {
                         diffLines = File.ReadAllLines(tmpFileName);
-                        Action action = () => this.ShowFile(tmpFileName);
-                        Dispatcher.Invoke(action);
+                        this.ShowFile(tmpFileName);
                     }
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
-                Action action = () => ShowStatusMessage(message);
-                Dispatcher.Invoke(action);
+                ShowStatusMessage(ex.Message);
             }
             service.NoRefresh = false;
         }
@@ -200,7 +195,6 @@ namespace F1SYS.VsGitToolsPackage
 
         #region Git functions
 
-        DateTime lastTimeRefresh = DateTime.Now.AddDays(-1);
         internal void Refresh(VsGitToolsService service, GitRepository tracker)
         {
 
@@ -215,9 +209,7 @@ namespace F1SYS.VsGitToolsPackage
 
             if (tracker == null)
             {
-                service.NoRefresh = true;
                 ClearUI();
-                service.NoRefresh = false;
                 return;
             }
 
@@ -643,6 +635,8 @@ namespace F1SYS.VsGitToolsPackage
             //_currentSortedColumn = (GridViewColumnHeader)columns[columns.Count - 1].Header;
             //_lastSortDirection = ListSortDirection.Ascending;
             //UpdateColumnHeaderTemplate(_currentSortedColumn, _lastSortDirection);
+
+            this.DiffEditor.Content = "";
         }
         internal void OnSettings()
         {

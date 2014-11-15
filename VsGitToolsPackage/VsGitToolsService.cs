@@ -102,12 +102,14 @@ namespace F1SYS.VsGitToolsPackage
         public int OnAfterOpenSolution([InAttribute] Object pUnkReserved, [InAttribute] int fNewSolution)
         {
             OpenRepository();
+            // NeedRefresh = true; // open solution will trigger file change event to cause refresh
             return VSConstants.S_OK;
         }
 
         public int OnAfterCloseSolution([InAttribute] Object pUnkReserved)
         {
             CloseRepository();
+            if (toolWindow != null) toolWindow.Refresh(this, package.repository);
             return VSConstants.S_OK;
         }
 
@@ -272,10 +274,17 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
+        private MyToolWindow toolWindow
+        {
+            get
+            {
+                return this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
+            }
+        }
         private void RefreshToolWindows()
         {
-            var window = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
-            if (window != null) window.Refresh(this, package.repository);
+
+            if (toolWindow != null) toolWindow.Refresh(this, package.repository);
         }
 
         #endregion
