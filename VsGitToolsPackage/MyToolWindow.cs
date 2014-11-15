@@ -64,6 +64,31 @@ namespace F1SYS.VsGitToolsPackage
             base.Content = new MyControl(this);
         }
 
+        internal void OnCommitCommand()
+        {
+            if (!hasFileSaved()) return;
+            //_Control.Commit();
+        }
+
+        internal void OnSettings()
+        {
+           _Control.OnSettings();
+        }
+
+        internal void Refresh(GitRepository gitRepository)
+        {
+            Debug.WriteLine("VS Git Tools - Refresh Git Changes Tool Windows ");
+
+            hasFileSaved(); //just a reminder, refresh anyway
+            //_Control.Refresh(gitRepository);
+        }
+
+        internal bool hasFileSaved()
+        {
+            var dte = this.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+               return dte.ItemOperations.PromptToSave != EnvDTE.vsPromptResult.vsPromptResultCancelled;
+        }
+
         // ----------------------------------------------------------------------------------
         /// <summary>
         /// Get the content of the window pane: an instance of the editor to be embedded into
@@ -239,12 +264,5 @@ namespace F1SYS.VsGitToolsPackage
         {
             _BufferAdapter.InitializeContent(message, message.Length);
         }
-
-        internal void Refresh(GitRepository gitRepository)
-        {
-            Debug.WriteLine("VS Git Tools - Refresh Git Changes Tool Windows ");
-            //throw new NotImplementedException();
-        }
-
     }
 }

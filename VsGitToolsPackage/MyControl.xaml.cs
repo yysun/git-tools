@@ -127,6 +127,10 @@ namespace F1SYS.VsGitToolsPackage
 
         }
 
+        internal void OnSettings()
+        {
+            Settings.Show();
+        }
     }
 
     public static class ExtHelper

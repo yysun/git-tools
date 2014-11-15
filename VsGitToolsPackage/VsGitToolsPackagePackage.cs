@@ -116,6 +116,14 @@ namespace F1SYS.VsGitToolsPackage
                 menu = new MenuCommand(new EventHandler(OnEditIgnore), cmd);
                 mcs.AddCommand(menu);
 
+                cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesCommit);
+                menu = new MenuCommand(new EventHandler(OnCommitCommand), cmd);
+                mcs.AddCommand(menu);
+
+                cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesSettings);
+                menu = new MenuCommand(new EventHandler(OnSettings), cmd);
+                mcs.AddCommand(menu);
+
                 cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandGitTortoise);
                 menu = new MenuCommand(new EventHandler(OnTortoiseGitCommand), cmd);
 
@@ -226,6 +234,21 @@ namespace F1SYS.VsGitToolsPackage
                 if (!File.Exists(fn)) File.WriteAllText(fn, "# git ignore file");
                 dte.ItemOperations.OpenFile(fn);
             }
+        }
+
+        private void OnCommitCommand(object sender, EventArgs e)
+        {
+            GetToolWindowPane<MyToolWindow>().OnCommitCommand();
+        }
+
+        private void OnSettings(object sender, EventArgs e)
+        {
+            GetToolWindowPane<MyToolWindow>().OnSettings();
+        }
+
+        private T GetToolWindowPane<T>() where T : ToolWindowPane
+        {
+            return (T)this.FindToolWindow(typeof(T), 0, true);
         }
 
         //private void ShowHistoryWindow(object sender, EventArgs e)

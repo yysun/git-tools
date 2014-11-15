@@ -1,4 +1,5 @@
 ﻿<UserControl x:Class="F1SYS.VsGitToolsPackage.MyControl"
+             xmlns:my="clr-namespace:F1SYS.VsGitToolsPackage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -290,7 +291,7 @@
 
         </Grid>
 
-        <!--<my:Settings HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="Settings" Grid.ColumnSpan="3" Grid.RowSpan="3" Visibility="Collapsed" />-->
+        <my:Settings HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="Settings" Grid.ColumnSpan="3" Grid.RowSpan="3" Visibility="Collapsed" />
 
     </Grid>
 </UserControl>
