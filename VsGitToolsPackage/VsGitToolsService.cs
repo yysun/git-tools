@@ -102,14 +102,14 @@ namespace F1SYS.VsGitToolsPackage
         public int OnAfterOpenSolution([InAttribute] Object pUnkReserved, [InAttribute] int fNewSolution)
         {
             OpenRepository();
-            // NeedRefresh = true; // open solution will trigger file change event to cause refresh
+            RefreshToolWindows();
             return VSConstants.S_OK;
         }
 
         public int OnAfterCloseSolution([InAttribute] Object pUnkReserved)
         {
             CloseRepository();
-            if (toolWindow != null) toolWindow.Refresh(this, package.repository);
+            RefreshToolWindows();
             return VSConstants.S_OK;
         }
 
