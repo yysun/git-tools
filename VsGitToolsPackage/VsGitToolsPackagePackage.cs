@@ -112,6 +112,10 @@ namespace F1SYS.VsGitToolsPackage
                 menu = new MenuCommand(new EventHandler(OnInitCommand), cmd);
                 mcs.AddCommand(menu);
 
+                cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandEditIgnore);
+                menu = new MenuCommand(new EventHandler(OnEditIgnore), cmd);
+                mcs.AddCommand(menu);
+
                 cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandGitTortoise);
                 menu = new MenuCommand(new EventHandler(OnTortoiseGitCommand), cmd);
 
@@ -133,18 +137,6 @@ namespace F1SYS.VsGitToolsPackage
                 cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandAbout);
                 menu = new MenuCommand(new EventHandler(OnAbout), cmd);
                 mcs.AddCommand(menu);
-
-                //cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesCommitToBranch);
-                //menu = new MenuCommand(new EventHandler(OnSwitchBranchCommand), cmd);
-                //mcs.AddCommand(menu);
-
-                //cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesCommit);
-                //menu = new MenuCommand(new EventHandler(OnCommitCommand), cmd);
-                //mcs.AddCommand(menu);
-
-                //cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesAmend);
-                //menu = new MenuCommand(new EventHandler(OnAmendCommitCommand), cmd);
-                //mcs.AddCommand(menu);
 
             }
 
@@ -223,6 +215,17 @@ namespace F1SYS.VsGitToolsPackage
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Readme.html");
             Process.Start(path);
+        }
+
+        private void OnEditIgnore(object sender, EventArgs e)
+        {
+            if (this.repository != null)
+            {
+                var dte = GetServiceEx<EnvDTE.DTE>() as EnvDTE.DTE;
+                var fn = Path.Combine(CurrentGitWorkingDirectory, ".gitignore");
+                if (!File.Exists(fn)) File.WriteAllText(fn, "# git ignore file");
+                dte.ItemOperations.OpenFile(fn);
+            }
         }
 
         //private void ShowHistoryWindow(object sender, EventArgs e)
