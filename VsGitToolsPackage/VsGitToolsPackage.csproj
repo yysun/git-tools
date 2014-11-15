@@ -139,6 +139,7 @@
   <ItemGroup>
     <Compile Include="GitBash.cs" />
     <Compile Include="GitBashResult.cs" />
+    <Compile Include="GitFileStatus.cs" />
     <Compile Include="GitSccOptions.cs" />
     <Compile Include="GitToolCommands.cs" />
     <Compile Include="GitRepository.cs" />
