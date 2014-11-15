@@ -15,6 +15,8 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using Microsoft.VisualStudio;
+
 
 namespace F1SYS.VsGitToolsPackage
 {
@@ -265,5 +267,158 @@ namespace F1SYS.VsGitToolsPackage
             _BufferAdapter.InitializeContent(message, message.Length);
         }
 
+
+        private IOleCommandTarget cachedEditorCommandTarget;
+        private IVsTextView textView;
+        private IVsCodeWindow codeWindow;
+        private IVsInvisibleEditor invisibleEditor;
+        private IVsFindTarget cachedEditorFindTarget;
+        private Microsoft.VisualStudio.OLE.Interop.IServiceProvider cachedOleServiceProvider;
+
+        public Tuple<System.Windows.Controls.Control, IVsTextView> SetDisplayedFile(string filePath)
+        {
+            //ClearEditor();
+            try
+            {
+                //Get an invisible editor over the file, this makes it much easier than having to manually figure out the right content type, 
+                //language service, and it will automatically associate the document with its owning project, meaning we will get intellisense
+                //in our editor with no extra work.
+                IVsInvisibleEditorManager invisibleEditorManager = (IVsInvisibleEditorManager)GetService(typeof(SVsInvisibleEditorManager));
+                ErrorHandler.ThrowOnFailure(invisibleEditorManager.RegisterInvisibleEditor(filePath,
+                                                                                           pProject: null,
+                                                                                           dwFlags: (uint)_EDITORREGFLAGS.RIEF_ENABLECACHING,
+                                                                                           pFactory: null,
+                                                                                           ppEditor: out this.invisibleEditor));
+
+                //The doc data is the IVsTextLines that represents the in-memory version of the file we opened in our invisibe editor, we need
+                //to extract that so that we can create our real (visible) editor.
+                IntPtr docDataPointer = IntPtr.Zero;
+                Guid guidIVSTextLines = typeof(IVsTextLines).GUID;
+                ErrorHandler.ThrowOnFailure(this.invisibleEditor.GetDocData(fEnsureWritable: 1, riid: ref guidIVSTextLines, ppDocData: out docDataPointer));
+                try
+                {
+                    IVsTextLines docData = (IVsTextLines)Marshal.GetObjectForIUnknown(docDataPointer);
+
+                    //Get the component model so we can request the editor adapter factory which we can use to spin up an editor instance.
+                    IComponentModel componentModel = (IComponentModel)GetService(typeof(SComponentModel));
+                    IVsEditorAdaptersFactoryService editorAdapterFactoryService = componentModel.GetService<IVsEditorAdaptersFactoryService>();
+
+                    //Create a code window adapter.
+                    this.codeWindow = editorAdapterFactoryService.CreateVsCodeWindowAdapter(OleServiceProvider);
+
+                    //Disable the splitter control on the editor as leaving it enabled causes a crash if the user
+                    //tries to use it here :(
+                    IVsCodeWindowEx codeWindowEx = (IVsCodeWindowEx)this.codeWindow;
+                    INITVIEW[] initView = new INITVIEW[1];
+                    codeWindowEx.Initialize((uint)_codewindowbehaviorflags.CWB_DISABLESPLITTER,
+                                             VSUSERCONTEXTATTRIBUTEUSAGE.VSUC_Usage_Filter,
+                                             szNameAuxUserContext: "",
+                                             szValueAuxUserContext: "",
+                                             InitViewFlags: 0,
+                                             pInitView: initView);
+
+                    //docData.SetStateFlags((uint)BUFFERSTATEFLAGS.BSF_USER_READONLY); //set read only
+
+                    //Associate our IVsTextLines with our new code window.
+                    ErrorHandler.ThrowOnFailure(this.codeWindow.SetBuffer((IVsTextLines)docData));
+
+                    //Get our text view for our editor which we will use to get the WPF control that hosts said editor.
+                    ErrorHandler.ThrowOnFailure(this.codeWindow.GetPrimaryView(out this.textView));
+
+                    //Get our WPF host from our text view (from our code window).
+                    IWpfTextViewHost textViewHost = editorAdapterFactoryService.GetWpfTextViewHost(this.textView);
+
+                    //textViewHost.TextView.Options.SetOptionValue(GitTextViewOptions.DiffMarginId, false);
+                    textViewHost.TextView.Options.SetOptionValue(DefaultTextViewHostOptions.ChangeTrackingId, false);
+                    textViewHost.TextView.Options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, false);
+                    textViewHost.TextView.Options.SetOptionValue(DefaultTextViewHostOptions.LineNumberMarginId, false);
+                    textViewHost.TextView.Options.SetOptionValue(DefaultTextViewHostOptions.OutliningMarginId, false);
+
+                    textViewHost.TextView.Options.SetOptionValue(DefaultTextViewOptions.ViewProhibitUserInputId, true);
+
+                    return Tuple.Create<System.Windows.Controls.Control, IVsTextView>(textViewHost.HostControl, this.textView);
+
+                    //Debug.Assert(contentControl != null);
+                    //contentControl.Content = textViewHost.HostControl;
+                }
+                finally
+                {
+                    if (docDataPointer != IntPtr.Zero)
+                    {
+                        //Release the doc data from the invisible editor since it gave us a ref-counted copy.
+                        Marshal.Release(docDataPointer);
+                    }
+                }
+            }
+            catch { }
+            return null;
+        }
+
+
+        #region Private Properties
+
+        /// <summary>
+        /// The IOleCommandTarget for the editor that our tool window will forward all command requests to when it is the active tool window
+        /// and the editor we are hosting has keyboard focus.
+        /// </summary>
+        private IOleCommandTarget EditorCommandTarget
+        {
+            get
+            {
+                return (this.cachedEditorCommandTarget ?? (this.cachedEditorCommandTarget = this.textView as IOleCommandTarget));
+            }
+        }
+
+        /// <summary>
+        /// The IVsFindTarget for the editor that our tool window will forward all find releated requests to when it is the active tool window
+        /// and the editor we are hosting has keyboard focus.
+        /// </summary>
+        private IVsFindTarget EditorFindTarget
+        {
+            get
+            {
+                return (this.cachedEditorFindTarget ?? (this.cachedEditorFindTarget = this.textView as IVsFindTarget));
+            }
+        }
+
+        /// <summary>
+        /// The shell's service provider as an OLE service provider (needed to create the editor bits).
+        /// </summary>
+        private Microsoft.VisualStudio.OLE.Interop.IServiceProvider OleServiceProvider
+        {
+            get
+            {
+                if (this.cachedOleServiceProvider == null)
+                {
+                    //ServiceProvider.GlobalProvider is a System.IServiceProvider, but the editor pieces want an OLE.IServiceProvider, luckily the
+                    //global provider is also IObjectWithSite and we can use that to extract its underlying (OLE) IServiceProvider object.
+                    IObjectWithSite objWithSite = (IObjectWithSite)ServiceProvider.GlobalProvider;
+
+                    Guid interfaceIID = typeof(Microsoft.VisualStudio.OLE.Interop.IServiceProvider).GUID;
+                    IntPtr rawSP;
+                    objWithSite.GetSite(ref interfaceIID, out rawSP);
+                    try
+                    {
+                        if (rawSP != IntPtr.Zero)
+                        {
+                            //Get an RCW over the raw OLE service provider pointer.
+                            this.cachedOleServiceProvider = (Microsoft.VisualStudio.OLE.Interop.IServiceProvider)Marshal.GetObjectForIUnknown(rawSP);
+                        }
+                    }
+                    finally
+                    {
+                        if (rawSP != IntPtr.Zero)
+                        {
+                            //Release the raw pointer we got from IObjectWithSite so we don't cause leaks.
+                            Marshal.Release(rawSP);
+                        }
+                    }
+                }
+
+                return this.cachedOleServiceProvider;
+            }
+        }
+
+        #endregion
     }
 }
