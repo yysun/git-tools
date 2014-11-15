@@ -33,7 +33,7 @@ namespace GitScc
         public static GitBashResult Run(string args, string workingDirectory)
         {
             if (string.IsNullOrWhiteSpace(gitExePath) || !File.Exists(gitExePath))
-                throw new Exception("Git Executable not found");
+                throw new GitException("Git Executable not found");
 
             GitBashResult result = new GitBashResult();
 
@@ -74,7 +74,7 @@ namespace GitScc
         public static void RunCmd(string args, string workingDirectory)
         {
             if (string.IsNullOrWhiteSpace(gitExePath) || !File.Exists(gitExePath))
-                throw new Exception("Git Executable not found");
+                throw new GitException("Git Executable not found");
 
             Debug.WriteLine(string.Format("{2}>{0} {1}", gitExePath, args, workingDirectory));
 
@@ -96,7 +96,7 @@ namespace GitScc
                 process.WaitForExit();
 
                 if (!string.IsNullOrEmpty(error))
-                    throw new Exception(error);
+                    throw new GitException(error);
             }
         }
 
@@ -128,5 +128,14 @@ namespace GitScc
             }
         }
 
+    }
+
+    public class GitException : Exception
+    {
+        public GitException(string message)
+            : base(message)
+        {
+
+        }
     }
 }

@@ -23,7 +23,8 @@ namespace F1SYS.VsGitToolsPackage
             this.changedFiles = null;
             try
             {
-                var output = GitRun("rev-parse --is-inside-work-tree", checkGit: false).Trim();
+                isGit = true;
+                var output = GitRun("rev-parse --is-inside-work-tree").Trim();
                 isGit = string.Compare("true", output, true) == 0;
             }
             catch 
@@ -34,15 +35,12 @@ namespace F1SYS.VsGitToolsPackage
 
 		#region Git commands
 
-        private string GitRun(string cmd, bool checkGit = true)
+        private string GitRun(string cmd)
         {
-            if (!GitBash.Exists) throw new Exception("git.exe is not found.");
-            if (checkGit && !this.IsGit) return "";
-
+            if (!this.IsGit) return null;
             var result = GitBash.Run(cmd, this.WorkingDirectory);
-            if (result.HasError || result.Output.Contains("fatal:"))
-                throw new Exception(result.Output);
-
+            if (result.HasError) throw new GitException(result.Error);
+            if (result.Output.Contains("fatal:")) throw new GitException(result.Output);
             return result.Output;
         }
 
@@ -65,10 +63,6 @@ namespace F1SYS.VsGitToolsPackage
 		{
 			return GitRun(string.Format("branch \"{0}\" {1}", name, id));
 		}
-        internal string GetCurrentBranch()
-        {
-            return GitRun("rev-parse --abbrev-ref HEAD").Trim();
-        }
 
         internal string GetBranchId(string name)
         {
@@ -299,14 +293,18 @@ namespace F1SYS.VsGitToolsPackage
         {
             get
             {
-                var branch = GetCurrentBranch();
-                if (branch != null)
+                var branch = "master";
+                try
                 {
+                    branch = GitRun("rev-parse --abbrev-ref HEAD").Trim();
                     if (IsInTheMiddleOfBisect) branch += " | BISECTING";
                     if (IsInTheMiddleOfMerge) branch += " | MERGING";
                     if (IsInTheMiddleOfPatch) branch += " | AM";
                     if (IsInTheMiddleOfRebase) branch += " | REBASE";
                     if (IsInTheMiddleOfRebaseI) branch += " | REBASE-i";
+                }
+                catch (GitException ex)
+                {
                 }
                 return branch;
             }
