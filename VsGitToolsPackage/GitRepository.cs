@@ -93,7 +93,15 @@ namespace F1SYS.VsGitToolsPackage
 	
         internal void InitRepo()
         {
-            if (!isGit) GitRun("init");
+            if (!isGit)
+            {
+                GitRun("init");
+                var ignoreFileName = Path.Combine(WorkingDirectory, ".gitignore");
+                if (!File.Exists(ignoreFileName))
+                {
+                    File.WriteAllText(ignoreFileName, Resources.IgnoreFileContent);
+                }
+            }
         }
     }
 }
