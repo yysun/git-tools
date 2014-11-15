@@ -104,46 +104,46 @@ namespace F1SYS.VsGitToolsPackage
                 //File.WriteAllText(tmpFileName, ret);
 
                 var tmpFileName = tracker.DiffFile(fileName);
-
                 if (!string.IsNullOrWhiteSpace(tmpFileName) && File.Exists(tmpFileName))
                 {
                     if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
                     {
-                        //this.DiffEditor.Text = "File is too big to display: " + fileName;
-                        this.toolWindow.SetText("File is too big to display: " + fileName);
+                        Action action = () => this.DiffEditor.Content = "File is too big to display: " + fileName;
+                        Dispatcher.Invoke(action);
                     }
                     else
                     {
                         diffLines = File.ReadAllLines(tmpFileName);
-                        this.ShowFile(tmpFileName);
+                        Action action = () => this.ShowFile(tmpFileName);
+                        Dispatcher.Invoke(action);
                     }
                 }
             }
             catch (Exception ex)
             {
-                //ShowStatusMessage(ex.Message);
-                //this.DiffEditor.Text = ex.Message;
-                this.toolWindow.SetText(ex.Message);
+                string message = ex.Message;
+                Action action = () => ShowStatusMessage(message);
+                Dispatcher.Invoke(action);
             }
             service.NoRefresh = false;
         }
 
         private void ClearEditor()
         {
-            //this.DiffEditor.Text = "";
-            this.toolWindow.SetText("");
+            this.toolWindow.ClearEditor();
+            this.DiffEditor.Content = null;
         }
 
         private void ShowFile(string fileName)
         {
             try
             {
-                //this.DiffEditor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.GetDefinitionByExtension(
-                //    Path.GetExtension(fileName));
-                //this.DiffEditor.ShowLineNumbers = true;
-                //this.DiffEditor.Load(fileName);
-
-                this.toolWindow.SetText(File.ReadAllText(fileName));
+                var tuple = this.toolWindow.SetDisplayedFile(fileName);
+                if (tuple != null)
+                {
+                    this.DiffEditor.Content = tuple.Item1;
+                    this.textView = tuple.Item2;
+                }
             }
             finally
             {
@@ -605,7 +605,7 @@ namespace F1SYS.VsGitToolsPackage
             GetSelectedFileFullName((fileName) =>
             {
                 OpenFile(fileName);
-                var dte = service.package.GetServiceEx<EnvDTE.DTE>() as EnvDTE.DTE;
+                var dte = toolWindow.dte;
                 var selection = dte.ActiveDocument.Selection as EnvDTE.TextSelection;
                 selection.MoveToLineAndOffset(start, column);
             });
@@ -616,7 +616,7 @@ namespace F1SYS.VsGitToolsPackage
             if (string.IsNullOrWhiteSpace(fileName)) return;
 
             fileName = fileName.Replace("/", "\\");
-            var dte = service.package.GetServiceEx<EnvDTE.DTE>() as EnvDTE.DTE;
+            var dte = toolWindow.dte;
             bool opened = false;
             Array projects = (Array)dte.ActiveSolutionProjects;
             foreach (dynamic project in projects)

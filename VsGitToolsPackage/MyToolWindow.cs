@@ -426,6 +426,28 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
+        /// <summary>
+        /// Cleans up an existing editor if we are about to put a new one in place, used to close down the old editor bits as well as
+        /// nulling out any cached objects that we have that came from the now dead editor.
+        /// </summary>
+        internal void ClearEditor()
+        {
+            if (this.codeWindow != null)
+            {
+                this.codeWindow.Close();
+                this.codeWindow = null;
+            }
+
+            if (this.textView != null)
+            {
+                this.textView.CloseView();
+                this.textView = null;
+            }
+
+            this.cachedEditorCommandTarget = null;
+            this.cachedEditorFindTarget = null;
+            this.invisibleEditor = null;
+        }
         #endregion
     }
 }
