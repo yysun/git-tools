@@ -85,10 +85,17 @@ namespace F1SYS.VsGitToolsPackage
             _Control.Refresh(vsGitToolsService, gitRepository);
         }
 
+        internal EnvDTE.DTE dte
+        {
+            get 
+            {
+                return this.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+            }
+        }
+
         internal bool hasFileSaved()
         {
-            var dte = this.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
-               return dte.ItemOperations.PromptToSave != EnvDTE.vsPromptResult.vsPromptResultCancelled;
+           return dte.ItemOperations.PromptToSave != EnvDTE.vsPromptResult.vsPromptResultCancelled;
         }
 
         // ----------------------------------------------------------------------------------

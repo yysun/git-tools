@@ -21,7 +21,7 @@ namespace F1SYS.VsGitToolsPackage
         private uint _vsSolutionEventsCookie, _vsIVsFileChangeEventsCookie, _vsIVsUpdateSolutionEventsCookie;
         private string lastMinotorFolder = "";
 
-        internal VsGitToolsPackagePackage package;
+        private VsGitToolsPackagePackage package;
 
         private void OpenRepository()
         {
