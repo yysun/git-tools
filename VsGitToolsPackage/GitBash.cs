@@ -130,6 +130,7 @@ namespace GitScc
 
     }
 
+    [Serializable]
     public class GitException : Exception
     {
         public GitException(string message)

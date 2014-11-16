@@ -38,8 +38,18 @@ namespace F1SYS.VsGitToolsPackage
         IServiceProvider _OleServiceProvider;
         ITextBufferFactoryService _BufferFactory;
         IWpfTextViewHost _TextViewHost;
+        
         private MyControl _Control;
-    
+        private VsGitToolsService _Service;
+
+        internal VsGitToolsService Service
+        {
+            get
+            {
+                if (_Service == null) _Service = GetService(typeof(VsGitToolsService)) as VsGitToolsService;
+                return _Service;
+            }
+        }
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
@@ -77,10 +87,11 @@ namespace F1SYS.VsGitToolsPackage
            _Control.OnSettings();
         }
 
-        internal void Refresh(VsGitToolsService vsGitToolsService)
+        internal void Refresh(bool checkFileSaved=false)
         {
             Debug.WriteLine("VS Git Tools - Refresh Git Changes Tool Windows ");
-            var gitRepository = vsGitToolsService.Repository;
+            
+            var gitRepository = Service.Repository;
 
             this.Caption = Resources.ToolWindowTitle;
             if (gitRepository != null && gitRepository.IsGit)
@@ -88,8 +99,8 @@ namespace F1SYS.VsGitToolsPackage
                 this.Caption = Resources.ToolWindowTitle + " - " + gitRepository.CurrentBranch;
             }
 
-            hasFileSaved(); //just a reminder, refresh anyway
-            _Control.Refresh(vsGitToolsService);
+            if (checkFileSaved) hasFileSaved(); //just a reminder, refresh anyway
+            _Control.Refresh(Service);
         }
 
         internal EnvDTE.DTE dte
@@ -214,6 +225,7 @@ namespace F1SYS.VsGitToolsPackage
             var cmdUi = Microsoft.VisualStudio.VSConstants.GUID_TextEditorFactory;
             windowFrame.SetGuidProperty((int)__VSFPROPID.VSFPROPID_InheritKeyBindings, ref cmdUi);
             base.OnToolWindowCreated();
+            Refresh();
         }
 
         internal void SetText(string message)

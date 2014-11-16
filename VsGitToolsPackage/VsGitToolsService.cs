@@ -266,12 +266,11 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        internal void RefreshToolWindows()
+        private void RefreshToolWindows()
         {
-            CloseRepository();
-            OpenRepository();
+            Repository.Refresh();
             var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
-            if (toolWindow != null) toolWindow.Refresh(this);
+            if (toolWindow != null) toolWindow.Refresh();
         }
 
         #endregion

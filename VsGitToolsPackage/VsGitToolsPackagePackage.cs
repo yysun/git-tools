@@ -168,6 +168,7 @@ namespace F1SYS.VsGitToolsPackage
             //_OnIdleEvent.UnRegisterForIdleTimeCallbacks();
 
             base.Dispose(disposing);
+            service.Dispose();
         }
         #endregion
 
@@ -175,7 +176,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void OnRefreshCommand(object sender, EventArgs e)
         {
-            service.RefreshToolWindows();
+            GetToolWindowPane<MyToolWindow>().Refresh(true);
         }
 
         private void OnInitCommand(object sender, EventArgs e)
