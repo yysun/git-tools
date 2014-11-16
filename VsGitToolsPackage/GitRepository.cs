@@ -4,10 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using GitScc;
 using System.Windows.Threading;
 
-namespace F1SYS.VsGitToolsPackage
+namespace GitScc
 {
 	public class GitRepository
 	{
@@ -20,6 +19,10 @@ namespace F1SYS.VsGitToolsPackage
         public GitRepository(string directory)
 		{
             this.workingDirectory = directory;
+            Refresh();
+		}
+        public void Refresh()
+        {
             this.changedFiles = null;
             try
             {
@@ -27,11 +30,11 @@ namespace F1SYS.VsGitToolsPackage
                 var output = GitRun("rev-parse --is-inside-work-tree").Trim();
                 isGit = string.Compare("true", output, true) == 0;
             }
-            catch 
+            catch
             {
                 isGit = false;
             }
-		}
+        }
 
 		#region Git commands
 
@@ -66,14 +69,13 @@ namespace F1SYS.VsGitToolsPackage
 
         internal string GetBranchId(string name)
         {
-            try
+            string id = null;
+            var result = GitBash.Run("rev-parse " + name, this.WorkingDirectory);
+            if (!result.HasError && !result.Output.Contains("fatal:"))
             {
-                return GitRun("show-ref refs/heads/" + name);
+                id = result.Output.Trim();
             }
-            catch
-            {
-                return null;
-            }
+            return id;
         }
 
 		internal string DeleteBranch(string name)
@@ -103,17 +105,10 @@ namespace F1SYS.VsGitToolsPackage
 
 		#endregion    
 	
-        internal void InitRepo()
+        public static void Init(string folderName)
         {
-            if (!isGit)
-            {
-                GitBash.Run("init", WorkingDirectory);
-                var ignoreFileName = Path.Combine(WorkingDirectory, ".gitignore");
-                if (!File.Exists(ignoreFileName))
-                {
-                    File.WriteAllText(ignoreFileName, Resources.IgnoreFileContent);
-                }
-            }
+            GitBash.Run("init", folderName);
+            GitBash.Run("config core.ignorecase true", folderName);
         }
 
         private bool IsBinaryFile(string fileName)
@@ -137,7 +132,7 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        internal string DiffFile(string fileName)
+        public string DiffFile(string fileName)
         {
             var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
             try
@@ -184,10 +179,6 @@ namespace F1SYS.VsGitToolsPackage
                     }
                 }
                 return changedFiles;
-            }
-            set
-            {
-                changedFiles = value;
             }
         }
 
@@ -294,17 +285,15 @@ namespace F1SYS.VsGitToolsPackage
             get
             {
                 var branch = "master";
-                try
+                var result = GitBash.Run("rev-parse --abbrev-ref HEAD", this.WorkingDirectory);
+                if (!result.HasError && !result.Output.Contains("fatal:"))
                 {
-                    branch = GitRun("rev-parse --abbrev-ref HEAD").Trim();
+                    branch = result.Output.Trim();
                     if (IsInTheMiddleOfBisect) branch += " | BISECTING";
                     if (IsInTheMiddleOfMerge) branch += " | MERGING";
                     if (IsInTheMiddleOfPatch) branch += " | AM";
                     if (IsInTheMiddleOfRebase) branch += " | REBASE";
                     if (IsInTheMiddleOfRebaseI) branch += " | REBASE-i";
-                }
-                catch (GitException ex)
-                {
                 }
                 return branch;
             }
@@ -375,7 +364,7 @@ namespace F1SYS.VsGitToolsPackage
             {
                 try
                 {
-                    return GitRun("log -1 --format=%s\r\n\r\n%b");
+                    return GitRun("log -1 --format=%s\r\n\r\n%b").Trim();
                 }
                 catch
                 {
@@ -384,17 +373,18 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        internal GitFileStatus GetFileStatus(string fileName)
+        public GitFileStatus GetFileStatus(string fileName)
         {
-            if (changedFiles == null) return GitFileStatus.NotControlled;
-
-            var file = changedFiles.Where(f => string.Compare(f.FileName, fileName, true) == 0).FirstOrDefault();
-            return file == null ? GitFileStatus.NotControlled : file.Status;
+            var file = ChangedFiles.Where(f => string.Compare(f.FileName, fileName, true) == 0).FirstOrDefault();
+            if (file != null) return file.Status;
+            if (FileExistsInRepo(fileName)) return GitFileStatus.Tracked;
+            // did not check if the file is ignored for performance reason
+            return GitFileStatus.NotControlled;
         }
 
-        internal void StageFile(string fileName)
+        public void StageFile(string fileName)
         {
-            if (File.Exists(fileName))
+            if (FileExistsInRepo(fileName))
             {
                 GitRun(string.Format("add \"{0}\"", fileName));
             }
@@ -404,7 +394,7 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        internal void UnStageFile(string fileName)
+        public void UnStageFile(string fileName)
         {
             var head = GetBranchId("HEAD");
 
@@ -418,7 +408,7 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        internal void AddIgnoreItem(string fileName)
+        public void AddIgnoreItem(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName)) return;
             var ignoreFile = Path.Combine(WorkingDirectory, ".gitignore");
@@ -439,7 +429,7 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        internal void CheckOutFile(string fileName)
+        public void CheckOutFile(string fileName)
         {
             GitRun(string.Format("checkout -- \"{0}\"", fileName));
         }
@@ -459,7 +449,6 @@ namespace F1SYS.VsGitToolsPackage
                 if (amend) opt += "--amend ";
                 if (signoff) opt += "--signoff ";
                 return GitRun(string.Format("commit -F \"{0}\" {1}", msgFile, opt));
-
             }
             finally
             {
