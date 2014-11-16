@@ -2,10 +2,11 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
     <Identity Id="54edbb65-f9f1-410f-b936-0ac28cfe4b1c" Version="1.0" Language="en-US" Publisher="Yiyi Sun" />
-    <DisplayName>Git Tools</DisplayName>
-    <Description xml:space="preserve">A visual Studio extension that integrates various Git tools.</Description>
+    <DisplayName>Git Changes Window</DisplayName>
+    <Description xml:space="preserve">This extension provides a git changes tool window, a graphical git history viewer and menus to launch Git Bash, Git Extenstions and TortoiseGit.</Description>
+    <MoreInfo>https://github.com/yysun/git-tools</MoreInfo>
     <License>License.txt</License>
-    <GettingStartedGuide>Readme.html</GettingStartedGuide>
+    <GettingStartedGuide>http://yysun.github.io/git-tools</GettingStartedGuide>
     <Icon>git_32.png</Icon>
     <Tags>git</Tags>
   </Metadata>
