@@ -4,6 +4,10 @@
     <Identity Id="54edbb65-f9f1-410f-b936-0ac28cfe4b1c" Version="1.0" Language="en-US" Publisher="Yiyi Sun" />
     <DisplayName>Git Tools</DisplayName>
     <Description xml:space="preserve">A visual Studio extension that integrates various Git tools.</Description>
+    <License>License.txt</License>
+    <GettingStartedGuide>Readme.html</GettingStartedGuide>
+    <Icon>git_32.png</Icon>
+    <Tags>git</Tags>
   </Metadata>
   <Installation InstalledByMsi="false">
     <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[12.0,13.0)" />
