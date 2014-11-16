@@ -192,7 +192,7 @@
 			   Margin="2,0,0,0" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" />
 
         <CheckBox Content="Amend last commit" HorizontalAlignment="Right" Margin="0,0,80,0" Name="chkAmend" VerticalAlignment="Center" 
-                  Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"  />
+                  Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" Checked="chkAmend_Checked"  />
 
         <CheckBox Content="Sign off" HorizontalAlignment="Right" Margin="0,0,6,0" Name="chkSignOff" VerticalAlignment="Center"
                   Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"/>

@@ -16,7 +16,7 @@ using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using Microsoft.VisualStudio;
-
+using GitScc;
 
 namespace F1SYS.VsGitToolsPackage
 {
@@ -30,7 +30,7 @@ namespace F1SYS.VsGitToolsPackage
     /// implementation of the IVsUIElementPane interface.
     /// </summary>
     [Guid("11dffb59-3169-48ac-9676-2916d06a36de")]
-    public class MyToolWindow : ToolWindowPane, IOleCommandTarget
+    public class MyToolWindow : ToolWindowPane //, IOleCommandTarget
     {
         IVsTextView _ViewAdapter;
         IVsTextBuffer _BufferAdapter;
@@ -69,7 +69,7 @@ namespace F1SYS.VsGitToolsPackage
         internal void OnCommitCommand()
         {
             if (!hasFileSaved()) return;
-            //_Control.Commit();
+            _Control.OnCommit();
         }
 
         internal void OnSettings()
@@ -212,66 +212,6 @@ namespace F1SYS.VsGitToolsPackage
             var cmdUi = Microsoft.VisualStudio.VSConstants.GUID_TextEditorFactory;
             windowFrame.SetGuidProperty((int)__VSFPROPID.VSFPROPID_InheritKeyBindings, ref cmdUi);
             base.OnToolWindowCreated();
-        }
-
-        // ----------------------------------------------------------------------------------
-        /// <summary>
-        /// Allow the embedded editor to handle keyboard messages before they are dispatched
-        /// to the window that has the focus.
-        /// </summary>
-        // ----------------------------------------------------------------------------------
-        protected override bool PreProcessMessage(ref Message m)
-        {
-            if (TextViewHost != null)
-            {
-                // copy the Message into a MSG[] array, so we can pass
-                // it along to the active core editor's IVsWindowPane.TranslateAccelerator
-                var pMsg = new MSG[1];
-                pMsg[0].hwnd = m.HWnd;
-                pMsg[0].message = (uint)m.Msg;
-                pMsg[0].wParam = m.WParam;
-                pMsg[0].lParam = m.LParam;
-
-                var vsWindowPane = (IVsWindowPane)_ViewAdapter;
-                return vsWindowPane.TranslateAccelerator(pMsg) == 0;
-            }
-            return base.PreProcessMessage(ref m);
-        }
-
-        // ----------------------------------------------------------------------------------
-        /// <summary>
-        /// Forwards command execution messages recevived by the window pane to the embedded
-        /// editor.
-        /// </summary>
-        // ----------------------------------------------------------------------------------
-        int IOleCommandTarget.Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt,
-                                   IntPtr pvaIn, IntPtr pvaOut)
-        {
-            var hr = (int)Microsoft.VisualStudio.OLE.Interop.Constants.OLECMDERR_E_NOTSUPPORTED;
-            if (_ViewAdapter != null)
-            {
-                var cmdTarget = (IOleCommandTarget)_ViewAdapter;
-                hr = cmdTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
-            }
-            return hr;
-        }
-
-        // ----------------------------------------------------------------------------------
-        /// <summary>
-        /// Forwards command status query messages recevived by the window pane to the 
-        /// embedded editor.
-        /// </summary>
-        // ----------------------------------------------------------------------------------
-        int IOleCommandTarget.QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds,
-                                          IntPtr pCmdText)
-        {
-            var hr = (int)Microsoft.VisualStudio.OLE.Interop.Constants.OLECMDERR_E_NOTSUPPORTED;
-            if (_ViewAdapter != null)
-            {
-                var cmdTarget = (IOleCommandTarget)_ViewAdapter;
-                hr = cmdTarget.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
-            }
-            return hr;
         }
 
         internal void SetText(string message)

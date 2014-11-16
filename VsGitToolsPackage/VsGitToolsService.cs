@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio;
+﻿using GitScc;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
@@ -243,7 +244,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private DateTime nextTimeRefresh = DateTime.Now;
 
-        internal void Refresh()
+        private void Refresh()
         {
             if (NeedRefresh && !NoRefresh)
             {
@@ -257,16 +258,9 @@ namespace F1SYS.VsGitToolsPackage
 
                     NoRefresh = true;
                     NeedRefresh = false;
-
-                    CloseRepository();
-                    OpenRepository();
-
                     RefreshToolWindows();
 
-                    //NeedRefresh = false;
-
-                    //NoRefresh = false;
-                    //nextTimeRefresh = DateTime.Now; //important !!
+                    NoRefresh = false;
 
                     //stopwatch.Stop();
                     //Debug.WriteLine("++++ UpdateNodesGlyphs: " + stopwatch.ElapsedMilliseconds);
@@ -274,16 +268,11 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        private MyToolWindow toolWindow
+        internal void RefreshToolWindows()
         {
-            get
-            {
-                return this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
-            }
-        }
-        private void RefreshToolWindows()
-        {
-
+            CloseRepository();
+            OpenRepository();
+            var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
             if (toolWindow != null) toolWindow.Refresh(this, package.repository);
         }
 

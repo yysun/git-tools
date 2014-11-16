@@ -16,7 +16,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-//using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace F1SYS.VsGitToolsPackage
@@ -33,14 +32,10 @@ namespace F1SYS.VsGitToolsPackage
         private IVsTextView textView;
         private string[] diffLines;
 
-        //private GridViewColumnHeader _currentSortedColumn;
-        //private ListSortDirection _lastSortDirection;
-
         public MyControl(MyToolWindow toolWindow)
         {
             InitializeComponent();
             this.toolWindow = toolWindow;
-            //this.service = BasicSccProvider.GetServiceEx<SccProviderService>();
         }
 
         #region Events
@@ -303,19 +298,7 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        private bool HasComments()
-        {
-            if (string.IsNullOrWhiteSpace(Comments))
-            {
-                MessageBox.Show("Please enter comments for the commit.", "Commit",
-                    MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return false;
-            }
-            else
-                return true;
-        }
-
-        private bool StageSelectedFiles(bool showWarning)
+        private void StageSelectedFiles()
         {
             var unstaged = this.dataGrid1.Items.Cast<GitFile>()
                                .Where(item => item.IsSelected && !item.IsStaged)
@@ -327,21 +310,12 @@ namespace F1SYS.VsGitToolsPackage
                 tracker.StageFile(item.FileName);
                 ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
             }
-
-            bool hasStaged = tracker == null ? false :
-                             tracker.ChangedFiles.Any(f => f.IsStaged);
-
-            if (!hasStaged && showWarning)
-            {
-                MessageBox.Show("No file has been staged for commit.", "Commit",
-                    MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
-            return hasStaged;
         }
 
         private void ShowStatusMessage(string msg)
         {
-
+            Action action = () => { toolWindow.dte.StatusBar.Text = msg; };
+            Dispatcher.Invoke(action);
         }
         #endregion
 
@@ -484,11 +458,6 @@ namespace F1SYS.VsGitToolsPackage
             }, true);
         }
 
-        //private void menuRefresh_Click(object sender, RoutedEventArgs e)
-        //{
-        //    HistoryViewCommands.RefreshGraph.Execute(null, this);
-        //}
-
         #endregion
 
         //private void chkNewBranch_Checked(object sender, RoutedEventArgs e)
@@ -503,49 +472,9 @@ namespace F1SYS.VsGitToolsPackage
 
         private void chkAmend_Checked(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(Comments))
+            if (string.IsNullOrWhiteSpace(Comments) && tracker != null)
             {
                 Comments = tracker.LastCommitMessage;
-            }
-        }
-
-        private void btnPendingChanges_Click(object sender, RoutedEventArgs e)
-        {
-            if (tracker == null) return;
-
-            try
-            {
-                service.NoRefresh = true;
-
-                //if (chkNewBranch.IsChecked == true)
-                //{
-                //    if (string.IsNullOrWhiteSpace(txtNewBranch.Text))
-                //    {
-                //        MessageBox.Show("Please enter new branch name.", "Commit",
-                //            MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                //        txtNewBranch.Focus();
-                //        return;
-                //    }
-                //    tracker.CheckOutBranch(txtNewBranch.Text, true);
-                //}
-
-                var isAmend = chkAmend.IsChecked == true;
-                if (HasComments() && StageSelectedFiles(!isAmend))
-                {
-                    ShowStatusMessage("Committing ...");
-                    var id = tracker.Commit(Comments, isAmend, chkSignOff.IsChecked == true);
-                    ShowStatusMessage("Commit successfully. Commit Hash: " + id);
-                    ClearUI();
-
-                    //HistoryViewCommands.CloseCommitDetails.Execute(this, null);
-                    //HistoryViewCommands.RefreshGraph.Execute(this, null);
-                }
-                service.NoRefresh = false;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                ShowStatusMessage(ex.Message);
             }
         }
 
@@ -553,10 +482,9 @@ namespace F1SYS.VsGitToolsPackage
         {
             if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control)
             {
-                btnPendingChanges_Click(this, null);
+                OnCommit();
             }
         }
-
 
         private void DiffEditor_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -632,16 +560,68 @@ namespace F1SYS.VsGitToolsPackage
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            //GridViewColumnCollection columns = ((GridView)listView1.View).Columns;
-            //_currentSortedColumn = (GridViewColumnHeader)columns[columns.Count - 1].Header;
-            //_lastSortDirection = ListSortDirection.Ascending;
-            //UpdateColumnHeaderTemplate(_currentSortedColumn, _lastSortDirection);
-
             this.DiffEditor.Content = "";
         }
         internal void OnSettings()
         {
             Settings.Show();
+        }
+
+        internal void OnCommit()
+        {
+            if (tracker == null) return;
+
+            try
+            {
+                service.NoRefresh = true;
+
+                //if (chkNewBranch.IsChecked == true)
+                //{
+                //    if (string.IsNullOrWhiteSpace(txtNewBranch.Text))
+                //    {
+                //        MessageBox.Show("Please enter new branch name.", "Commit",
+                //            MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                //        txtNewBranch.Focus();
+                //        return;
+                //    }
+                //    tracker.CheckOutBranch(txtNewBranch.Text, true);
+                //}
+
+                var isAmend = chkAmend.IsChecked == true;
+
+                if (string.IsNullOrWhiteSpace(Comments))
+                {
+                    MessageBox.Show("Please enter comments for the commit.", "Commit",
+                        MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    return;
+                }
+
+                ShowStatusMessage("Staging files ...");
+                StageSelectedFiles();
+
+                if (!isAmend)
+                {
+                    tracker.Refresh();
+                    bool hasStaged = tracker == null ? false :
+                                     tracker.ChangedFiles.Any(f => f.IsStaged);
+                    if (!hasStaged)
+                    {
+                        MessageBox.Show("No file has been selected/staged for commit.", "Commit",
+                            MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        return;
+                    }
+                }
+
+                var id = tracker.Commit(Comments, isAmend, chkSignOff.IsChecked == true);
+                ShowStatusMessage("Commit successfully. Commit Hash: " + id);
+                ClearUI();
+                service.NoRefresh = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                ShowStatusMessage(ex.Message);
+            }
         }
     }
 

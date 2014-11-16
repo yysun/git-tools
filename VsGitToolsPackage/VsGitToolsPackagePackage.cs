@@ -171,12 +171,18 @@ namespace F1SYS.VsGitToolsPackage
 
         private void OnRefreshCommand(object sender, EventArgs e)
         {
-            GetToolWindowPane<MyToolWindow>().Refresh(service, repository);
+            service.RefreshToolWindows();
         }
 
         private void OnInitCommand(object sender, EventArgs e)
         {
-            if (repository != null) repository.InitRepo();
+            GitRepository.Init(repository.WorkingDirectory);
+            var ignoreFileName = Path.Combine(repository.WorkingDirectory, ".gitignore");
+            if (!File.Exists(ignoreFileName))
+            {
+                File.WriteAllText(ignoreFileName, Resources.IgnoreFileContent);
+            }
+            repository.Refresh();
         }
 
         private void OnGitBashCommand(object sender, EventArgs e)
