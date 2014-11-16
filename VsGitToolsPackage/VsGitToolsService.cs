@@ -23,17 +23,17 @@ namespace F1SYS.VsGitToolsPackage
         private string lastMinotorFolder = "";
 
         private VsGitToolsPackagePackage package;
+        public GitRepository Repository {  get; private set; }
 
         private void OpenRepository()
         {
-            GitRepository repository = null;
             string solutionDirectory, solutionFile, solutionUserOptions;
             try
             {
                 IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
                 if (sol.GetSolutionInfo(out solutionDirectory, out solutionFile, out solutionUserOptions) == VSConstants.S_OK)
                 {
-                    repository = new GitRepository(solutionDirectory);
+                    Repository = new GitRepository(solutionDirectory);
                     var monitorFolder = solutionDirectory;
 
                     IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
@@ -48,10 +48,9 @@ namespace F1SYS.VsGitToolsPackage
             }
             catch (Exception ex)
             {
-                repository = null;
+                Repository = null;
                 Debug.WriteLine("VS Git Tools - OpenRepository raised excpetion: ", ex.ToString());
             }
-            package.repository = repository;
         }
 
         private void CloseRepository()
@@ -64,7 +63,6 @@ namespace F1SYS.VsGitToolsPackage
                 _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
                 lastMinotorFolder = "";
             }
-            package.repository = null;
         }
 
         public VsGitToolsService(VsGitToolsPackagePackage package)
@@ -273,7 +271,7 @@ namespace F1SYS.VsGitToolsPackage
             CloseRepository();
             OpenRepository();
             var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
-            if (toolWindow != null) toolWindow.Refresh(this, package.repository);
+            if (toolWindow != null) toolWindow.Refresh(this);
         }
 
         #endregion

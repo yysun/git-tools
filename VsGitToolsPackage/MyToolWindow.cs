@@ -77,9 +77,11 @@ namespace F1SYS.VsGitToolsPackage
            _Control.OnSettings();
         }
 
-        internal void Refresh(VsGitToolsService vsGitToolsService, GitRepository gitRepository)
+        internal void Refresh(VsGitToolsService vsGitToolsService)
         {
             Debug.WriteLine("VS Git Tools - Refresh Git Changes Tool Windows ");
+            var gitRepository = vsGitToolsService.Repository;
+
             this.Caption = Resources.ToolWindowTitle;
             if (gitRepository != null && gitRepository.IsGit)
             {
@@ -87,7 +89,7 @@ namespace F1SYS.VsGitToolsPackage
             }
 
             hasFileSaved(); //just a reminder, refresh anyway
-            _Control.Refresh(vsGitToolsService, gitRepository);
+            _Control.Refresh(vsGitToolsService);
         }
 
         internal EnvDTE.DTE dte

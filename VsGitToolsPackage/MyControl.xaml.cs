@@ -190,13 +190,11 @@ namespace F1SYS.VsGitToolsPackage
 
         #region Git functions
 
-        internal void Refresh(VsGitToolsService service, GitRepository tracker)
+        internal void Refresh(VsGitToolsService service)
         {
-
             this.label3.Content = "Changed files";
-
-            this.tracker = tracker;
             this.service = service;
+            this.tracker = service.Repository;
 
             this.chkAmend.IsChecked = false;
             this.chkSignOff.IsChecked = false;
@@ -208,7 +206,6 @@ namespace F1SYS.VsGitToolsPackage
                 return;
             }
 
-            //lblMessage.Content = "Commit to: " + tracker.CurrentBranch;
             service.NoRefresh = true;
             ShowStatusMessage("Getting changed files ...");
 
@@ -221,7 +218,6 @@ namespace F1SYS.VsGitToolsPackage
                 .Select(i => i.FileName).ToList();
 
             this.dataGrid1.BeginInit();
-
             try
             {
 

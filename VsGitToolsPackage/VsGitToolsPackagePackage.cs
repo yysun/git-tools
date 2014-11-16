@@ -442,7 +442,7 @@ namespace F1SYS.VsGitToolsPackage
             return GetService(typeof(T));
         }
 
-        internal GitRepository repository;
+        private GitRepository repository { get {return service.Repository;} }
 
         internal bool IsSolutionGitControlled
         {
