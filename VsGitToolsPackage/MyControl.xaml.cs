@@ -374,7 +374,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void menuUndo_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFileFullName(fileName =>
+            GetSelectedFileName(fileName =>
             {
                 GitFileStatus status = tracker.GetFileStatus(fileName);
                 if (status == GitFileStatus.Modified || status == GitFileStatus.Staged ||
