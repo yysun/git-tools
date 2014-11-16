@@ -124,6 +124,10 @@ namespace F1SYS.VsGitToolsPackage
                 menu = new MenuCommand(new EventHandler(OnCommitCommand), cmd);
                 mcs.AddCommand(menu);
 
+                cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandHistory);
+                menu = new MenuCommand(new EventHandler(ShowHistoryWindow), cmd);
+                mcs.AddCommand(menu);
+
                 cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesSettings);
                 menu = new MenuCommand(new EventHandler(OnSettings), cmd);
                 mcs.AddCommand(menu);
@@ -266,36 +270,36 @@ namespace F1SYS.VsGitToolsPackage
             return (T)this.FindToolWindow(typeof(T), 0, true);
         }
 
-        //private void ShowHistoryWindow(object sender, EventArgs e)
-        //{
-        //    var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        //    path = Path.Combine(path, "Dragon.pkg");
-        //    var tmpPath = Path.Combine(Path.GetTempPath(), "Dragon.exe");
+        private void ShowHistoryWindow(object sender, EventArgs e)
+        {
+            var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            path = Path.Combine(path, "\\Resources\\Dragon.exe");
+            var tmpPath = Path.Combine(Path.GetTempPath(), "Dragon.exe");
 
-        //    var needCopy = !File.Exists(tmpPath);
-        //    if (!needCopy)
-        //    {
-        //        var date1 = File.GetLastWriteTimeUtc(path);
-        //        var date2 = File.GetLastWriteTimeUtc(tmpPath);
-        //        needCopy = (date1 > date2);
-        //    }
+            var needCopy = !File.Exists(tmpPath);
+            if (!needCopy)
+            {
+                var date1 = File.GetLastWriteTimeUtc(path);
+                var date2 = File.GetLastWriteTimeUtc(tmpPath);
+                needCopy = (date1 > date2);
+            }
 
-        //    if (needCopy)
-        //    {
-        //        try
-        //        {
-        //            File.Copy(path, tmpPath, true);
-        //        }
-        //        catch // try copy file silently
-        //        {
-        //        }
-        //    }
+            if (needCopy)
+            {
+                try
+                {
+                    File.Copy(path, tmpPath, true);
+                }
+                catch // try copy file silently
+                {
+                }
+            }
 
-        //    if (File.Exists(tmpPath))
-        //    {
-        //        Process.Start(tmpPath, "\"" + sccService.CurrentTracker.GitWorkingDirectory + "\"");
-        //    }
-        //}
+            if (File.Exists(tmpPath) && repository != null)
+            {
+                Process.Start(tmpPath, "\"" + repository.WorkingDirectory);
+            }
+        }
 
         #endregion
 

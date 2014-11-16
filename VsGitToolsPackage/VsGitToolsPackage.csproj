@@ -215,6 +215,10 @@
     <Resource Include="Resources\Compare.png" />
     <Resource Include="Resources\History.png" />
     <Resource Include="Resources\Loading.png" />
+    <Content Include="Resources\Dragon.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\git_32.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
