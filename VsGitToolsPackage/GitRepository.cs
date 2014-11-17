@@ -455,6 +455,20 @@ namespace GitScc
                 File.Delete(msgFile);
             }
         }
+
+        public bool CurrentCommitHasRefs()
+        {
+            var head = GetBranchId("HEAD");
+            if (head == null) return false;
+            var result = GitBash.Run("show-ref --head --dereference", WorkingDirectory);
+            if (!result.HasError && !result.Output.Contains("fatal:"))
+            {
+                var refs = result.Output.Split('\n')
+                          .Where(t => t.IndexOf(head) >= 0);
+                return refs.Count() > 2;
+            }
+            return false;
+        }
     }
 
 }

@@ -703,8 +703,8 @@ namespace F1SYS.VsGitToolsPackage
 
 Are you sure you want to continue?";
 
-                    if (MessageBox.Show(amendMsg, "Amend Last Commit",
-                    MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    if (tracker.CurrentCommitHasRefs() && MessageBox.Show(amendMsg, "Amend Last Commit",
+                        MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
                     {
                         return;
                     }
