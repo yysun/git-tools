@@ -16,10 +16,10 @@ namespace GitScc
             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
             "gitscc.config");
 
-        public string GitBashPath       { get; set; }
-        public string GitExtensionPath  { get; set; }
-        public string DifftoolPath      { get; set; }
-        public string TortoiseGitPath   { get; set; }
+        public string GitBashPath { get; set; }
+        public string GitExtensionPath { get; set; }
+        public string DifftoolPath { get; set; }
+        public string TortoiseGitPath { get; set; }
         public bool NotExpandTortoiseGit { get; set; }
         public bool NotExpandGitExtensions { get; set; }
         public bool UseTGitIconSet { get; set; }
@@ -44,14 +44,14 @@ namespace GitScc
 
         private GitSccOptions()
         {
-            
+
         }
 
         internal static GitSccOptions LoadFromConfig()
         {
             GitSccOptions options = null;
 
-            
+
             if (File.Exists(configFileName))
             {
                 try
@@ -67,7 +67,7 @@ namespace GitScc
                 }
             }
 
-            if(options == null) options = new GitSccOptions();
+            if (options == null) options = new GitSccOptions();
 
             options.Init();
 

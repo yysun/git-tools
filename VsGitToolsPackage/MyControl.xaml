@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:vsfx="clr-namespace:Microsoft.VisualStudio.Shell;assembly=Microsoft.VisualStudio.Shell.12.0"
+             xmlns:vsui="clr-namespace:GitScc.PlatformUI"
              mc:Ignorable="d"
              Foreground="{DynamicResource {x:Static vsfx:VsBrushes.CommandBarTextActiveKey}}"
 			 Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
@@ -52,9 +53,9 @@
             <Border SnapsToDevicePixels="True" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" Margin="{TemplateBinding Margin}">
                 <GridViewRowPresenter Grid.RowSpan="2" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
             </Border>
-            <!--<ControlTemplate.Triggers>
+            <ControlTemplate.Triggers>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Value="{DynamicResource {x:Static vsfx:TreeViewColors.SelectedItemActiveBrushKey}}" Property="Background" />
+                    <Setter Value="{DynamicResource {x:Static vsui:TreeViewColors.SelectedItemActiveBrushKey}}" Property="Background" />
                     <Setter Value="{DynamicResource {x:Static vsui:TreeViewColors.SelectedItemActiveTextBrushKey}}" Property="Foreground" />
                 </Trigger>
                 <MultiTrigger>
@@ -65,7 +66,7 @@
                     <Setter Value="{DynamicResource {x:Static vsui:TreeViewColors.SelectedItemInactiveBrushKey}}" Property="Background" />
                     <Setter Value="{DynamicResource {x:Static vsui:TreeViewColors.SelectedItemInactiveTextBrushKey}}" Property="Foreground" />
                 </MultiTrigger>
-            </ControlTemplate.Triggers>-->
+            </ControlTemplate.Triggers>
         </ControlTemplate>
 
         <Style x:Key="ListViewItemStyle2012" TargetType="{x:Type ListViewItem}">
@@ -83,7 +84,7 @@
 
         <Style x:Key="GridViewColumnHeaderGripper2012" TargetType="{x:Type Thumb}">
             <Setter Property="Width" Value="8" />
-            <!--<Setter Property="Background" Value="{DynamicResource {x:Static vsui:HeaderColors.SeparatorLineBrushKey}}" />-->
+            <Setter Property="Background" Value="{DynamicResource {x:Static vsui:HeaderColors.SeparatorLineBrushKey}}" />
             <Setter Property="Template" Value="{StaticResource GridViewColumnHeaderGripperTemplate2012}" />
         </Style>
 
@@ -94,7 +95,7 @@
                 </Border>
                 <Thumb Name="PART_HeaderGripper" HorizontalAlignment="Right" Margin="0,0,-4,0" Style="{StaticResource GridViewColumnHeaderGripper2012}" />
             </Grid>
-            <!--<ControlTemplate.Triggers>
+            <ControlTemplate.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Value="{DynamicResource {x:Static vsui:HeaderColors.MouseOverBrushKey}}" Property="Background" />
                     <Setter Value="{DynamicResource {x:Static vsui:HeaderColors.MouseOverTextBrushKey}}" Property="Foreground" />
@@ -103,11 +104,11 @@
                     <Setter Value="{DynamicResource {x:Static vsui:HeaderColors.MouseDownBrushKey}}" Property="Background" />
                     <Setter Value="{DynamicResource {x:Static vsui:HeaderColors.MouseDownTextBrushKey}}" Property="Foreground" />
                 </Trigger>
-            </ControlTemplate.Triggers>-->
+            </ControlTemplate.Triggers>
         </ControlTemplate>
 
         <Style x:Key="{x:Type Path}" TargetType="{x:Type Path}">
-            <!--<Setter Property="Fill" Value="{DynamicResource {x:Static vsui:HeaderColors.GlyphBrushKey}}" />
+            <Setter Property="Fill" Value="{DynamicResource {x:Static vsui:HeaderColors.GlyphBrushKey}}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Path=IsMouseOver,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type GridViewColumnHeader}}}" Value="True">
                     <Setter Property="Fill" Value="{DynamicResource {x:Static vsui:HeaderColors.MouseOverGlyphBrushKey}}" />
@@ -115,7 +116,7 @@
                 <DataTrigger Binding="{Binding Path=IsPressed,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type GridViewColumnHeader}}}" Value="True">
                     <Setter Property="Fill" Value="{DynamicResource {x:Static vsui:HeaderColors.MouseDownGlyphBrushKey}}" />
                 </DataTrigger>
-            </Style.Triggers>-->
+            </Style.Triggers>
         </Style>
 
         <Style x:Key="{x:Type ListView}" TargetType="{x:Type ListView}">
@@ -124,24 +125,14 @@
                     <Setter Property="HorizontalContentAlignment" Value="Left" />
                     <Setter Property="VerticalContentAlignment" Value="Center" />
                     <Setter Property="Padding" Value="6,4,4,4" />
-                    <!--<Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static local:GitSccOptions.IsVisualStudio2012}, Mode=OneTime}" Value="True">
                             <Setter Property="Foreground" Value="{DynamicResource {x:Static vsui:HeaderColors.DefaultTextBrushKey}}" />
                             <Setter Property="Background" Value="{DynamicResource {x:Static vsui:HeaderColors.DefaultBrushKey}}" />
                             <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsui:HeaderColors.SeparatorLineBrushKey}}" />
                             <Setter Property="Template" Value="{StaticResource GridViewColumnHeaderTemplate2012}" />
-                        </DataTrigger>
-                    </Style.Triggers>-->
                 </Style>
             </Style.Resources>
-            <!--<Style.Triggers>
-                <DataTrigger Binding="{Binding Source={x:Static local:GitSccOptions.IsVisualStudio2012}, Mode=OneTime}" Value="True">
                     <Setter Property="ItemContainerStyle" Value="{StaticResource ListViewItemStyle2012}" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static local:GitSccOptions.IsVisualStudio2010}, Mode=OneTime}" Value="True">
-                    <Setter Property="ItemContainerStyle" Value="{StaticResource ListViewItemStyle2010}" />
-                </DataTrigger>
-            </Style.Triggers>-->
+
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Background" Value="{DynamicResource {x:Static vsfx:VsBrushes.BackgroundKey}}" />
         </Style>
@@ -210,7 +201,7 @@
 						  VerticalAlignment="Top" HorizontalAlignment="Stretch" Name="gridSplitter2"
 						  Style="{StaticResource HorizontalGridSplitter}"/>
 
-            <Label Content="Changed Files" HorizontalAlignment="Stretch" Name="label3" VerticalAlignment="Center"
+            <Label Content="Changed Files:" HorizontalAlignment="Stretch" Name="label3" VerticalAlignment="Center"
 				   Margin="2,0,2,0" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
 				   Grid.Row="2" ToolTip="select file to commit, or right click to stage/unstage file" />
 
@@ -222,46 +213,57 @@
                     </Style>
                 </RichTextBox.Resources>
             </RichTextBox>
+           
+            <ListView Name="listView1" Grid.Row="3" Margin="6,0,6,10" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
+					  SelectedValuePath="FileName" KeyUp="listView1_KeyUp" PreviewKeyDown="listView1_PreviewKeyDown" ButtonBase.Click="listView1_Click" 
+                      Background="{DynamicResource {x:Static vsfx:VsBrushes.WindowKey}}">
+                <ListView.View>
+                    <GridView AllowsColumnReorder="False">
+                        <GridViewColumn Width="Auto">
+                            <GridViewColumn.Header>
+                                <GridViewColumnHeader Content="Staged" Tag="Staged" />
+                            </GridViewColumn.Header>
+                            <GridViewColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <CheckBox Name="checkBoxAllStaged" Click="checkBoxAllStaged_Click"
+										  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </GridViewColumn.HeaderTemplate>
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox Name="checkBoxSelected" Click="checkBoxSelected_Click" IsChecked="{Binding IsSelected}"
+											  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding Status}" Width="Auto">
+                            <GridViewColumn.Header>
+                                <GridViewColumnHeader Content="Status" Tag="Status" />
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+                        <GridViewColumn DisplayMemberBinding="{Binding FileName}" Width="800">
+                            <GridViewColumn.Header>
+                                <GridViewColumnHeader Content="File" Tag="FileName" />
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
 
-            <DataGrid AutoGenerateColumns="False" Grid.Row="3" HorizontalAlignment="Stretch" Margin="6,0,6,10" Name="dataGrid1" VerticalAlignment="Stretch"
-					  GridLinesVisibility="None" Sorting="dataGrid1_Sorting" IsReadOnly="True" SelectedValuePath="FileName"
-					  SelectionMode="Extended" SelectionChanged="dataGrid1_SelectionChanged" ContextMenuOpening="dataGrid1_ContextMenuOpening"
-					  CanUserResizeRows="False" CanUserDeleteRows="False" CanUserAddRows="False" CanUserReorderColumns="False" RowHeaderWidth="0" KeyDown="dataGrid1_KeyDown">
-
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn Header="Staged" CanUserResize="False">
-                        <DataGridTemplateColumn.HeaderTemplate>
-                            <DataTemplate>
-                                <CheckBox x:Name="checkBoxAllStaged" Click="checkBoxAllStaged_Click"  
-										  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.HeaderTemplate>
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <CheckBox x:Name="checkBoxSelected" Click="checkBoxSelected_Click"  IsChecked="{Binding IsSelected}"
-										  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" CanUserResize="True" Width="70" />
-                    <DataGridTextColumn Header="File" Binding="{Binding FileName}" Width="*" />
-                </DataGrid.Columns>
-
-                <DataGrid.ContextMenu>
+                <ListView.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Stage File" Name="menuStage" Click="menuStage_Click" />
                         <MenuItem Header="Un-Stage File" Name="menuUnstage" Click="menuUnstage_Click" />
                         <MenuItem Header="Compare..." Name="menuCompare" Click="menuCompare_Click" Visibility="Collapsed" />
                         <MenuItem Header="Undo File Changes" Name="menuUndo" Click="menuUndo_Click"/>
                         <MenuItem Header="Delete File" Name="menuDeleteFile" Click="menuDeleteFile_Click"/>
-                        <MenuItem Header="Ignore File" Name="menuIgnore" Click="menuIgnore_Click" >
+                        <MenuItem Header="Ignore file" Name="menuIgnore" Click="menuIgnore_Click" >
                             <MenuItem Header="Add File to .gitignore" Name="menuIgnoreFile" Click="menuIgnoreFile_Click"/>
                             <MenuItem Header="Add File Path to .gitignore" Name="menuIgnoreFilePath" Click="menuIgnoreFilePath_Click"/>
                             <MenuItem Header="Add File Extensions to .gitignore" Name="menuIgnoreFileExt" Click="menuIgnoreFileExt_Click"/>
                         </MenuItem>
                     </ContextMenu>
-                </DataGrid.ContextMenu>
-            </DataGrid>
+                </ListView.ContextMenu>
+            </ListView>
 
             <Label Content="(If refreshing is slow, try turn off auto-refresh in Tools | Options)" Foreground="#FF333333" Height="28" HorizontalAlignment="Left" Margin="231,0,0,0" Name="label4" VerticalAlignment="Center" Grid.Row="2" Visibility="Collapsed" />
         </Grid>

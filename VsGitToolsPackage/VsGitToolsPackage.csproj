@@ -166,6 +166,9 @@
     </Compile>
     <Compile Include="MyToolWindow.cs" />
     <Compile Include="Guids.cs" />
+    <Compile Include="PlatformUI\HeaderColors.cs" />
+    <Compile Include="PlatformUI\PlatformColorHelper.cs" />
+    <Compile Include="PlatformUI\TreeViewColors.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -38,32 +38,13 @@ namespace F1SYS.VsGitToolsPackage
             this.toolWindow = toolWindow;
         }
 
+
         #region Events
-        private string sortMemberPath = "FileName";
-        private ListSortDirection sortDirection = ListSortDirection.Ascending;
-
-        private void dataGrid1_Sorting(object sender, DataGridSortingEventArgs e)
-        {
-            sortMemberPath = e.Column.SortMemberPath;
-            sortDirection = e.Column.SortDirection != ListSortDirection.Ascending ?
-                ListSortDirection.Ascending : ListSortDirection.Descending;
-        }
-
-        private void dataGrid1_KeyDown(object sender, KeyEventArgs e)
-        {
-            var selectedItem = this.dataGrid1.SelectedItem as GitFile;
-            if (selectedItem == null || e.Key != Key.Space) return;
-            var selected = !selectedItem.IsSelected;
-            foreach (var item in this.dataGrid1.SelectedItems)
-            {
-                ((GitFile)item).IsSelected = selected;
-            }
-        }
 
         private void checkBoxSelected_Click(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;
-            foreach (var item in this.dataGrid1.SelectedItems)
+            foreach (var item in this.listView1.SelectedItems)
             {
                 ((GitFile)item).IsSelected = checkBox.IsChecked == true;
             }
@@ -72,51 +53,12 @@ namespace F1SYS.VsGitToolsPackage
         private void checkBoxAllStaged_Click(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;
-            foreach (var item in this.dataGrid1.Items.Cast<GitFile>())
+            foreach (var item in this.listView1.Items.Cast<GitFile>())
             {
                 ((GitFile)item).IsSelected = checkBox.IsChecked == true;
             }
         }
 
-        private void dataGrid1_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var fileName = GetSelectedFileName();
-            if (fileName == null)
-            {
-                this.ClearEditor();
-                diffLines = new string[0];
-                return;
-            }
-
-            service.NoRefresh = true;
-            try
-            {
-                //var ret = tracker.DiffFile(fileName);
-                //ret = ret.Replace("\r", "").Replace("\n", "\r\n");
-
-                //var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
-                //File.WriteAllText(tmpFileName, ret);
-
-                var tmpFileName = tracker.DiffFile(fileName);
-                if (!string.IsNullOrWhiteSpace(tmpFileName) && File.Exists(tmpFileName))
-                {
-                    if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
-                    {
-                        this.DiffEditor.Content = "File is too big to display: " + fileName;
-                    }
-                    else
-                    {
-                        diffLines = File.ReadAllLines(tmpFileName);
-                        this.ShowFile(tmpFileName);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowStatusMessage(ex.Message);
-            }
-            service.NoRefresh = false;
-        }
 
         private void ClearEditor()
         {
@@ -143,11 +85,205 @@ namespace F1SYS.VsGitToolsPackage
 
         #endregion
 
+        #region listView1
+        private GridViewColumnHeader _currentSortedColumn;
+        private ListSortDirection _lastSortDirection;
+
+        private void listView1_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+                e.Handled = true;
+        }
+
+        private void listView1_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Space)
+                return;
+
+            var selectedItem = this.listView1.SelectedItem as GitFile;
+            if (selectedItem == null) return;
+            var selected = !selectedItem.IsSelected;
+            foreach (var item in this.listView1.SelectedItems)
+            {
+                ((GitFile)item).IsSelected = selected;
+            }
+
+            e.Handled = true;
+        }
+
+        private void listView1_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var fileName = GetSelectedFileName();
+            if (fileName == null)
+            {
+                this.ClearEditor();
+                diffLines = new string[0];
+                return;
+            }
+
+            try
+            {
+                //var ret = tracker.DiffFile(fileName);
+                //ret = ret.Replace("\r", "").Replace("\n", "\r\n");
+
+                //var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
+                //File.WriteAllText(tmpFileName, ret);
+
+                var tmpFileName = tracker.DiffFile(fileName);
+                if (!string.IsNullOrWhiteSpace(tmpFileName) && File.Exists(tmpFileName))
+                {
+                    if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
+                    {
+                        Action action = () => this.DiffEditor.Content = "File is too big to display: " + fileName;
+                        Dispatcher.Invoke(action);
+                    }
+                    else
+                    {
+                        diffLines = File.ReadAllLines(tmpFileName);
+                        Action action = () => this.ShowFile(tmpFileName);
+                        Dispatcher.Invoke(action);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+                ShowStatusMessage(message);
+            }
+        }
+
+        private void listView1_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // only enable double-click to open when exactly one item is selected
+            if (listView1.SelectedItems.Count != 1)
+                return;
+
+            // disable double-click to open for the checkbox
+            var checkBox = FindAncestorOfType<CheckBox>(e.OriginalSource as DependencyObject);
+            if (checkBox != null)
+                return;
+
+            GetSelectedFileFullName((fileName) =>
+            {
+                OpenFile(fileName);
+            });
+        }
+
+        private void listView1_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (this.listView1.SelectedItems.Count == 0)
+                return;
+
+            if (this.listView1.SelectedItems.Count == 1)
+            {
+                var selectedItem = this.listView1.SelectedItems[0] as GitFile;
+                if (selectedItem == null) return;
+
+                switch (selectedItem.Status)
+                {
+                    case GitFileStatus.Added:
+                    case GitFileStatus.New:
+                        menuCompare.IsEnabled = menuUndo.IsEnabled = false;
+                        break;
+
+                    case GitFileStatus.Modified:
+                    case GitFileStatus.Staged:
+                        menuCompare.IsEnabled = menuUndo.IsEnabled = true;
+                        break;
+
+                    case GitFileStatus.Removed:
+                    case GitFileStatus.Deleted:
+                        menuCompare.IsEnabled = false;
+                        menuUndo.IsEnabled = true;
+                        break;
+                }
+
+                menuStage.Visibility = selectedItem.IsStaged ? Visibility.Collapsed : Visibility.Visible;
+                menuUnstage.Visibility = !selectedItem.IsStaged ? Visibility.Collapsed : Visibility.Visible;
+                menuDeleteFile.Visibility = (selectedItem.Status == GitFileStatus.New || selectedItem.Status == GitFileStatus.Modified) ?
+                    Visibility.Visible : Visibility.Collapsed;
+            }
+            else
+            {
+                menuStage.Visibility =
+                menuUnstage.Visibility =
+                menuDeleteFile.Visibility = Visibility.Visible;
+                menuUndo.IsEnabled = true;
+                menuIgnore.IsEnabled = false;
+                menuCompare.IsEnabled = false;
+            }
+        }
+
+        private T FindAncestorOfType<T>(DependencyObject dependencyObject)
+            where T : DependencyObject
+        {
+            for (var current = dependencyObject; current != null; current = VisualTreeHelper.GetParent(current))
+            {
+                T typed = current as T;
+                if (typed != null)
+                    return typed;
+            }
+
+            return null;
+        }
+
+        private void listView1_Click(object sender, RoutedEventArgs e)
+        {
+            GridViewColumnHeader header = e.OriginalSource as GridViewColumnHeader;
+            if (header == null || header.Role == GridViewColumnHeaderRole.Padding)
+                return;
+
+            ListSortDirection direction = ListSortDirection.Ascending;
+            if (header == _currentSortedColumn && _lastSortDirection == ListSortDirection.Ascending)
+                direction = ListSortDirection.Descending;
+
+            Sort(header, direction);
+            UpdateColumnHeaderTemplate(header, direction);
+            _currentSortedColumn = header;
+            _lastSortDirection = direction;
+        }
+
+        private void SortCurrentColumn()
+        {
+            if (_currentSortedColumn != null)
+                Sort(_currentSortedColumn, _lastSortDirection);
+        }
+
+        private void Sort(GridViewColumnHeader header, ListSortDirection direction)
+        {
+            if (listView1.ItemsSource != null)
+            {
+                ICollectionView view = CollectionViewSource.GetDefaultView(listView1.ItemsSource);
+                view.SortDescriptions.Clear();
+                view.SortDescriptions.Add(new SortDescription(header.Tag as string, direction));
+                view.Refresh();
+            }
+        }
+
+        private void UpdateColumnHeaderTemplate(GridViewColumnHeader header, ListSortDirection direction)
+        {
+            // don't change the template if we're sorting by the check state
+            GridViewColumn checkStateColumn = ((GridView)listView1.View).Columns[0];
+            if (header.Column != checkStateColumn)
+            {
+                if (direction == ListSortDirection.Ascending)
+                    header.Column.HeaderTemplate = Resources["HeaderTemplateArrowUp"] as DataTemplate;
+                else
+                    header.Column.HeaderTemplate = Resources["HeaderTemplateArrowDown"] as DataTemplate;
+            }
+
+            if (_currentSortedColumn != null && _currentSortedColumn != header && _currentSortedColumn.Column != checkStateColumn)
+                _currentSortedColumn.Column.HeaderTemplate = null;
+        }
+
+        #endregion
+
         #region Select File
         private string GetSelectedFileName()
         {
-            if (this.dataGrid1.SelectedCells.Count == 0) return null;
-            var selectedItem = this.dataGrid1.SelectedCells[0].Item as GitFile;
+            if (this.listView1.SelectedItems.Count == 0)
+                return null;
+            var selectedItem = this.listView1.SelectedItems[0] as GitFile;
             if (selectedItem == null) return null;
             return selectedItem.FileName;
         }
@@ -171,7 +307,7 @@ namespace F1SYS.VsGitToolsPackage
         {
             try
             {
-                var files = this.dataGrid1.SelectedItems.Cast<GitFile>()
+                var files = this.listView1.SelectedItems.Cast<GitFile>()
                     .Select(item => System.IO.Path.Combine(this.tracker.WorkingDirectory, item.FileName))
                     .ToList();
 
@@ -186,6 +322,7 @@ namespace F1SYS.VsGitToolsPackage
                 ShowStatusMessage(ex.Message);
             }
         }
+
         #endregion
 
         #region Git functions
@@ -213,28 +350,20 @@ namespace F1SYS.VsGitToolsPackage
             //stopwatch.Start();
 
             var selectedFile = GetSelectedFileName();
-            var selectedFiles = this.dataGrid1.Items.Cast<GitFile>()
+            var selectedFiles = this.listView1.Items.Cast<GitFile>()
                 .Where(i => i.IsSelected)
                 .Select(i => i.FileName).ToList();
 
-            this.dataGrid1.BeginInit();
+            this.listView1.BeginInit();
             try
             {
 
-                this.dataGrid1.ItemsSource = tracker.ChangedFiles;
+                this.listView1.ItemsSource = tracker.ChangedFiles;
 
-                ICollectionView view = CollectionViewSource.GetDefaultView(this.dataGrid1.ItemsSource);
-                if (view != null)
-                {
-                    view.SortDescriptions.Clear();
-                    view.SortDescriptions.Add(new SortDescription(sortMemberPath, sortDirection));
-                    view.Refresh();
-                }
-
-                this.dataGrid1.SelectedValue = selectedFile;
+                this.listView1.SelectedValue = selectedFile;
                 selectedFiles.ForEach(fn =>
                 {
-                    var item = this.dataGrid1.Items.Cast<GitFile>()
+                    var item = this.listView1.Items.Cast<GitFile>()
                         .Where(i => i.FileName == fn)
                         .FirstOrDefault();
                     if (item != null) item.IsSelected = true;
@@ -254,7 +383,10 @@ namespace F1SYS.VsGitToolsPackage
                 ShowStatusMessage(ex.Message);
                 this.DiffEditor.Content = ex.Message;
             }
-            this.dataGrid1.EndInit();
+
+            this.listView1.EndInit();
+
+
 
             //stopwatch.Stop();
             //Debug.WriteLine("**** PendingChangesView Refresh: " + stopwatch.ElapsedMilliseconds);
@@ -269,10 +401,10 @@ namespace F1SYS.VsGitToolsPackage
 
         internal void ClearUI()
         {
-            this.dataGrid1.ItemsSource = null;
+            this.listView1.ItemsSource = null;
             this.textBoxComments.Document.Blocks.Clear();
             this.ClearEditor();
-            var chk = this.dataGrid1.FindVisualChild<CheckBox>("checkBoxAllStaged");
+            var chk = this.listView1.FindVisualChild<CheckBox>("checkBoxAllStaged");
             if (chk != null) chk.IsChecked = false;
         }
 
@@ -296,7 +428,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void StageSelectedFiles()
         {
-            var unstaged = this.dataGrid1.Items.Cast<GitFile>()
+            var unstaged = this.listView1.Items.Cast<GitFile>()
                                .Where(item => item.IsSelected && !item.IsStaged)
                                .ToArray();
             var count = unstaged.Length;
@@ -316,53 +448,6 @@ namespace F1SYS.VsGitToolsPackage
         #endregion
 
         #region Menu Events
-
-        private void dataGrid1_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            if (this.dataGrid1.SelectedItems.Count == 0) return;
-
-            if (this.dataGrid1.SelectedItems.Count == 1)
-            {
-                var selectedItem = this.dataGrid1.SelectedItem as GitFile;
-                if (selectedItem == null) return;
-
-                switch (selectedItem.Status)
-                {
-                    case GitFileStatus.Added:
-                    case GitFileStatus.New:
-                        //menuCompare.IsEnabled = 
-                        menuUndo.IsEnabled = false;
-                        break;
-
-                    case GitFileStatus.Modified:
-                    case GitFileStatus.Staged:
-                        //menuCompare.IsEnabled = 
-                        menuUndo.IsEnabled = true;
-                        break;
-
-                    case GitFileStatus.Removed:
-                    case GitFileStatus.Deleted:
-                        //menuCompare.IsEnabled = false;
-                        menuUndo.IsEnabled = true;
-                        break;
-                }
-
-                menuStage.Visibility = selectedItem.IsStaged ? Visibility.Collapsed : Visibility.Visible;
-                menuUnstage.Visibility = !selectedItem.IsStaged ? Visibility.Collapsed : Visibility.Visible;
-                menuDeleteFile.Visibility = (selectedItem.Status == GitFileStatus.New || selectedItem.Status == GitFileStatus.Modified) ?
-                    Visibility.Visible : Visibility.Collapsed;
-                menuIgnore.IsEnabled = true;
-            }
-            else
-            {
-                menuStage.Visibility =
-                menuUnstage.Visibility =
-                menuDeleteFile.Visibility = Visibility.Visible;
-                menuUndo.IsEnabled = true;
-                menuIgnore.IsEnabled = false;
-                //menuCompare.IsEnabled = false;
-            }
-        }
 
         private void menuCompare_Click(object sender, RoutedEventArgs e)
         {
@@ -557,6 +642,11 @@ namespace F1SYS.VsGitToolsPackage
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             this.DiffEditor.Content = "";
+
+            GridViewColumnCollection columns = ((GridView)listView1.View).Columns;
+            _currentSortedColumn = (GridViewColumnHeader)columns[columns.Count - 1].Header;
+            _lastSortDirection = ListSortDirection.Ascending;
+            UpdateColumnHeaderTemplate(_currentSortedColumn, _lastSortDirection);
         }
         internal void OnSettings()
         {
