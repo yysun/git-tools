@@ -607,6 +607,18 @@ namespace F1SYS.VsGitToolsPackage
                         return;
                     }
                 }
+                else
+                {
+                    const string amendMsg = @"You are about to amend a commit that has tags or remotes, which could cause issues in local and remote repositories.
+
+Are you sure you want to continue?";
+
+                    if (MessageBox.Show(amendMsg, "Amend Last Commit",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    {
+                        return;
+                    }
+                }
 
                 var id = tracker.Commit(Comments, isAmend, chkSignOff.IsChecked == true);
                 ShowStatusMessage("Commit successfully. Commit Hash: " + id);
