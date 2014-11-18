@@ -337,7 +337,7 @@ namespace F1SYS.VsGitToolsPackage
             this.chkSignOff.IsChecked = false;
             //this.chkNewBranch.IsChecked = false;
 
-            if (tracker == null)
+            if (tracker == null || tracker == null)
             {
                 ClearUI();
                 return;

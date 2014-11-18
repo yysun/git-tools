@@ -55,6 +55,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void CloseRepository()
         {
+            Repository = null;
             if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
             {
                 IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
@@ -268,7 +269,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void RefreshToolWindows()
         {
-            Repository.Refresh();
+            if (Repository != null) Repository.Refresh();
             var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
             if (toolWindow != null) toolWindow.Refresh();
         }
