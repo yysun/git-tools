@@ -84,7 +84,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

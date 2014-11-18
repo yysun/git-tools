@@ -217,6 +217,7 @@
     <Resource Include="Resources\Compare.png" />
     <Resource Include="Resources\History.png" />
     <Resource Include="Resources\Loading.png" />
+    <Content Include="extension.vsixmanifest" />
     <Content Include="License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -229,7 +230,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="Resources\Package.ico" />
+    <Content Include="Resources\Package.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\Preview.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Resource Include="Resources\PendingCheckins.png" />
     <Resource Include="Resources\Refresh.png" />
     <Resource Include="Resources\Switch.png" />
