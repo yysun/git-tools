@@ -24,18 +24,18 @@ namespace DiffClassifier
         #region Content Type and File Extension Definitions
 
         [Export]
-        [Name("diff")]
+        [Name("gittools_diff")]
         [BaseDefinition("text")]
         internal static ContentTypeDefinition diffContentTypeDefinition = null;
 
         [Export]
         [FileExtension(".diff")]
-        [ContentType("diff")]
+        [ContentType("gittools_diff")]
         internal static FileExtensionToContentTypeDefinition diffFileExtensionDefinition = null;
 
         [Export]
         [FileExtension(".patch")]
-        [ContentType("diff")]
+        [ContentType("gittools_diff")]
         internal static FileExtensionToContentTypeDefinition patchFileExtensionDefinition = null;
 
         #endregion
@@ -43,36 +43,36 @@ namespace DiffClassifier
         #region Classification Type Definitions
 
         [Export]
-        [Name("diff")]
+        [Name("gittools_diff")]
         internal static ClassificationTypeDefinition diffClassificationDefinition = null;
 
         [Export]
-        [Name("diff.added")]
+        [Name("gittools_diff.added")]
         [BaseDefinition("diff")]
         internal static ClassificationTypeDefinition diffAddedDefinition = null;
 
         [Export]
-        [Name("diff.removed")]
+        [Name("gittools_diff.removed")]
         [BaseDefinition("diff")]
         internal static ClassificationTypeDefinition diffRemovedDefinition = null;
 
         [Export]
-        [Name("diff.changed")]
+        [Name("gittools_diff.changed")]
         [BaseDefinition("diff")]
         internal static ClassificationTypeDefinition diffChangedDefinition = null;
 
         [Export]
-        [Name("diff.infoline")]
+        [Name("gittools_diff.infoline")]
         [BaseDefinition("diff")]
         internal static ClassificationTypeDefinition diffInfolineDefinition = null;
 
         [Export]
-        [Name("diff.patchline")]
+        [Name("gittools_diff.patchline")]
         [BaseDefinition("diff")]
         internal static ClassificationTypeDefinition diffPatchLineDefinition = null;
 
         [Export]
-        [Name("diff.header")]
+        [Name("gittools_diff.header")]
         [BaseDefinition("diff")]
         internal static ClassificationTypeDefinition diffHeaderDefinition = null;
 
@@ -81,8 +81,8 @@ namespace DiffClassifier
         #region Classification Format Productions
 
         [Export(typeof(EditorFormatDefinition))]
-        [ClassificationType(ClassificationTypeNames = "diff.added")]
-        [Name("diff.added")]
+        [ClassificationType(ClassificationTypeNames = "gittools_diff.added")]
+        [Name("gittools_diff.added")]
         internal sealed class DiffAddedFormat : ClassificationFormatDefinition
         {
             public DiffAddedFormat()
@@ -93,8 +93,8 @@ namespace DiffClassifier
         }
 
         [Export(typeof(EditorFormatDefinition))]
-        [ClassificationType(ClassificationTypeNames = "diff.removed")]
-        [Name("diff.removed")]
+        [ClassificationType(ClassificationTypeNames = "gittools_diff.removed")]
+        [Name("gittools_diff.removed")]
         internal sealed class DiffRemovedFormat : ClassificationFormatDefinition
         {
             public DiffRemovedFormat()
@@ -105,8 +105,8 @@ namespace DiffClassifier
         }
 
         [Export(typeof(EditorFormatDefinition))]
-        [ClassificationType(ClassificationTypeNames = "diff.changed")]
-        [Name("diff.changed")]
+        [ClassificationType(ClassificationTypeNames = "gittools_diff.changed")]
+        [Name("gittools_diff.changed")]
         internal sealed class DiffChangedFormat : ClassificationFormatDefinition
         {
             public DiffChangedFormat()
@@ -116,8 +116,8 @@ namespace DiffClassifier
         }
 
         [Export(typeof(EditorFormatDefinition))]
-        [ClassificationType(ClassificationTypeNames = "diff.infoline")]
-        [Name("diff.infoline")]
+        [ClassificationType(ClassificationTypeNames = "gittools_diff.infoline")]
+        [Name("gittools_diff.infoline")]
         internal sealed class DiffInfolineFormat : ClassificationFormatDefinition
         {
             public DiffInfolineFormat()
@@ -127,8 +127,8 @@ namespace DiffClassifier
         }
 
         [Export(typeof(EditorFormatDefinition))]
-        [ClassificationType(ClassificationTypeNames = "diff.patchline")]
-        [Name("diff.patchline")]
+        [ClassificationType(ClassificationTypeNames = "gittools_diff.patchline")]
+        [Name("gittools_diff.patchline")]
         internal sealed class DiffPatchLineFormat : ClassificationFormatDefinition
         {
             public DiffPatchLineFormat()
@@ -138,8 +138,8 @@ namespace DiffClassifier
         }
 
         [Export(typeof(EditorFormatDefinition))]
-        [ClassificationType(ClassificationTypeNames = "diff.header")]
-        [Name("diff.header")]
+        [ClassificationType(ClassificationTypeNames = "gittools_diff.header")]
+        [Name("gittools_diff.header")]
         internal sealed class DiffHeaderFormat : ClassificationFormatDefinition
         {
             public DiffHeaderFormat()

@@ -62,34 +62,34 @@ namespace DiffClassifier
                         new SnapshotSpan(line.Start, Math.Min(4, line.Length))); // We only need the first 4 
 
                 if (text.StartsWith("!", StringComparison.Ordinal))
-                    type = _classificationTypeRegistry.GetClassificationType("diff.changed");
+                    type = _classificationTypeRegistry.GetClassificationType("gittools_diff.changed");
 
                 else if (text.StartsWith("---", StringComparison.Ordinal))
-                    type = _classificationTypeRegistry.GetClassificationType("diff.header");
+                    type = _classificationTypeRegistry.GetClassificationType("gittools_diff.header");
                 else if (text.StartsWith("-", StringComparison.Ordinal))
-                    type = _classificationTypeRegistry.GetClassificationType("diff.removed");
+                    type = _classificationTypeRegistry.GetClassificationType("gittools_diff.removed");
                 else if (text.StartsWith("<", StringComparison.Ordinal))
-                    type = _classificationTypeRegistry.GetClassificationType("diff.removed");
+                    type = _classificationTypeRegistry.GetClassificationType("gittools_diff.removed");
 
                 else if (text.StartsWith("@@", StringComparison.Ordinal))
-                    type = _classificationTypeRegistry.GetClassificationType("diff.patchline");
+                    type = _classificationTypeRegistry.GetClassificationType("gittools_diff.patchline");
 
                 else if (text.StartsWith("+++", StringComparison.Ordinal))
-                    type = _classificationTypeRegistry.GetClassificationType("diff.header");
+                    type = _classificationTypeRegistry.GetClassificationType("gittools_diff.header");
                 else if (text.StartsWith("+", StringComparison.Ordinal))
-                    type = _classificationTypeRegistry.GetClassificationType("diff.added");
+                    type = _classificationTypeRegistry.GetClassificationType("gittools_diff.added");
                 else if (text.StartsWith(">", StringComparison.Ordinal))
-                    type = _classificationTypeRegistry.GetClassificationType("diff.added");
+                    type = _classificationTypeRegistry.GetClassificationType("gittools_diff.added");
 
                 else if (text.StartsWith("***", StringComparison.Ordinal))
                 {
                     if (i < 2)
-                        type = _classificationTypeRegistry.GetClassificationType("diff.header");
+                        type = _classificationTypeRegistry.GetClassificationType("gittools_diff.header");
                     else
-                        type = _classificationTypeRegistry.GetClassificationType("diff.infoline");
+                        type = _classificationTypeRegistry.GetClassificationType("gittools_diff.infoline");
                 }
                 else if (text.Length > 0 && !char.IsWhiteSpace(text[0]))
-                    type = _classificationTypeRegistry.GetClassificationType("diff.infoline");
+                    type = _classificationTypeRegistry.GetClassificationType("gittools_diff.infoline");
 
                 if (type != null)
                     spans.Add(new ClassificationSpan(line.Extent, type));

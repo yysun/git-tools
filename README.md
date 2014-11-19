@@ -20,11 +20,11 @@ How to use
 ----------
 * Install [Git for Windows](http://code.google.com/p/msysgit), [Git Extensions](http://code.google.com/p/gitextensions) or [TortoiseGit](http://code.google.com/p/tortoisegit).
 * Run Visual Studio. 
-* Go to Tools | Extensions and Updates..., search online gallery for Git Changes Window and install. 
-* Select Top Menu GITTools
+* Go to Tools | Extensions and Updates..., search online gallery for Git Tools and install. 
+* Select Top Menu 'Git Tools' or add 'Git Tools'toolbar to the main window.
 
 Compile Source Code
 -------------------
 * Install [Visual Studio 2013 SDK](http://www.microsoft.com/en-ca/download/details.aspx?id=40758)
 * Get source code: _git clone https://github.com/yysun/git-tools.git_
-* Open and compile in Visual Studio 2013
+* Open the solution and compile in Visual Studio 2013
