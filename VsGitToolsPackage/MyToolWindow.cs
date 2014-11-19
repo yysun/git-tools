@@ -102,6 +102,9 @@ namespace F1SYS.VsGitToolsPackage
             if (force) hasFileSaved(); //just a reminder, refresh anyway
 
             _Control.Refresh(gitRepository, force);
+
+            var svc = this.GetService(typeof(IVsUIShell)) as IVsUIShell;
+            svc.UpdateCommandUI(1);
         }
 
         internal EnvDTE.DTE dte
