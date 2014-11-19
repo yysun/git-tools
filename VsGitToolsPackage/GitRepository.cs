@@ -24,16 +24,14 @@ namespace GitScc
         public void Refresh()
         {
             this.changedFiles = null;
-            try
+            this.isGit = false;
+
+            var result = GitBash.Run("rev-parse --is-inside-work-tree", WorkingDirectory);
+            if (!result.HasError && !result.Output.Contains("fatal:"))
             {
-                isGit = true;
-                var output = GitRun("rev-parse --is-inside-work-tree").Trim();
-                isGit = string.Compare("true", output, true) == 0;
+                isGit = string.Compare("true", result.Output.Trim(), true) == 0;
             }
-            catch
-            {
-                isGit = false;
-            }
+            
         }
 
 		#region Git commands
