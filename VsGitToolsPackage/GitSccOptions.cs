@@ -93,8 +93,8 @@ namespace GitScc
             if (string.IsNullOrEmpty(TortoiseGitPath))
             {
                 TortoiseGitPath = TryFindFile(new string[]{
-                    @"C:\Program Files\TortoiseGit\bin\TortoiseProc.exe",
-                    @"C:\Program Files (x86)\TortoiseGit\bin\TortoiseProc.exe",
+                    @"C:\Program Files\TortoiseGit\bin\TortoiseGitProc.exe",
+                    @"C:\Program Files (x86)\TortoiseGit\bin\TortoiseGitProc.exe",
                 });
             }
 
