@@ -26,7 +26,7 @@ namespace F1SYS.VsGitToolsPackage
     public partial class MyControl : UserControl
     {
         GitRepository tracker;
-        VsGitToolsService service;
+        //VsGitToolsService service;
 
         private MyToolWindow toolWindow;
         private IVsTextView textView;
@@ -327,24 +327,26 @@ namespace F1SYS.VsGitToolsPackage
 
         #region Git functions
 
-        internal void Refresh(VsGitToolsService service)
+        internal void Refresh(GitRepository tracker, bool force=false)
         {
-            this.label3.Content = "Changed files";
-            this.service = service;
-            this.tracker = service.Repository;
+            this.tracker = tracker;
 
+            this.label3.Content = "Changed files";
             this.chkAmend.IsChecked = false;
             this.chkSignOff.IsChecked = false;
             //this.chkNewBranch.IsChecked = false;
 
-            if (tracker == null || tracker == null)
+            if (tracker == null)
             {
                 ClearUI();
                 return;
             }
+            
+            if (force) tracker.Refresh();
+            
 
-            service.NoRefresh = true;
-            ShowStatusMessage("Getting changed files ...");
+            //service.NoRefresh = true;
+            //ShowStatusMessage("Getting changed files ...");
 
             //Stopwatch stopwatch = new Stopwatch();
             //stopwatch.Start();
@@ -368,8 +370,6 @@ namespace F1SYS.VsGitToolsPackage
                         .FirstOrDefault();
                     if (item != null) item.IsSelected = true;
                 });
-
-                ShowStatusMessage("");
 
                 var changed = tracker.ChangedFiles;
                 this.label3.Content = string.Format("Changed files:  +{0} ~{1} -{2} !{3}",
@@ -396,7 +396,7 @@ namespace F1SYS.VsGitToolsPackage
             //else
             //    this.label4.Visibility = Visibility.Collapsed;
 
-            service.NoRefresh = false;
+            //service.NoRefresh = false;
         }
 
         internal void ClearUI()
@@ -659,7 +659,7 @@ namespace F1SYS.VsGitToolsPackage
 
             try
             {
-                service.NoRefresh = true;
+                //service.NoRefresh = true;
 
                 //if (chkNewBranch.IsChecked == true)
                 //{
@@ -713,7 +713,9 @@ Are you sure you want to continue?";
                 var id = tracker.Commit(Comments, isAmend, chkSignOff.IsChecked == true);
                 ShowStatusMessage("Commit successfully. Commit Hash: " + id);
                 ClearUI();
-                service.NoRefresh = false;
+                //service.NoRefresh = false;
+                tracker.Refresh();
+                toolWindow.Refresh();
             }
             catch (Exception ex)
             {

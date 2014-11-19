@@ -87,7 +87,7 @@ namespace F1SYS.VsGitToolsPackage
            _Control.OnSettings();
         }
 
-        internal void Refresh(bool checkFileSaved=false)
+        internal void Refresh(bool force=false)
         {
             Debug.WriteLine("VS Git Tools - Refresh Git Changes Tool Windows ");
             
@@ -99,8 +99,9 @@ namespace F1SYS.VsGitToolsPackage
                 this.Caption = Resources.ToolWindowTitle + " - " + gitRepository.CurrentBranch;
             }
 
-            if (checkFileSaved) hasFileSaved(); //just a reminder, refresh anyway
-            _Control.Refresh(Service);
+            if (force) hasFileSaved(); //just a reminder, refresh anyway
+
+            _Control.Refresh(gitRepository, force);
         }
 
         internal EnvDTE.DTE dte

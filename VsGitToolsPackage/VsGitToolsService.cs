@@ -237,7 +237,7 @@ namespace F1SYS.VsGitToolsPackage
             set
             {
                 noRefresh = value;
-                nextTimeRefresh = DateTime.Now.AddMilliseconds(888);
+                nextTimeRefresh = DateTime.Now.AddMilliseconds(388);
             }
         }
 
