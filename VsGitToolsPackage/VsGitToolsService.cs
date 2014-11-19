@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace F1SYS.VsGitToolsPackage
 {
@@ -21,6 +22,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private uint _vsSolutionEventsCookie, _vsIVsFileChangeEventsCookie, _vsIVsUpdateSolutionEventsCookie;
         private string lastMinotorFolder = "";
+        private DispatcherTimer timer;
 
         private VsGitToolsPackagePackage package;
         public GitRepository Repository {  get; private set; }
@@ -79,6 +81,11 @@ namespace F1SYS.VsGitToolsPackage
             {
                 sbm.AdviseUpdateSolutionEvents(this, out _vsIVsUpdateSolutionEventsCookie);
             }
+
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(588);
+            timer.Tick += new EventHandler(timer_Tick);
+
         }
 
         public void Dispose()
@@ -242,7 +249,7 @@ namespace F1SYS.VsGitToolsPackage
         }
 
         private DateTime nextTimeRefresh = DateTime.Now;
-
+        
         private void Refresh()
         {
             if (NeedRefresh && !NoRefresh)
@@ -257,14 +264,25 @@ namespace F1SYS.VsGitToolsPackage
 
                     NoRefresh = true;
                     NeedRefresh = false;
-                    RefreshToolWindows();
 
-                    NoRefresh = false;
+                    //RefreshToolWindows();
+                    //NoRefresh = false;
 
                     //stopwatch.Stop();
                     //Debug.WriteLine("++++ UpdateNodesGlyphs: " + stopwatch.ElapsedMilliseconds);
+
+                    timer.Start();
                 }
             }
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            Debug.WriteLine("==== timer_Tick ");
+            timer.Stop();
+
+            RefreshToolWindows();
+            NoRefresh = false;
         }
 
         private void RefreshToolWindows()
