@@ -240,9 +240,9 @@ namespace F1SYS.VsGitToolsPackage
 
         private void OnAbout(object sender, EventArgs e)
         {
-            var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            path = Path.Combine(path, "Readme.html");
-            Process.Start(path);
+            //var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //path = Path.Combine(path, "Readme.html");
+            Process.Start("http://yysun.github.io/git-tools");
         }
 
         private void OnEditIgnore(object sender, EventArgs e)
