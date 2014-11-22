@@ -352,7 +352,7 @@ namespace GitScc
 
         private bool FileExistsInRepo(string fileName)
         {
-            return File.Exists(Path.Combine(WorkingDirectory, fileName));
+            return File.Exists(Path.Combine(WorkingDirectory + "\\.git", fileName));
         }
 
         private bool FileExistsInRepo(string directory, string fileName)
@@ -514,6 +514,29 @@ namespace GitScc
             if (!result.HasError)
                 return result.Output.Split(new char[] { '\0' }, StringSplitOptions.RemoveEmptyEntries);
             return new string[0];
+        }
+
+
+        public void EditIngoreFile()
+        {
+            var ignoreFile = Path.Combine(WorkingDirectory, ".gitignore");
+
+            var ret = GitBash.Run("config core.editor", WorkingDirectory);
+            if (!ret.HasError && ret.Output.Trim() != "")
+            {
+                var editor = ret.Output.Trim();
+                if (editor.Length == 0) editor = "notepad.exe";
+                var cmd = string.Format("{0} \"{1}\"", editor, ignoreFile);
+                cmd = cmd.Replace("/", "\\");
+                var pinfo = new ProcessStartInfo("cmd.exe")
+                {
+                    Arguments = "/C \"" + cmd + "\"",
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WorkingDirectory = this.WorkingDirectory,
+                };
+                Process.Start(pinfo);
+            }
         }
 
         private RepositoryGraph repositoryGraph;

@@ -5,9 +5,21 @@
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:ZoomAndPan="clr-namespace:ZoomAndPan"
 			 mc:Ignorable="d" 
-			 d:DesignHeight="400" d:DesignWidth="600" SizeChanged="UserControl_SizeChanged">
-   
-	<Grid>
+			 d:DesignHeight="400" d:DesignWidth="600" SizeChanged="UserControl_SizeChanged" ContextMenuOpening="UserControl_ContextMenuOpening">
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="open ..." Click="menuOpen_Click" />
+            <MenuItem Header="init" Click="menuInit_Click" x:Name="menuInit"/>
+            <MenuItem Header="ignore" Click="menuEditGitIgnore_Click" x:Name="menuIgnore"/>
+            <!--<MenuItem Header="clone" Click="menuClone_Click" />            
+            <MenuItem Header="fetch" Click="menuFetch_Click" />
+            <MenuItem Header="pull" Click="menuPull_Click" />
+            <MenuItem Header="push" Click="menuPush_Click" />-->
+            <MenuItem Header="refresh" Click="menuRefresh_Click" />
+            <MenuItem Header="about" Click="menuAbout_Click" />
+        </ContextMenu>
+    </UserControl.ContextMenu>
+    <Grid>
 		<ScrollViewer x:Name="scrollRoot" CanContentScroll="True"
 					  VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
 			<ZoomAndPan:ZoomAndPanControl

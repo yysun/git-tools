@@ -32,12 +32,21 @@ namespace GitScc
 
         public static GitBashResult Run(string args, string workingDirectory)
         {
+            Debug.WriteLine(string.Format("{2}>{0} {1}", gitExePath, args, workingDirectory));
+
             if (string.IsNullOrWhiteSpace(gitExePath) || !File.Exists(gitExePath))
                 throw new GitException("Git Executable not found");
 
-            GitBashResult result = new GitBashResult();
+            if (!Directory.Exists(workingDirectory))
+            {
+                return new GitBashResult
+                    {
+                        HasError = true,
+                        Error = workingDirectory + " is not a valid folder to run git command " + args
+                    };
+            }
 
-            //Debug.WriteLine(string.Format("{2}>{0} {1}", gitExePath, args, workingDirectory));
+            GitBashResult result = new GitBashResult();
 
             var pinfo = new ProcessStartInfo(gitExePath)
             {

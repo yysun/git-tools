@@ -48,10 +48,11 @@ namespace GitUI
 				loading.Visibility = Visibility.Visible;
 				Action act = () =>
 				{
+                    this.txtRepo.Text = gitViewModel.Tracker.WorkingDirectory;
+                    this.txtPrompt.Text = "(no git repository)";
+
 					if (!gitViewModel.NoRefresh && gitViewModel.Tracker.IsGit)
 					{
-						this.txtRepo.Text = gitViewModel.Tracker.WorkingDirectory;
-
                         var changed = gitViewModel.Tracker.ChangedFiles;
                         var prompt = string.Format("{4}:  +{0} ~{1} -{2} !{3}",
                             changed.Where(f => f.Status == GitFileStatus.New || f.Status == GitFileStatus.Added).Count(),
@@ -309,11 +310,22 @@ namespace GitUI
 
                 var repo = new GitRepository(dropped);
 
-                if (Directory.Exists(dropped) && repo.IsGit &&
-                    MessageBox.Show("Do you want to open Git repository from " + repo.WorkingDirectory,
-                    "Git repository found", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (Directory.Exists(dropped))
                 {
-                    this.OpenRepository(dropped);
+
+                    if (repo.IsGit && MessageBox.Show("Do you want to open Git repository from " + repo.WorkingDirectory + "?",
+                    "Git repository found", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        this.OpenRepository(dropped);
+                    }
+
+                    if (!repo.IsGit && MessageBox.Show("There is no git repository found in " + dropped + 
+                        "\r\n\r\n Do you want to initialize a new git repository?",
+                    "Git repository NOT found", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        this.OpenRepository(dropped);
+                        GitViewModel.Current.Init();
+                    }
                 }
 			}
 		}

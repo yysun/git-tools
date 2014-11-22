@@ -17,6 +17,7 @@ using GitScc.DataServices;
 using GitUI;
 using System.Windows.Media.Animation;
 using Gitscc;
+using System.Diagnostics;
 
 namespace GitScc.UI
 {
@@ -584,5 +585,78 @@ namespace GitScc.UI
             AdjustCanvasSize();
         } 
         #endregion
+
+        private void menuInit_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                GitViewModel.Current.Init();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void menuEditGitIgnore_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                GitViewModel.Current.OpenIgnoreFile();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void menuOpen_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                HistoryViewCommands.OpenRepository.Execute(null, this);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void menuClone_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void menuFetch_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void menuPull_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void menuPush_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void menuRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            HistoryViewCommands.RefreshGraph.Execute(null, this);
+        }
+
+        private void menuAbout_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("http://yysun.github.io/git-tools");
+        }
+
+        private void UserControl_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            menuInit.IsEnabled = !GitViewModel.Current.Tracker.IsGit;
+            menuIgnore.IsEnabled = GitViewModel.Current.Tracker.IsGit;
+        }
+
     }
 }

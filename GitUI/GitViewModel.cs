@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Input;
 using GitScc;
 using System.Windows.Threading;
+using System.Diagnostics;
 
 namespace GitUI
 {
@@ -255,7 +256,18 @@ namespace GitUI
             return GitRun(string.Format("cherry-pick {0}", id));
         }
 
+
+        internal void Init()
+        {
+            GitRun("init");
+        }
+
+        internal void OpenIgnoreFile()
+        {
+            Tracker.EditIngoreFile();
+        }
 		#endregion    
-   
+  
+    
     }
 }
