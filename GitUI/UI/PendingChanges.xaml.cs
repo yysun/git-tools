@@ -27,7 +27,6 @@ namespace GitUI.UI
         public PendingChanges()
         {
             InitializeComponent();
-            this.service = GitViewModel.Current;
         }
 
         #region Events
@@ -553,6 +552,11 @@ namespace GitUI.UI
             {
                 btnPendingChanges_Click(this, null);
             }
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.service = GitViewModel.Current;
         }
     }
 
