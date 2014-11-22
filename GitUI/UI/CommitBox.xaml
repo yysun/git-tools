@@ -35,11 +35,12 @@
 	</UserControl.Resources>
 	<UserControl.ContextMenu>
 		<ContextMenu>
+            <MenuItem Header="checkout" Click="CheckoutCommit_Click"/>            
 			<MenuItem Header="new tag" Click="NewTag_Click" />
 			<MenuItem Header="new branch" Click="NewBranch_Click" />
 			<!--<MenuItem Header="view details" Command="cmd:HistoryViewCommands.OpenCommitDetails" CommandParameter="{Binding Id}" />-->
             <MenuItem Header="archive" Click="Export_Click" />
-		</ContextMenu>
+        </ContextMenu>
 	</UserControl.ContextMenu>    
 	<Grid x:Name="root" Height="120" Width="200" RenderTransformOrigin="0.5,0.5" MouseEnter="root_MouseEnter" MouseLeave="root_MouseLeave" MouseLeftButtonUp="root_MouseLeftButtonUp">
 		<Grid.RenderTransform>

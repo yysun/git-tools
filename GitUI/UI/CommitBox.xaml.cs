@@ -108,18 +108,25 @@ namespace GitScc.UI
                     && r.Name == branch).FirstOrDefault();
                 if (branch1 != null && branch1.Id.StartsWith(commit.ShortId)) return;
 
-
                 string branchId = GitViewModel.Current.GetBranchId(branch).Output;
+                GitBashResult ret0 = null, ret1;
 
                 if (!string.IsNullOrWhiteSpace(branchId))
                 {
-                    MessageBox.Show("Branch already exists for " + branchId, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    var result = MessageBox.Show("Branch " + branch + " already exists.\r\n\r\n" +
+                        "Do you want to move it to here?", "Warning",
+                        MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        ret0 = GitViewModel.Current.DeleteBranch(branch);
+                    }
                 }
-                else
-                {
-                    var ret = GitViewModel.Current.AddBranch(branch, commit.ShortId);
-                    HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
-                }
+
+                ret1 = GitViewModel.Current.AddBranch(branch, commit.ShortId);
+                if (ret0 != null) ret1.Output += ret0.Output;
+                HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret1 }, this);
+
             }
             catch (Exception ex)
             {
@@ -144,5 +151,12 @@ namespace GitScc.UI
                 HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
             }
         }
+
+        private void CheckoutCommit_Click(object sender, RoutedEventArgs e)
+        {
+            var ret = GitViewModel.Current.CheckoutBranch(this.txtId.Text);
+            HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
+        }
+
     }
 }
