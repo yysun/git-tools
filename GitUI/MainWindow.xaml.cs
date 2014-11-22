@@ -208,7 +208,7 @@ namespace GitUI
 			txtMessage.Opacity = 1.0;
 			DoubleAnimation doubleAnimation = new DoubleAnimation
 			{
-				Duration = new Duration(TimeSpan.FromMilliseconds(10000)),
+                Duration = new Duration(ret.HasError ? TimeSpan.FromSeconds(30) : TimeSpan.FromSeconds(10)),
 				From = 1.0,
 				To = 0.0
 			};
@@ -295,14 +295,14 @@ namespace GitUI
 
 				if (!Directory.Exists(dropped)) dropped = Path.GetDirectoryName(dropped);
 
-                //var gitWorkingFolder = GitFileStatusTracker.GetRepositoryDirectory(dropped);
+                var repo = new GitRepository(dropped);
 
-                //if (Directory.Exists(dropped) && gitWorkingFolder != null &&
-                //    MessageBox.Show("Do you want to open Git repository from " + gitWorkingFolder,
-                //    "Git repository found", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                //{
-                //    this.OpenRepository(dropped);
-                //}
+                if (Directory.Exists(dropped) && repo.IsGit &&
+                    MessageBox.Show("Do you want to open Git repository from " + repo.WorkingDirectory,
+                    "Git repository found", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    this.OpenRepository(dropped);
+                }
 			}
 		}
 
