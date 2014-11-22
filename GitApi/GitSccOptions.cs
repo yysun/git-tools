@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Xml.Serialization;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace GitScc
 {
@@ -47,7 +45,7 @@ namespace GitScc
 
         }
 
-        internal static GitSccOptions LoadFromConfig()
+        public static GitSccOptions LoadFromConfig()
         {
             GitSccOptions options = null;
 
@@ -100,12 +98,14 @@ namespace GitScc
 
             if (string.IsNullOrEmpty(DifftoolPath)) DifftoolPath = "diffmerge.exe";
 
-            bool diffServiceAvailable = Package.GetGlobalService(typeof(SVsDifferenceService)) != null;
-            if (!diffServiceAvailable)
-                UseVsDiff = false;
+            //bool diffServiceAvailable = Package.GetGlobalService(typeof(SVsDifferenceService)) != null;
+            //if (!diffServiceAvailable)
+            //    UseVsDiff = false;
+
+            UseVsDiff = true;
         }
 
-        internal void SaveConfig()
+        public void SaveConfig()
         {
             try
             {

@@ -1,5 +1,4 @@
-﻿using F1SYS.VsGitToolsPackage;
-using GitScc;
+﻿using GitScc;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;

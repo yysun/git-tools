@@ -469,4 +469,8 @@ namespace GitScc
         }
     }
 
+    public class GitFileStatusTracker: GitRepository
+    {
+        public GitFileStatusTracker(string directory) : base(directory) { }
+    }
 }

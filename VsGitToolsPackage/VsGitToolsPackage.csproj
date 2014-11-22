@@ -155,12 +155,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GitBash.cs" />
-    <Compile Include="GitBashResult.cs" />
-    <Compile Include="GitFileStatus.cs" />
-    <Compile Include="GitSccOptions.cs" />
     <Compile Include="GitToolCommands.cs" />
-    <Compile Include="GitRepository.cs" />
     <Compile Include="MyControl.xaml.cs">
       <DependentUpon>MyControl.xaml</DependentUpon>
     </Compile>
@@ -261,6 +256,10 @@
       <Name>DiffClassifier</Name>
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3bTemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\GitApi\GitScc.csproj">
+      <Project>{161e81e2-25e5-4134-8d2d-595419b1265b}</Project>
+      <Name>GitScc</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

@@ -55,9 +55,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VsGitToolsPackage\VsGitToolsPackage.csproj">
-      <Project>{b867c32c-3c78-47e3-95de-9a43b7af1fa7}</Project>
-      <Name>VsGitToolsPackage</Name>
+    <ProjectReference Include="..\GitApi\GitScc.csproj">
+      <Project>{161e81e2-25e5-4134-8d2d-595419b1265b}</Project>
+      <Name>GitScc</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
