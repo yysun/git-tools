@@ -10,6 +10,7 @@ using GitScc;
 using Microsoft.Windows.Shell;
 using Mono.Options;
 using Gitscc;
+using System.Diagnostics;
 
 namespace GitUI
 {
@@ -102,6 +103,7 @@ namespace GitUI
 			if (dlg.ShowDialog() == true)
 			{
 				this.graph.SaveToFile(dlg.FileName);
+                Process.Start(dlg.FileName);
 			}
 		}
 
@@ -323,11 +325,19 @@ namespace GitUI
 
 		private void OpenRepository_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			var dlg = new System.Windows.Forms.FolderBrowserDialog();
-			if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-			{
-				this.OpenRepository(dlg.SelectedPath);
-			}
+            using (var dialog = new System.Windows.Forms.OpenFileDialog { 
+                Filter = "All Files|*.*", Title = "Open Git Repository", RestoreDirectory = true })
+            {
+                dialog.ValidateNames = false;
+                dialog.CheckFileExists = false;
+                dialog.CheckPathExists = true;
+                dialog.FileName = "Folder Selection";
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    var folder = dialog.FileName.Replace("\\Folder Selection", "");
+                    this.OpenRepository(folder);
+                }
+            }
 		}
 	}
 }
