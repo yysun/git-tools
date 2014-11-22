@@ -25,15 +25,17 @@ namespace GitScc
 		}
         public void Refresh()
         {
+            this.repositoryGraph = null;
             this.changedFiles = null;
             this.isGit = false;
 
-            var result = GitBash.Run("rev-parse --is-inside-work-tree", WorkingDirectory);
+            var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory);
             if (!result.HasError && !result.Output.Contains("fatal:"))
             {
+                this.workingDirectory = result.Output.Trim();
+                result = GitBash.Run("rev-parse --is-inside-work-tree", WorkingDirectory);
                 isGit = string.Compare("true", result.Output.Trim(), true) == 0;
             }
-            
         }
 
 		#region Git commands
@@ -505,13 +507,7 @@ namespace GitScc
             return new string[0];
         }
 
-    }
-
-    public class GitFileStatusTracker: GitRepository
-    {
-        public GitFileStatusTracker(string directory) : base(directory) { }
-
-        RepositoryGraph repositoryGraph;
+        private RepositoryGraph repositoryGraph;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public RepositoryGraph RepositoryGraph
@@ -525,5 +521,11 @@ namespace GitScc
                 return repositoryGraph;
             }
         }
+    }
+
+    public class GitFileStatusTracker: GitRepository
+    {
+        public GitFileStatusTracker(string directory) : base(directory) { }
+
     }
 }

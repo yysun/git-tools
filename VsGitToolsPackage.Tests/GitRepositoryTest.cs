@@ -79,9 +79,7 @@ namespace VsGitToolsPackage.Tests
             var newFolder = tempFolder + "\\t t\\a a";
             Directory.CreateDirectory(newFolder);
             GitRepository tracker = new GitRepository(newFolder);
-
-            //TODO: search for root working directory
-            //Assert.AreEqual(tempFolder, tracker.WorkingDirectory);
+            Assert.AreEqual(tempFolder.Replace("\\", "/"), tracker.WorkingDirectory);
         }
 
         [TestMethod()]
@@ -92,7 +90,6 @@ namespace VsGitToolsPackage.Tests
             GitRepository tracker = new GitRepository(tempFolder);
 
             Assert.IsTrue(tracker.IsGit);
-            Assert.AreEqual(tempFolder, tracker.WorkingDirectory);
             Assert.IsTrue(Directory.Exists(tempFolder + "\\.git"));
         }
 
