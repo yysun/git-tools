@@ -80,7 +80,7 @@ namespace GitUI
 			});
 
 			timer = new DispatcherTimer();
-			timer.Interval = TimeSpan.FromMilliseconds(100);
+			timer.Interval = TimeSpan.FromMilliseconds(500);
 			timer.Tick += new EventHandler(timer_Tick);
 			timer.Start();
 		}
@@ -178,7 +178,7 @@ namespace GitUI
 			timer.Stop();
 			NoRefresh = true;
 			NeedRefresh = false;
-			lastTimeRefresh = DateTime.Now.AddSeconds(2);
+			lastTimeRefresh = DateTime.Now.AddMilliseconds(400);
 		}
 
 		#endregion
@@ -191,39 +191,12 @@ namespace GitUI
 		{
 			if (!GitBash.Exists) throw new Exception("git.exe is not found.");
 			if (this.Tracker == null) throw new Exception("Git repository is not found.");
-
-			//if (console != null)
-			//{
-			//    console.Run("git " + cmd);
-			//    return "";
-			//}
-			//else
-			//{
-			//    var result = GitBash.Run(cmd, this.Tracker.GitWorkingDirectory);
-			//    return result.Output;
-			//}
-
 			return GitBash.Run(cmd, this.Tracker.WorkingDirectory);
-
-			//if (result.HasError && !string.IsNullOrWhiteSpace(result.Error)) 
-			//    throw new Exception(result.Error); // TODO: add GitExecutionException class
-			//return result.Output;
 		}
 
 		private void GitRunCmd(string cmd)
 		{
 			if (!GitBash.Exists) throw new Exception("git.exe is not found.");
-
-			//if (this.Tracker == null) throw new Exception("Git repository is not found.");
-			//if (console != null)
-			//{
-			//    console.Run("git " + cmd);
-			//}
-			//else
-			//{
-			//    GitBash.RunCmd(cmd, this.Tracker.GitWorkingDirectory);
-			//}
-
 			GitBash.RunCmd(cmd, this.Tracker.WorkingDirectory);
 		}
 
