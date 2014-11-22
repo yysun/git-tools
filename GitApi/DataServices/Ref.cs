@@ -9,6 +9,7 @@ namespace GitScc.DataServices
     {
         public string Id { get; set; }
         public string RefName { get; set; }
+        public string IsHead { get; set; }
         public string Name
         {
             get

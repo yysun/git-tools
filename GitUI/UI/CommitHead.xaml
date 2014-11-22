@@ -14,8 +14,10 @@
     <StackPanel Height="18" Orientation="Horizontal">
         <Polygon x:Name="polygon" Points="0,0.5 1,0 1,1" Fill="#93F87C7C" Width="12" Height="6" Stretch="Fill" Stroke="{x:Null}" />
         <Border x:Name="border" BorderThickness="1" CornerRadius="4" BorderBrush="#93F87C7C" Background="#93F87C7C">
-            <TextBlock x:Name="textBlock" Padding="10,0" Text="{Binding Name}" FontSize="10"
+            <TextBlock x:Name="txtName" Padding="10,0" Text="{Binding Name}" FontSize="10"
                        VerticalAlignment="Center" HorizontalAlignment="Center" ></TextBlock>
         </Border>
+        <TextBlock x:Name="txtHead" Padding="0,0" Text="{Binding IsHead}" FontSize="10" Foreground="#FF0000"
+                       VerticalAlignment="Center" HorizontalAlignment="Left" ></TextBlock>
     </StackPanel>
 </UserControl>

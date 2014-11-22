@@ -74,16 +74,26 @@ namespace GitScc.DataServices
             {
                 if (refs == null)
                 {
-                    var result = GitBash.Run("show-ref --head --dereference", this.workingDirectory);
-                    if (!result.HasError)
+                    var branch = "";
+
+                    var result = GitBash.Run("rev-parse --abbrev-ref HEAD", this.workingDirectory);
+                    if (!result.HasError && !result.Output.Contains("fatal:"))
+                    {
+                        branch = "refs/heads/" + result.Output.Trim();
+                    }
+
+                    result = GitBash.Run("show-ref --head --dereference", this.workingDirectory);
+                    if (!result.HasError && !result.Output.Contains("fatal:"))
+                    {
                         refs = (from t in result.Output.Split('\n')
                                 where !string.IsNullOrWhiteSpace(t)
                                 select new Ref
                                 {
                                     Id = t.Substring(0, 40),
-                                    RefName = t.Substring(41)
+                                    RefName = t.Substring(41),
+                                    IsHead = t.Substring(41).Equals(branch) ? "*" : ""
                                 }).ToList();
-
+                    }
                 }
                 return refs;
             }
