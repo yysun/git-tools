@@ -1,0 +1,155 @@
+﻿<UserControl x:Class="GitUI.UI.PendingChanges" xmlns:cmd="clr-namespace:GitUI" 
+			 xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 mc:Ignorable="d" 
+			 d:DesignHeight="300" d:DesignWidth="800" KeyDown="UserControl_KeyDown">
+	<UserControl.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="ResourceDictionary.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+		
+	</UserControl.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="60" />
+			<RowDefinition Height="*" />
+		</Grid.RowDefinitions>
+
+		<Grid>
+			<Label Content="Commit" HorizontalAlignment="Left" Margin="8,28,0,6" Name="lblCommit" d:LayoutOverrides="Height"  Visibility="Hidden" />
+			<Label Content="Message" HorizontalAlignment="Left" Margin="8,5,0,0" Name="lblMessage" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" />
+			<Button Content="close" HorizontalAlignment="Right" Margin="0,19,20,17" Padding="10,0"
+					Command="cmd:HistoryViewCommands.CloseCommitDetails" CommandParameter="PendingChanges"
+					Template="{DynamicResource CloseButtonControlTemplate}" ToolTip="Back to graphic view" d:LayoutOverrides="Height" />
+			<Button Content="Commit" HorizontalAlignment="Right" Margin="0,9,46,7" Name="btnPendingChanges" Padding="10,0" RenderTransformOrigin="11.042,1.083" Template="{DynamicResource PendingChangesButtonControlTemplate}" ToolTip="Pending Changes" Click="btnPendingChanges_Click" />
+			<CheckBox Content="Amend last commit" Height="16" HorizontalAlignment="Left" Margin="292,34,0,0" Name="chkAmend" VerticalAlignment="Top" Checked="chkAmend_Checked" />
+			<CheckBox Content="Commit to new branch" Height="16" HorizontalAlignment="Left" Margin="12,34,0,0" Name="chkNewBranch" VerticalAlignment="Top" Checked="chkNewBranch_Checked" />
+			<TextBox Height="23" HorizontalAlignment="Left" Margin="156,31,0,0" Name="txtNewBranch" VerticalAlignment="Top" Width="120" TextChanged="txtNewBranch_TextChanged" />
+			<CheckBox Content="Sign off" Height="16" HorizontalAlignment="Left" Margin="428,34,0,0" Name="chkSignOff" VerticalAlignment="Top" />
+			<Grid.Background>
+				<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+					<GradientStop Color="#FFF2F2F2" Offset="0" />
+					<GradientStop Color="#FFDBDBDB" Offset="1" />
+					<GradientStop Color="#FFD8D5D5" Offset="0.331" />
+				</LinearGradientBrush>
+			</Grid.Background>
+		</Grid>
+
+		<Grid x:Name="Main" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="520" MinWidth="20" MaxWidth="1000"/>
+				<ColumnDefinition Width="4" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
+			</Grid.RowDefinitions>
+			<Grid.Background>
+				<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+					<GradientStop Color="#FFE4E4E4" Offset="1" />
+					<GradientStop Color="White" Offset="0" />
+				</LinearGradientBrush>
+			</Grid.Background>
+			
+			<GridSplitter Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+					  VerticalAlignment="Stretch" HorizontalAlignment="Center" Name="gridSplitter1" Width="4" ResizeDirection="Columns" />
+
+			<Grid Height="36" HorizontalAlignment="Stretch" VerticalAlignment="Top" >
+				<Grid.Background>
+					<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+						<GradientStop Color="#FFCBCBCB" Offset="0" />
+						<GradientStop Color="White" Offset="1" />
+					</LinearGradientBrush>
+				</Grid.Background>
+				<TextBlock Text="Comments" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0" />
+			</Grid>
+
+			<Grid Grid.Column="2" Height="36" HorizontalAlignment="Stretch" VerticalAlignment="Top" >
+				<Grid.Background>
+					<LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+						<GradientStop Color="#FFCBCBCB" Offset="0" />
+						<GradientStop Color="White" Offset="1" />
+					</LinearGradientBrush>
+				</Grid.Background>
+				<TextBlock Text="Changes" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0" />
+			</Grid>
+
+			<Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="grid1">
+
+				<Grid.RowDefinitions>
+					<RowDefinition Height="150" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="*" />
+				</Grid.RowDefinitions>
+
+				<GridSplitter Grid.Row="1" Grid.ColumnSpan="2"
+					  VerticalAlignment="Top" HorizontalAlignment="Stretch" Name="gridSplitter2" Height="4" />
+
+				<Label Content="Changed Files" Height="28" HorizontalAlignment="Stretch" Name="label3" VerticalAlignment="Center" 
+					   Margin="12,0,12,0" Foreground="#FF333333" Grid.Row="2" ToolTip="select file to commit, or right click to stage/unstage file" />
+
+				<RichTextBox HorizontalAlignment="Stretch" Name="textBoxComments" VerticalAlignment="Stretch" Margin="10,0,10,10" 
+					 AcceptsReturn="True" VerticalScrollBarVisibility="Visible" SpellCheck.IsEnabled="True">
+					<RichTextBox.Resources>
+						<Style TargetType="{x:Type Paragraph}">
+							<Setter Property="Margin" Value="0"/>
+						</Style>
+					</RichTextBox.Resources>
+				</RichTextBox>
+
+				<DataGrid AutoGenerateColumns="False" Grid.Row="3" HorizontalAlignment="Stretch" Margin="10,0,10,10" Name="dataGrid1" VerticalAlignment="Stretch"
+					  GridLinesVisibility="None"  Foreground="#FF333333" Sorting="dataGrid1_Sorting" IsReadOnly="True" SelectedValuePath="FileName"
+					  SelectionMode="Extended" SelectionChanged="dataGrid1_SelectionChanged" ContextMenuOpening="dataGrid1_ContextMenuOpening"
+					  CanUserResizeRows="False" CanUserDeleteRows="False" CanUserAddRows="False" CanUserReorderColumns="False" RowHeaderWidth="0" KeyDown="dataGrid1_KeyDown">
+
+					<DataGrid.Columns>
+						<DataGridTemplateColumn Header="Staged" CanUserResize="False">
+							<DataGridTemplateColumn.HeaderTemplate>
+								<DataTemplate>
+									<CheckBox x:Name="checkBoxAllStaged" Click="checkBoxAllStaged_Click"  
+										  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+								</DataTemplate>
+							</DataGridTemplateColumn.HeaderTemplate>
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<CheckBox x:Name="checkBoxSelected" Click="checkBoxSelected_Click"  IsChecked="{Binding IsSelected}"
+										  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+						<DataGridTextColumn Header="Status" Binding="{Binding Status}" CanUserResize="True" Width="70" />
+						<DataGridTextColumn Header="File" Binding="{Binding FileName}" Width="*" />
+					</DataGrid.Columns>
+
+					<DataGrid.ContextMenu>
+						<ContextMenu>
+							<MenuItem Header="Stage File" Name="menuStage" Click="menuStage_Click" />
+							<MenuItem Header="Un-Stage File" Name="menuUnstage" Click="menuUnstage_Click" />
+							<MenuItem Header="Compare..." Name="menuCompare" Click="menuCompare_Click" Visibility="Collapsed" />
+							<MenuItem Header="Undo File Changes" Name="menuUndo" Click="menuUndo_Click"/>
+							<MenuItem Header="Delete File" Name="menuDeleteFile" Click="menuDeleteFile_Click"/>
+							<MenuItem Header="Ignore File" Name="menuIgnore" Click="menuIgnore_Click" >
+								<MenuItem Header="Add File to .gitignore" Name="menuIgnoreFile" Click="menuIgnoreFile_Click"/>
+								<MenuItem Header="Add File Path to .gitignore" Name="menuIgnoreFilePath" Click="menuIgnoreFilePath_Click"/>
+								<MenuItem Header="Add File Extensions to .gitignore" Name="menuIgnoreFileExt" Click="menuIgnoreFileExt_Click"/>
+							</MenuItem>
+							<MenuItem Header="Refresh" Name="menuRefresh" Click="menuRefresh_Click"/>
+						</ContextMenu>
+					</DataGrid.ContextMenu>
+				</DataGrid>
+				
+			</Grid>
+
+			<Grid Grid.Column="2" Grid.Row="1" Background="White">
+				<avalonEdit:TextEditor x:Name="DiffEditor" FontFamily="Consolas" FontSize="10pt"/>
+			</Grid>
+		</Grid>
+	</Grid>
+</UserControl>

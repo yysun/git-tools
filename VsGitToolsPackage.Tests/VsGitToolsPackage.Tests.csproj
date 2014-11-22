@@ -55,9 +55,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GitApi\GitScc.csproj">
+    <ProjectReference Include="..\GitApi\GitApi.csproj">
       <Project>{161e81e2-25e5-4134-8d2d-595419b1265b}</Project>
-      <Name>GitScc</Name>
+      <Name>GitApi</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

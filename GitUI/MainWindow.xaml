@@ -1,0 +1,109 @@
+﻿<Window xmlns:my="clr-namespace:GitUI.UI" xmlns:cmd="clr-namespace:GitUI"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="http://schemas.microsoft.com/winfx/2006/xaml/presentation/shell"
+        xmlns:GitScc_UI="clr-namespace:GitScc.UI" x:Class="GitUI.MainWindow" Height="460" Width="800" 
+        Loaded="Window_Loaded" PreviewKeyDown="Window_PreviewKeyDown"
+        Icon="/GitUI;component/Resources/dragon.png"
+        AllowDrop="True" Drop="Window_Drop">
+
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static shell:SystemCommands.CloseWindowCommand}" Executed="_OnSystemCommandCloseWindow"/>
+        
+        <CommandBinding Command="cmd:HistoryViewCommands.OpenCommitDetails"  Executed="OpenCommitDetails_Executed" />        
+        <CommandBinding Command="cmd:HistoryViewCommands.CloseCommitDetails"  Executed="CloseCommitDetails_Executed" />
+        <CommandBinding Command="cmd:HistoryViewCommands.SelectCommit"  Executed="SelectCommit_Executed" />        
+        <CommandBinding Command="cmd:HistoryViewCommands.CompareCommits"  Executed="CompareCommits_Executed" />
+        <CommandBinding Command="cmd:HistoryViewCommands.ExportGraph"  Executed="ExportGraph" />
+        <CommandBinding Command="cmd:HistoryViewCommands.RefreshGraph"  Executed="RefreshGraph_Executed" />
+        <CommandBinding Command="cmd:HistoryViewCommands.ScrollToCommit"  Executed="ScrollToCommit_Executed" />
+        <CommandBinding Command="cmd:HistoryViewCommands.GraphLoaded"  Executed="GraphLoaded_Executed" />
+        <CommandBinding Command="cmd:HistoryViewCommands.PendingChanges"  Executed="PendingChanges_Executed" />
+        <CommandBinding Command="cmd:HistoryViewCommands.ShowMessage"  Executed="ShowMessage_Executed" />
+        <CommandBinding Command="cmd:HistoryViewCommands.OpenRepository"  Executed="OpenRepository_Executed" />
+    </Window.CommandBindings>
+    
+    <Window.Resources>
+        
+        <Style x:Key="GradientStyle" TargetType="{x:Type cmd:MainWindow}">
+            <Setter Property="shell:WindowChrome.WindowChrome">
+                <Setter.Value>
+                    <shell:WindowChrome ResizeBorderThickness="4" CaptionHeight="6" CornerRadius="6,6,6,6" GlassFrameThickness="0"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type cmd:MainWindow}">
+                        <Grid Background="#FFDBDBDB">
+                            <!--<Border>
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,50" MappingMode="Absolute">
+                                        <GradientStop Offset="0" Color="#AAF2F2F2"/>
+                                        <GradientStop Offset="1" Color="#AAFFFFFF"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <ContentPresenter Margin="2" Content="{TemplateBinding Content}"/>
+                            </Border>-->
+                            <ContentPresenter Margin="0" Content="{TemplateBinding Content}"/>
+                            <!--<Button shell:WindowChrome.IsHitTestVisibleInChrome="True"
+                                    VerticalAlignment="Top" HorizontalAlignment="Right" Content="x"
+                                    Command="{x:Static shell:SystemCommands.CloseWindowCommand}">
+                                
+                            </Button>-->
+                            <!--
+                                Width="{Binding Source={x:Static shell:SystemParameters2.Current}, Path=WindowCaptionButtonsLocation.Width}"
+                                Height="{Binding Source={x:Static shell:SystemParameters2.Current}, Path=WindowCaptionButtonsLocation.Height}"
+                                Margin="{Binding Source={x:Static shell:SystemParameters2.Current}, Path=WindowCaptionButtonsLocation, Converter={StaticResource CaptionButtonMarginConverter}}"
+                            -->
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <Grid x:Name="rootGrid">
+        <!--<Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="0"/>
+        </Grid.RowDefinitions>-->
+       
+        <GitScc_UI:HistoryGraph HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="graph" Margin="0,90,0,0" />
+
+        <my:MainToolBar x:Name="topToolBar" Height="90"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Top">
+        </my:MainToolBar>
+
+        <!--<my:BottomToolBar x:Name="bottomToolBar" Height="60" Visibility="Collapsed"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+            <my:BottomToolBar.RenderTransform>
+                <TranslateTransform Y="60" />
+            </my:BottomToolBar.RenderTransform>
+        </my:BottomToolBar>-->
+        
+        <GitScc_UI:CommitDetails x:Name="details" Visibility="Collapsed" Background="White">
+            <GitScc_UI:CommitDetails.RenderTransform>
+                <TranslateTransform/>
+            </GitScc_UI:CommitDetails.RenderTransform>
+        </GitScc_UI:CommitDetails>
+
+        <my:PendingChanges x:Name="pendingChanges" Visibility="Collapsed" Background="White">
+            <my:PendingChanges.RenderTransform>
+                <TranslateTransform/>
+            </my:PendingChanges.RenderTransform>
+        </my:PendingChanges>
+        
+        <!--<GridSplitter VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="1"
+                      Height="4" Background="#FFAAAAAA"/>
+        
+        <my:GitConsole x:Name="gitConsole" VerticalAlignment="Stretch" Grid.Row="2"/>-->
+
+        <GitScc_UI:Loading x:Name="loading"  HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+        <TextBlock HorizontalAlignment="Left" Margin="15,0,0,20" x:Name="txtSettings" Text="v" VerticalAlignment="Bottom" Foreground="#FFEEEEEE" FontFamily="Wingdings" FontSize="18" />
+        <TextBlock HorizontalAlignment="Right" Margin="0,0,25,25" x:Name="txtRepo" Text="(No Repo)" VerticalAlignment="Bottom" Foreground="#FF999999" />
+        <TextBlock HorizontalAlignment="Right" Margin="0,0,25,45" x:Name="txtPrompt" Text="(0 0 0 0)" VerticalAlignment="Bottom" Foreground="#FF999999"  />
+        <TextBlock Foreground="#FF990000" HorizontalAlignment="Left" Margin="15,96,0,0" x:Name="txtMessage" Text="" VerticalAlignment="Top" />
+    </Grid>
+</Window>

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using GitScc.DataServices;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -467,10 +469,61 @@ namespace GitScc
             }
             return false;
         }
+
+        public string DiffFile(string fileName, string commitId1, string commitId2)
+        {
+            if (!this.IsGit) return "";
+
+            var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
+            var fileNameRel = fileName;
+
+            GitBash.RunCmd(string.Format("diff {2} {3} -- \"{0}\" > \"{1}\"", fileNameRel, tmpFileName, commitId1, commitId2), WorkingDirectory);
+            return tmpFileName;
+        }
+
+
+        public string Blame(string fileName)
+        {
+            if (!this.IsGit) return "";
+
+            var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".blame");
+            var fileNameRel = fileName;
+            GitBash.RunCmd(string.Format("blame -M -w -- \"{0}\" > \"{1}\"", fileNameRel, tmpFileName), WorkingDirectory);
+            return tmpFileName;
+
+        }
+
+        public IEnumerable<string> GetCommitsForFile(string fileName)
+        {
+            if (!this.IsGit) return new string[0];
+
+            var fileNameRel = fileName;
+
+            var result = GitBash.Run(string.Format("log -z --ignore-space-change --pretty=format:%H -- \"{0}\"", fileNameRel), WorkingDirectory);
+            if (!result.HasError)
+                return result.Output.Split(new char[] { '\0' }, StringSplitOptions.RemoveEmptyEntries);
+            return new string[0];
+        }
+
     }
 
     public class GitFileStatusTracker: GitRepository
     {
         public GitFileStatusTracker(string directory) : base(directory) { }
+
+        RepositoryGraph repositoryGraph;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public RepositoryGraph RepositoryGraph
+        {
+            get
+            {
+                if (repositoryGraph == null)
+                {
+                    repositoryGraph = IsGit ? new RepositoryGraph(this.WorkingDirectory) : null;
+                }
+                return repositoryGraph;
+            }
+        }
     }
 }

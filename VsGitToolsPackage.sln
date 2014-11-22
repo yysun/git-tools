@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VsGitToolsPackage", "VsGitToolsPackage\VsGitToolsPackage.csproj", "{B867C32C-3C78-47E3-95DE-9A43B7AF1FA7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C756204F-28E1-473A-8160-E697E3303F1B} = {C756204F-28E1-473A-8160-E697E3303F1B}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E805C6B0-DCBB-4262-8B56-B6A96A78AA33}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,7 +20,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiffClassifier", "DiffClass
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VsGitToolsPackage.Tests", "VsGitToolsPackage.Tests\VsGitToolsPackage.Tests.csproj", "{0E10AFF0-4405-46C1-8FE6-802B17290576}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitScc", "GitApi\GitScc.csproj", "{161E81E2-25E5-4134-8D2D-595419B1265B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitApi", "GitApi\GitApi.csproj", "{161E81E2-25E5-4134-8D2D-595419B1265B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitUI", "GitUI\GitUI.csproj", "{C756204F-28E1-473A-8160-E697E3303F1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +56,12 @@ Global
 		{161E81E2-25E5-4134-8D2D-595419B1265B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{161E81E2-25E5-4134-8D2D-595419B1265B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{161E81E2-25E5-4134-8D2D-595419B1265B}.Release|x86.ActiveCfg = Release|Any CPU
+		{C756204F-28E1-473A-8160-E697E3303F1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C756204F-28E1-473A-8160-E697E3303F1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C756204F-28E1-473A-8160-E697E3303F1B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C756204F-28E1-473A-8160-E697E3303F1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C756204F-28E1-473A-8160-E697E3303F1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C756204F-28E1-473A-8160-E697E3303F1B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

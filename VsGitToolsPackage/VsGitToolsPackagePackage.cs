@@ -274,7 +274,7 @@ namespace F1SYS.VsGitToolsPackage
         private void ShowHistoryWindow(object sender, EventArgs e)
         {
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            path = Path.Combine(path, "\\Resources\\Dragon.exe");
+            path = Path.Combine(path, "Dragon.exe");
             var tmpPath = Path.Combine(Path.GetTempPath(), "Dragon.exe");
 
             var needCopy = !File.Exists(tmpPath);
