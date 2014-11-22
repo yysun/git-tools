@@ -63,7 +63,7 @@ namespace GitScc.UI
             try
             {
                 dynamic commit = this.DataContext;
-                var text = string.Format("{0}\r\n\r\n{1}\r\n\r\n{2}, {3}",
+                var text = string.Format("Enter tag for commit: {0}",
                     commit.ShortId, commit.Comments, commit.Author, commit.Date);
 
                 string tag = Interaction.InputBox(text, "git tag", "");
@@ -97,7 +97,7 @@ namespace GitScc.UI
             try
             {
                 dynamic commit = this.DataContext;
-                var text = string.Format("{0}\r\n\r\n{1}\r\n\r\n{2}, {3}",
+                var text = string.Format("Enter branch name for commit: {0}",
                     commit.ShortId, commit.Comments, commit.Author, commit.Date);
 
                 string branch = Interaction.InputBox(text, "git branch", "");
@@ -110,10 +110,11 @@ namespace GitScc.UI
 
                 string branchId = GitViewModel.Current.GetBranchId(branch).Output;
                 GitBashResult ret0 = null, ret1;
+                MessageBoxResult result;
 
                 if (!string.IsNullOrWhiteSpace(branchId))
                 {
-                    var result = MessageBox.Show("Branch " + branch + " already exists.\r\n\r\n" +
+                    result = MessageBox.Show("Branch " + branch + " already exists.\r\n\r\n" +
                         "Do you want to move it to here?", "Warning",
                         MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
@@ -127,6 +128,18 @@ namespace GitScc.UI
                 if (ret0 != null) ret1.Output += ret0.Output;
                 HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret1 }, this);
 
+                if (!ret1.HasError)
+                {
+                    result = MessageBox.Show("Branch " + branch + " has been created.\r\n\r\n" +
+                            "Do you want to check it out?", "Checkout",
+                            MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        ret1 = GitViewModel.Current.CheckoutBranch(branch);
+                        HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret1 }, this);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -156,6 +169,22 @@ namespace GitScc.UI
         {
             var ret = GitViewModel.Current.CheckoutBranch(this.txtId.Text);
             HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
+        }
+
+        private void CherryPick_Click(object sender, RoutedEventArgs e)
+        {
+            var branch = GitViewModel.Current.Tracker.CurrentBranch;
+            var result = MessageBox.Show("Are you sure you want to cherry pick " + txtId.Text
+                + " to current branch " + branch + "?", "Warning",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                var ret = GitViewModel.Current.CherryPick(this.txtId.Text);
+                HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
+
+            }
+
         }
 
     }

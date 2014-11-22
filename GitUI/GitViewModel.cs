@@ -250,7 +250,12 @@ namespace GitUI
 			GitRunCmd(string.Format("format-patch {0}..{1} -o \"{2}\"", id1, id2, fileName));
 		}
 
+        internal GitBashResult CherryPick(string id)
+        {
+            return GitRun(string.Format("cherry-pick {0}", id));
+        }
+
 		#endregion    
-	
-	}
+   
+    }
 }

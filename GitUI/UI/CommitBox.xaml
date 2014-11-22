@@ -38,7 +38,7 @@
             <MenuItem Header="checkout" Click="CheckoutCommit_Click"/>            
 			<MenuItem Header="new tag" Click="NewTag_Click" />
 			<MenuItem Header="new branch" Click="NewBranch_Click" />
-			<!--<MenuItem Header="view details" Command="cmd:HistoryViewCommands.OpenCommitDetails" CommandParameter="{Binding Id}" />-->
+            <MenuItem Header="cherry pick" Click="CherryPick_Click" />
             <MenuItem Header="archive" Click="Export_Click" />
         </ContextMenu>
 	</UserControl.ContextMenu>    

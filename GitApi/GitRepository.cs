@@ -296,6 +296,7 @@ namespace GitScc
                     if (IsInTheMiddleOfPatch) branch += " | AM";
                     if (IsInTheMiddleOfRebase) branch += " | REBASE";
                     if (IsInTheMiddleOfRebaseI) branch += " | REBASE-i";
+                    if (IsInTheMiddleOfCherryPick) branch += " | CHERRY-PIKCING";
                 }
                 return branch;
             }
@@ -338,6 +339,14 @@ namespace GitScc
             get
             {
                 return this.IsGit ? FileExistsInRepo("rebase-*", "interactive") : false;
+            }
+        }
+
+        public bool IsInTheMiddleOfCherryPick
+        {
+            get
+            {
+                return this.IsGit ? FileExistsInRepo("CHERRY_PICK_HEAD") : false;
             }
         }
 
@@ -521,6 +530,7 @@ namespace GitScc
                 return repositoryGraph;
             }
         }
+
     }
 
     public class GitFileStatusTracker: GitRepository
