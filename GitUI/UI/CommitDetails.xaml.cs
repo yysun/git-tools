@@ -9,6 +9,10 @@ using System.Windows.Threading;
 using GitScc.DataServices;
 using GitUI;
 using System.Diagnostics;
+using System.Reflection;
+using System.Xml;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using ICSharpCode.AvalonEdit.Highlighting;
 
 namespace GitScc.UI
 {
@@ -30,8 +34,23 @@ namespace GitScc.UI
 
         private void ShowFile(string tmpFileName)
         {
-            this.editor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.GetDefinitionByExtension(
-                Path.GetExtension(tmpFileName));
+            var ext = Path.GetExtension(tmpFileName);
+            if (ext == ".diff")
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                using (Stream s = assembly.GetManifestResourceStream("GitUI.Resources.Patch-Mode.xshd"))
+                {
+                    using (XmlTextReader reader = new XmlTextReader(s))
+                    {
+                        this.editor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+                    }
+                }
+            }
+            else
+            {
+                this.editor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(
+                    ext);
+            }
             this.editor.ShowLineNumbers = true;
             this.editor.Load(tmpFileName);
             File.Delete(tmpFileName);

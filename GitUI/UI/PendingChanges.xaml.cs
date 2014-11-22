@@ -11,6 +11,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using GitScc;
+using System.Reflection;
+using System.Xml;
+using ICSharpCode.AvalonEdit.Highlighting.Xshd;
+using ICSharpCode.AvalonEdit.Highlighting;
 
 namespace GitUI.UI
 {
@@ -125,8 +129,23 @@ namespace GitUI.UI
         {
             try
             {
-                this.DiffEditor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.GetDefinitionByExtension(
-                    Path.GetExtension(fileName));
+                var ext = Path.GetExtension(fileName);
+                if (ext == ".diff")
+                {
+                    var assembly = Assembly.GetExecutingAssembly();
+                    using (Stream s = assembly.GetManifestResourceStream("GitUI.Resources.Patch-Mode.xshd"))
+                    {
+                        using (XmlTextReader reader = new XmlTextReader(s))
+                        {
+                            DiffEditor.SyntaxHighlighting = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+                        }
+                    }
+                }
+                else
+                {
+                    this.DiffEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(
+                        ext);
+                }
                 this.DiffEditor.ShowLineNumbers = true;
                 this.DiffEditor.Load(fileName);
             }

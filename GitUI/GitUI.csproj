@@ -179,6 +179,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <EmbeddedResource Include="Resources\Patch-Mode.xshd" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Loading.png" />
