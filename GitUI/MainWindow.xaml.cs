@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -46,10 +47,19 @@ namespace GitUI
 				loading.Visibility = Visibility.Visible;
 				Action act = () =>
 				{
-					if (gitViewModel.Tracker.IsGit)
+					if (!gitViewModel.NoRefresh && gitViewModel.Tracker.IsGit)
 					{
 						this.txtRepo.Text = gitViewModel.Tracker.WorkingDirectory;
-						//this.txtPrompt.Text = GitIntellisenseHelper.GetPrompt();
+
+                        var changed = gitViewModel.Tracker.ChangedFiles;
+                        var prompt = string.Format("{4}:  +{0} ~{1} -{2} !{3}",
+                            changed.Where(f => f.Status == GitFileStatus.New || f.Status == GitFileStatus.Added).Count(),
+                            changed.Where(f => f.Status == GitFileStatus.Modified || f.Status == GitFileStatus.Staged).Count(),
+                            changed.Where(f => f.Status == GitFileStatus.Deleted || f.Status == GitFileStatus.Removed).Count(),
+                            changed.Where(f => f.Status == GitFileStatus.Conflict).Count(),
+                            gitViewModel.Tracker.CurrentBranch);
+
+						this.txtPrompt.Text = prompt;
 					}
 					this.graph.Show(gitViewModel.Tracker, reload != null);
 					this.pendingChanges.Refresh(gitViewModel.Tracker);
