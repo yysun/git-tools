@@ -254,7 +254,7 @@ namespace GitUI
 
 		internal GitBashResult DeleteBranch(string name)
 		{
-			return GitRun("branch -d " + name);
+			return GitRun("branch -D " + name);
 		}
 
 		internal GitBashResult CheckoutBranch(string name)
