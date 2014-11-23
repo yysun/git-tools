@@ -14,6 +14,8 @@ namespace GitScc
 	{
 		private string workingDirectory;
         private bool isGit;
+        private string branch;
+        private IEnumerable<GitFile> changedFiles;
 
 		public string WorkingDirectory { get { return workingDirectory; } }
         public bool IsGit { get { return isGit; } }
@@ -28,9 +30,10 @@ namespace GitScc
             this.repositoryGraph = null;
             this.changedFiles = null;
             this.isGit = false;
+            this.branch = null;
 
-            var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory);
-            if (!result.HasError && !result.Output.Contains("fatal:"))
+            var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory); 
+            if (!result.HasError && !result.Output.StartsWith("fatal:"))
             {
                 this.workingDirectory = result.Output.Trim();
                 result = GitBash.Run("rev-parse --is-inside-work-tree", WorkingDirectory);
@@ -45,7 +48,7 @@ namespace GitScc
             if (!this.IsGit) return null;
             var result = GitBash.Run(cmd, this.WorkingDirectory);
             if (result.HasError) throw new GitException(result.Error);
-            if (result.Output.Contains("fatal:")) throw new GitException(result.Output);
+            if (result.Output.StartsWith("fatal:")) throw new GitException(result.Output);
             return result.Output;
         }
 
@@ -73,7 +76,7 @@ namespace GitScc
         {
             string id = null;
             var result = GitBash.Run("rev-parse " + name, this.WorkingDirectory);
-            if (!result.HasError && !result.Output.Contains("fatal:"))
+            if (!result.HasError && !result.Output.StartsWith("fatal:"))
             {
                 id = result.Output.Trim();
             }
@@ -161,8 +164,6 @@ namespace GitScc
             }
             return tmpFileName;
         }
-
-        private IEnumerable<GitFile> changedFiles;
 
         public IEnumerable<GitFile> ChangedFiles
         {
@@ -286,17 +287,20 @@ namespace GitScc
         {
             get
             {
-                var branch = "master";
-                var result = GitBash.Run("rev-parse --abbrev-ref HEAD", this.WorkingDirectory);
-                if (!result.HasError && !result.Output.Contains("fatal:"))
+                if (branch == null)
                 {
-                    branch = result.Output.Trim();
-                    if (IsInTheMiddleOfBisect) branch += " | BISECTING";
-                    if (IsInTheMiddleOfMerge) branch += " | MERGING";
-                    if (IsInTheMiddleOfPatch) branch += " | AM";
-                    if (IsInTheMiddleOfRebase) branch += " | REBASE";
-                    if (IsInTheMiddleOfRebaseI) branch += " | REBASE-i";
-                    if (IsInTheMiddleOfCherryPick) branch += " | CHERRY-PIKCING";
+                    branch = "master";
+                    var result = GitBash.Run("rev-parse --abbrev-ref HEAD", this.WorkingDirectory);
+                    if (!result.HasError && !result.Output.StartsWith("fatal:"))
+                    {
+                        branch = result.Output.Trim();
+                        if (IsInTheMiddleOfBisect) branch += " | BISECTING";
+                        if (IsInTheMiddleOfMerge) branch += " | MERGING";
+                        if (IsInTheMiddleOfPatch) branch += " | AM";
+                        if (IsInTheMiddleOfRebase) branch += " | REBASE";
+                        if (IsInTheMiddleOfRebaseI) branch += " | REBASE-i";
+                        if (IsInTheMiddleOfCherryPick) branch += " | CHERRY-PIKCING";
+                    }
                 }
                 return branch;
             }
@@ -485,7 +489,7 @@ namespace GitScc
             var head = GetBranchId("HEAD");
             if (head == null) return false;
             var result = GitBash.Run("show-ref --head --dereference", WorkingDirectory);
-            if (!result.HasError && !result.Output.Contains("fatal:"))
+            if (!result.HasError && !result.Output.StartsWith("fatal:"))
             {
                 var refs = result.Output.Split('\n')
                           .Where(t => t.IndexOf(head) >= 0);
