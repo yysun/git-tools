@@ -306,7 +306,7 @@ namespace GitScc
         {
             get
             {
-                return this.IsGit ? FileExistsInRepo("BISECT_START") : false;
+                return this.IsGit && FileExistsInGit("BISECT_START");
             }
         }
 
@@ -314,7 +314,7 @@ namespace GitScc
         {
             get
             {
-                return this.IsGit ? FileExistsInRepo("MERGE_HEAD") : false;
+                return this.IsGit && FileExistsInGit("MERGE_HEAD");
             }
         }
 
@@ -322,7 +322,7 @@ namespace GitScc
         {
             get
             {
-                return this.IsGit ? FileExistsInRepo("rebase-*", "applying") : false;
+                return this.IsGit ? FileExistsInGit("rebase-*", "applying") : false;
             }
         }
 
@@ -330,7 +330,7 @@ namespace GitScc
         {
             get
             {
-                return this.IsGit ? FileExistsInRepo("rebase-*", "rebasing") : false;
+                return this.IsGit ? FileExistsInGit("rebase-*", "rebasing") : false;
             }
         }
 
@@ -338,28 +338,41 @@ namespace GitScc
         {
             get
             {
-                return this.IsGit ? FileExistsInRepo("rebase-*", "interactive") : false;
+                return this.IsGit && FileExistsInGit("git-rebase-todo");
             }
+        }
+
+        private bool FileExistsInGit(string fileName)
+        {
+            return this.IsGit && File.Exists(Path.Combine(GitDirectory, fileName));
         }
 
         public bool IsInTheMiddleOfCherryPick
         {
             get
             {
-                return this.IsGit ? FileExistsInRepo("CHERRY_PICK_HEAD") : false;
+                return this.IsGit && FileExistsInGit("CHERRY_PICK_HEAD");
+            }
+        }
+
+        private string GitDirectory
+        {
+            get
+            {
+                return Path.Combine(WorkingDirectory, ".git");
             }
         }
 
         private bool FileExistsInRepo(string fileName)
         {
-            return File.Exists(Path.Combine(WorkingDirectory + "\\.git", fileName));
+            return File.Exists(Path.Combine(WorkingDirectory, fileName));
         }
 
-        private bool FileExistsInRepo(string directory, string fileName)
+        private bool FileExistsInGit(string directory, string fileName)
         {
-            if (Directory.Exists(WorkingDirectory))
+            if (Directory.Exists(GitDirectory))
             {
-                foreach (var dir in Directory.GetDirectories(WorkingDirectory, directory))
+                foreach (var dir in Directory.GetDirectories(GitDirectory, directory))
                 {
                     if (File.Exists(Path.Combine(dir, fileName))) return true;
                 }
