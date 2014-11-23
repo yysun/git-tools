@@ -28,3 +28,4 @@ _ReSharper*/
 *.vssscc
 $tf*/
 packages*/
+GitUI/Resources/GitApi2.dll

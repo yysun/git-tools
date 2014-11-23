@@ -274,7 +274,7 @@ namespace F1SYS.VsGitToolsPackage
         private void ShowHistoryWindow(object sender, EventArgs e)
         {
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            path = Path.Combine(path, "Dragon.exe");
+            path = Path.Combine(path, "Resources\\Dragon.exe");
             var tmpPath = Path.Combine(Path.GetTempPath(), "Dragon.exe");
 
             var needCopy = !File.Exists(tmpPath);
@@ -296,9 +296,9 @@ namespace F1SYS.VsGitToolsPackage
                 }
             }
 
-            if (File.Exists(tmpPath) && repository != null)
+            if (File.Exists(tmpPath))
             {
-                Process.Start(tmpPath, "\"" + repository.WorkingDirectory);
+                Process.Start(tmpPath, "\"" + repository.WorkingDirectory + "\"");
             }
         }
 

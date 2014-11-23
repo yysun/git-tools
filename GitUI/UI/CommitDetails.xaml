@@ -1,6 +1,6 @@
 ﻿<UserControl x:Class="GitScc.UI.CommitDetails" xmlns:cmd="clr-namespace:GitUI" 
 			 xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
-			 xmlns:model="clr-namespace:GitScc.DataServices;assembly=GitApi" 
+			 xmlns:model="clr-namespace:GitScc.DataServices;assembly=GitApi2" 
 			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 

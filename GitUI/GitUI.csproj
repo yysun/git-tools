@@ -195,9 +195,11 @@
   <ItemGroup>
     <Resource Include="Resources\dragon.png" />
     <EmbeddedResource Include="Resources\Microsoft.Windows.Shell.dll" />
-    <EmbeddedResource Include="Resources\GitApi.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\GitApi2.dll" />
+    <EmbeddedResource Include="Resources\ICSharpCode.AvalonEdit.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
