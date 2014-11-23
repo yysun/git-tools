@@ -94,57 +94,55 @@ namespace GitScc.UI
 
         private void NewBranch_Click(object sender, RoutedEventArgs e)
         {
-            try
+
+            dynamic commit = this.DataContext;
+            var text = string.Format("Enter branch name for commit: {0}",
+                commit.ShortId, commit.Comments, commit.Author, commit.Date);
+
+            string branch = Interaction.InputBox(text, "git branch", "");
+
+            if (string.IsNullOrWhiteSpace(branch)) return;
+
+            var branch1 = ((Ref[])commit.Refs).Where(r => r.Type == RefTypes.Branch
+                && r.Name == branch).FirstOrDefault();
+            if (branch1 != null && branch1.Id.StartsWith(commit.ShortId)) return;
+
+            string branchId = GitViewModel.Current.GetBranchId(branch).Output;
+
+            GitBashResult ret;
+            MessageBoxResult result;
+
+            if (!string.IsNullOrWhiteSpace(branchId))
             {
-                dynamic commit = this.DataContext;
-                var text = string.Format("Enter branch name for commit: {0}",
-                    commit.ShortId, commit.Comments, commit.Author, commit.Date);
+                result = MessageBox.Show("Branch " + branch + " already exists.\r\n\r\n" +
+                    "Do you want to move it to here?", "Warning",
+                    MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
-                string branch = Interaction.InputBox(text, "git branch", "");
-
-                if (string.IsNullOrWhiteSpace(branch)) return;
-
-                var branch1 = ((Ref[])commit.Refs).Where(r => r.Type == RefTypes.Branch
-                    && r.Name == branch).FirstOrDefault();
-                if (branch1 != null && branch1.Id.StartsWith(commit.ShortId)) return;
-
-                string branchId = GitViewModel.Current.GetBranchId(branch).Output;
-                GitBashResult ret0 = null, ret1;
-                MessageBoxResult result;
-
-                if (!string.IsNullOrWhiteSpace(branchId))
+                if (result == MessageBoxResult.Yes)
                 {
-                    result = MessageBox.Show("Branch " + branch + " already exists.\r\n\r\n" +
-                        "Do you want to move it to here?", "Warning",
-                        MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-                    if (result == MessageBoxResult.Yes)
+                    ret = GitViewModel.Current.DeleteBranch(branch);
+                    if (ret.HasError)
                     {
-                        ret0 = GitViewModel.Current.DeleteBranch(branch);
-                    }
-                }
-
-                ret1 = GitViewModel.Current.AddBranch(branch, commit.ShortId);
-                if (ret0 != null) ret1.Output += ret0.Output;
-                HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret1 }, this);
-
-                if (!ret1.HasError)
-                {
-                    result = MessageBox.Show("Branch " + branch + " has been created.\r\n\r\n" +
-                            "Do you want to check it out?", "Checkout",
-                            MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        ret1 = GitViewModel.Current.CheckoutBranch(branch);
-                        HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret1 }, this);
+                        HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
+                        return;
                     }
                 }
             }
-            catch (Exception ex)
+
+            ret = GitViewModel.Current.AddBranch(branch, commit.ShortId);
+            if (!ret.HasError)
             {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                result = MessageBox.Show("Branch " + branch + " has been created.\r\n\r\n" +
+                        "Do you want to check it out?", "Checkout",
+                        MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    ret = GitViewModel.Current.CheckoutBranch(branch);
+                }
             }
+
+            HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
