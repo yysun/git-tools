@@ -658,5 +658,20 @@ namespace GitScc.UI
             menuIgnore.IsEnabled = GitViewModel.Current.Tracker.IsGit;
         }
 
+        private void menuStash_Click(object sender, RoutedEventArgs e)
+        {
+            GitViewModel.Current.Stash();
+        }
+
+        private void menuStashPop_Click(object sender, RoutedEventArgs e)
+        {
+            GitViewModel.Current.StashPop();
+        }
+
+        private void menuMergeTool_Click(object sender, RoutedEventArgs e)
+        {
+            GitViewModel.Current.MergeTool();
+        }
+
     }
 }

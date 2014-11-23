@@ -188,9 +188,11 @@ namespace GitUI
 
 		private GitBashResult GitRun(string cmd)
 		{
-			if (!GitBash.Exists) throw new Exception("git.exe is not found.");
-			if (this.Tracker == null) throw new Exception("Git repository is not found.");
-			return GitBash.Run(cmd, this.Tracker.WorkingDirectory);
+			if (!GitBash.Exists) throw new GitException("git.exe is not found.");
+			if (this.Tracker == null) throw new GitException("Git repository is not found.");
+			var ret = GitBash.Run(cmd, this.Tracker.WorkingDirectory);
+            HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, null);
+            return ret;
 		}
 
 		private void GitRunCmd(string cmd)
@@ -199,9 +201,9 @@ namespace GitUI
 			GitBash.RunCmd(cmd, this.Tracker.WorkingDirectory);
 		}
 
-		internal GitBashResult AddTag(string name, string id)
+		internal void AddTag(string name, string id)
 		{
-			return GitRun(string.Format("tag \"{0}\" {1}", name, id));
+            GitRun(string.Format("tag \"{0}\" {1}", name, id));
 		}
 
 		internal GitBashResult GetTagId(string name)
@@ -209,14 +211,14 @@ namespace GitUI
 			return GitRun("show-ref refs/tags/" + name);
 		}
 
-		internal GitBashResult DeleteTag(string name)
+		internal void DeleteTag(string name)
 		{
-			return GitRun("tag -d " + name);
+            GitRun("tag -d " + name);
 		}
 
-		internal GitBashResult AddBranch(string name, string id)
+        internal GitBashResult AddBranch(string name, string id)
 		{
-			return GitRun(string.Format("branch \"{0}\" {1}", name, id));
+            return GitRun(string.Format("branch \"{0}\" {1}", name, id));
 		}
 
 		internal GitBashResult GetBranchId(string name)
@@ -224,19 +226,19 @@ namespace GitUI
 			return GitRun("show-ref refs/heads/" + name);
 		}
 
-		internal GitBashResult DeleteBranch(string name)
+        internal GitBashResult DeleteBranch(string name)
 		{
-			return GitRun("branch -D " + name);
+            return GitRun("branch -D " + name);
 		}
 
-		internal GitBashResult CheckoutBranch(string name)
+		internal void CheckoutBranch(string name)
 		{
-			return GitRun("checkout " + name);
+            GitRun("checkout " + name);
 		}
 
-		internal GitBashResult Archive(string id, string fileName)
+		internal void Archive(string id, string fileName)
 		{
-			return GitRun(string.Format("archive {0} --format=zip --output \"{1}\"", id, fileName));
+			GitRun(string.Format("archive {0} --format=zip --output \"{1}\"", id, fileName));
 		}
 
 		internal void Patch(string id1, string fileName)
@@ -249,11 +251,10 @@ namespace GitUI
 			GitRunCmd(string.Format("format-patch {0}..{1} -o \"{2}\"", id1, id2, fileName));
 		}
 
-        internal GitBashResult CherryPick(string id)
+        internal void CherryPick(string id)
         {
-            return GitRun(string.Format("cherry-pick {0}", id));
+            GitRun(string.Format("cherry-pick {0}", id));
         }
-
 
         internal void Init()
         {
@@ -264,8 +265,35 @@ namespace GitUI
         {
             Tracker.EditIngoreFile();
         }
-		#endregion    
-  
-    
+
+
+        internal void Stash()
+        {
+            GitRun("stash");
+        }
+
+        internal void StashPop()
+        {
+            GitRun("stash pop");
+        }
+
+        internal void MergeTool()
+        {
+            GitRun("mergetool");
+        }
+
+        internal void Rebase(string branchName)
+        {
+            GitRun("rebase " + branchName);
+        }
+
+        internal void RebaseI(string id)
+        {
+            GitRun("rebase -i @.." + id);
+        }
+
+        #endregion
+
+
     }
 }

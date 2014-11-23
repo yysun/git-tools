@@ -33,7 +33,8 @@ namespace GitScc.UI
                 this.polygon.Fill = new SolidColorBrush(Color.FromArgb(128, 255, 0, 0));
                 this.txtName.Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
                 this.txtHead.Foreground = new SolidColorBrush(Color.FromRgb(255, 255, 255));
-                this.menuCheckoutBranch.IsEnabled = this.menuDeleteBranch.IsEnabled = false;
+                this.menuCheckoutBranch.IsEnabled = this.menuDeleteBranch.IsEnabled =
+                this.menuRebase.IsEnabled = false;
             }
         }
 
@@ -41,8 +42,7 @@ namespace GitScc.UI
 
         private void CheckoutBranch_Click(object sender, RoutedEventArgs e)
         {
-            var ret = GitViewModel.Current.CheckoutBranch(BranchName);
-            HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
+            GitViewModel.Current.CheckoutBranch(BranchName);
         }
 
         private void DeleteBranch_Click(object sender, RoutedEventArgs e)
@@ -50,8 +50,21 @@ namespace GitScc.UI
             if (MessageBox.Show("Are you sure you want to delete branch: " + BranchName,
                 "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                var ret = GitViewModel.Current.DeleteBranch(BranchName);
-                HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
+                GitViewModel.Current.DeleteBranch(BranchName);
+            }
+        }
+
+        private void Rebase_Click(object sender, RoutedEventArgs e)
+        {
+            var branch = GitViewModel.Current.Tracker.CurrentBranch;
+
+            var result = MessageBox.Show("Are you sure you want to rebase current branch: " + branch
+                + " on top of branch " + BranchName + "?", "Warning",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                GitViewModel.Current.Rebase(BranchName);
             }
         }
     }

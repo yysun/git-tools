@@ -9,6 +9,7 @@
         <ContextMenu>
             <MenuItem Header="checkout" Click="CheckoutBranch_Click" x:Name="menuCheckoutBranch" />
             <MenuItem Header="delete branch" Click="DeleteBranch_Click" x:Name="menuDeleteBranch"/>
+            <MenuItem Header="rebase" Click="Rebase_Click" x:Name="menuRebase"/>
         </ContextMenu>
     </UserControl.ContextMenu>
     <StackPanel Height="18" Orientation="Horizontal">

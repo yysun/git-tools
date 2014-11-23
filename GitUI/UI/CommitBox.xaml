@@ -39,6 +39,7 @@
 			<MenuItem Header="new tag" Click="NewTag_Click" />
 			<MenuItem Header="new branch" Click="NewBranch_Click" />
             <MenuItem Header="cherry pick" Click="CherryPick_Click" />
+            <MenuItem Header="rebase -i" Click="RebaseI_Click" />
             <MenuItem Header="archive" Click="Export_Click" />
         </ContextMenu>
 	</UserControl.ContextMenu>    

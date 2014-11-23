@@ -138,7 +138,7 @@ namespace GitScc.UI
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    ret = GitViewModel.Current.CheckoutBranch(branch);
+                    GitViewModel.Current.CheckoutBranch(branch);
                 }
             }
 
@@ -158,15 +158,13 @@ namespace GitScc.UI
             dlg.FileName = this.txtId.Text + ".zip";
             if (dlg.ShowDialog() == true)
             {
-                var ret = GitViewModel.Current.Archive(this.txtId.Text, dlg.FileName);
-                HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
+                GitViewModel.Current.Archive(this.txtId.Text, dlg.FileName);
             }
         }
 
         private void CheckoutCommit_Click(object sender, RoutedEventArgs e)
         {
-            var ret = GitViewModel.Current.CheckoutBranch(this.txtId.Text);
-            HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
+            GitViewModel.Current.CheckoutBranch(this.txtId.Text);
         }
 
         private void CherryPick_Click(object sender, RoutedEventArgs e)
@@ -178,9 +176,19 @@ namespace GitScc.UI
 
             if (result == MessageBoxResult.Yes)
             {
-                var ret = GitViewModel.Current.CherryPick(this.txtId.Text);
-                HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, this);
+                GitViewModel.Current.CherryPick(this.txtId.Text);
+            }
+        }
 
+        private void RebaseI_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to start interactive rebase from HEAD to " + 
+                txtId.Text + "?", "Warning",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                GitViewModel.Current.RebaseI(this.txtId.Text);
             }
 
         }
