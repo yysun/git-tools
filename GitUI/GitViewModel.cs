@@ -38,9 +38,7 @@ namespace GitUI
 				{
 					var args = Environment.GetCommandLineArgs();
 					current = new GitViewModel();
-
-					var directory = args.Length > 1 ? args[1] :
-						Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+					var directory = args.Length > 1 ? args[1] :	Environment.CurrentDirectory;
 					current.Open(directory);
 				}
 
