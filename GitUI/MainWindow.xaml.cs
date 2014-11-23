@@ -34,42 +34,12 @@ namespace GitUI
 			//this.rootGrid.RowDefinitions[0].Height = new GridLength(this.ActualHeight - 60);
 
 			this.gitViewModel = GitViewModel.Current;
-			//this.bottomToolBar.GitViewModel = GitViewModel.Current;
 
 			if (gitViewModel.Tracker.IsGit)
 				this.Title = gitViewModel.Tracker.WorkingDirectory;
 
-			this.gitViewModel.GraphChanged += (o, reload) =>
-			{
-				// show loading sign immediately
-				////Action a = () => loading.Visibility = Visibility.Visible;
-				////this.Dispatcher.BeginInvoke(a, DispatcherPriority.Render);
-
-				loading.Visibility = Visibility.Visible;
-				Action act = () =>
-				{
-                    this.txtRepo.Text = gitViewModel.Tracker.WorkingDirectory;
-                    this.txtPrompt.Text = "(no git repository)";
-
-					if (!gitViewModel.NoRefresh && gitViewModel.Tracker.IsGit)
-					{
-                        var changed = gitViewModel.Tracker.ChangedFiles;
-                        var prompt = string.Format("{4}:  +{0} ~{1} -{2} !{3}",
-                            changed.Where(f => f.Status == GitFileStatus.New || f.Status == GitFileStatus.Added).Count(),
-                            changed.Where(f => f.Status == GitFileStatus.Modified || f.Status == GitFileStatus.Staged).Count(),
-                            changed.Where(f => f.Status == GitFileStatus.Deleted || f.Status == GitFileStatus.Removed).Count(),
-                            changed.Where(f => f.Status == GitFileStatus.Conflict).Count(),
-                            gitViewModel.Tracker.CurrentBranch);
-
-						this.txtPrompt.Text = prompt;
-					}
-					this.graph.Show(gitViewModel.Tracker, reload != null);
-					this.pendingChanges.Refresh(gitViewModel.Tracker);
-				};
-				this.Dispatcher.BeginInvoke(act, DispatcherPriority.ApplicationIdle);
-			};
-
-			this.gitViewModel.Refresh(true);
+            this.gitViewModel.GraphChanged += gitViewModel_GraphChanged;
+            gitViewModel_GraphChanged(this, null);
 
 			Action a1 = () => this.WindowState = WindowState.Maximized;
 			this.Dispatcher.BeginInvoke(a1, DispatcherPriority.ApplicationIdle);
@@ -87,6 +57,49 @@ namespace GitUI
 
 			optionSet.Parse(Environment.GetCommandLineArgs());
 		}
+
+        void gitViewModel_GraphChanged(object sender, EventArgs e)
+        {
+            Action a = () => loading.Visibility = Visibility.Visible;
+            this.Dispatcher.BeginInvoke(a, DispatcherPriority.Render);
+
+            Action act = () =>
+            {
+
+                gitViewModel.NoRefresh = true;
+
+                this.topToolBar.GitViewModel = gitViewModel;
+                //this.bottomToolBar.GitViewModel = GitViewModel.Current;
+
+                this.txtRepo.Text = gitViewModel.Tracker.WorkingDirectory;
+                this.txtPrompt.Text = "(no git repository)";
+
+                if (gitViewModel.Tracker.IsGit)
+                {
+                    var changed = gitViewModel.Tracker.ChangedFiles;
+                    var prompt = string.Format("{4}:  +{0} ~{1} -{2} !{3}",
+                        changed.Where(f => f.Status == GitFileStatus.New || f.Status == GitFileStatus.Added).Count(),
+                        changed.Where(f => f.Status == GitFileStatus.Modified || f.Status == GitFileStatus.Staged).Count(),
+                        changed.Where(f => f.Status == GitFileStatus.Deleted || f.Status == GitFileStatus.Removed).Count(),
+                        changed.Where(f => f.Status == GitFileStatus.Conflict).Count(),
+                        gitViewModel.Tracker.CurrentBranch);
+
+                    this.txtPrompt.Text = prompt;
+                }
+
+                this.Title = string.Format("{0} ({1})", this.txtRepo.Text, this.txtPrompt.Text);
+
+                this.graph.Show(gitViewModel.Tracker, true);
+                this.pendingChanges.Refresh(gitViewModel.Tracker);
+
+                //Action b = () => loading.Visibility = Visibility.Collapsed;
+                //this.Dispatcher.BeginInvoke(b, DispatcherPriority.Render);
+
+                //loading.Visibility = Visibility.Collapsed;
+            };
+            
+            this.Dispatcher.BeginInvoke(act, DispatcherPriority.ApplicationIdle);
+        }
 
 		private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
 		{
@@ -182,32 +195,19 @@ namespace GitUI
 			}
 		}
 
-		private void GraphLoaded_Executed(object sender, ExecutedRoutedEventArgs e)
-		{
-			gitViewModel.DisableAutoRefresh();
-
-			this.loading.Visibility = Visibility.Collapsed;
-			this.topToolBar.GitViewModel = gitViewModel;
-
-			this.Title = gitViewModel.Tracker.IsGit ?
-				string.Format("{0} ({1})", gitViewModel.Tracker.WorkingDirectory, gitViewModel.Tracker.CurrentBranch) :
-				string.Format("{0} (No Repository)", gitViewModel.WorkingDirectory);
-
-			gitViewModel.EnableAutoRefresh();
-		}
+        private void GraphLoaded_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            gitViewModel.NoRefresh = false;
+            loading.Visibility = Visibility.Collapsed;
+        }
 
 		private void RefreshGraph_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			gitViewModel.Refresh(true);
+			gitViewModel.RefreshToolWindows();
 		}
 
 		private void ShowMessage_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			//dynamic msg = e.Parameter;
-			//txtMessage.Text = msg.Message;
-			//txtMessage.Foreground = new SolidColorBrush(
-			//    msg.Error ? Colors.Red : Colors.Navy);
-
 			dynamic msg = e.Parameter;
 			var ret = msg.GitBashResult as GitBashResult;
 			if (ret == null) return;
@@ -215,7 +215,6 @@ namespace GitUI
 			txtMessage.Text = string.Format("{0} {1}", ret.Output, ret.Error);
 			txtMessage.Foreground = new SolidColorBrush(
 				ret.HasError ? Colors.Red : Colors.Navy);
-
 
 			txtMessage.Visibility = Visibility.Visible;
 			txtMessage.Opacity = 1.0;
@@ -295,7 +294,6 @@ namespace GitUI
 			HistoryViewCommands.CloseCommitDetails.Execute(null, this);
 			HistoryViewCommands.CloseCommitDetails.Execute("PendingChanges", this);
 			this.gitViewModel.Open(path);
-			this.gitViewModel.Refresh(true);
 		}
 
 		private void Window_Drop(object sender, DragEventArgs e)
@@ -303,27 +301,15 @@ namespace GitUI
 			if (e.Data.GetDataPresent(DataFormats.FileDrop))
 			{
 				this.Activate();
-
 				var dropped = ((string[])e.Data.GetData(DataFormats.FileDrop, true))[0];
-
 				if (!Directory.Exists(dropped)) dropped = Path.GetDirectoryName(dropped);
-
-                var repo = new GitRepository(dropped);
-
                 if (Directory.Exists(dropped))
                 {
-
-                    if (repo.IsGit && MessageBox.Show("Do you want to open Git repository from " + repo.WorkingDirectory + "?",
-                    "Git repository found", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    {
-                        this.OpenRepository(dropped);
-                    }
-
-                    if (!repo.IsGit && MessageBox.Show("There is no git repository found in " + dropped + 
+                    this.OpenRepository(dropped);
+                    if (!GitViewModel.Current.Tracker.IsGit && MessageBox.Show("There is no git repository found in " + dropped + 
                         "\r\n\r\n Do you want to initialize a new git repository?",
                     "Git repository NOT found", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
-                        this.OpenRepository(dropped);
                         GitViewModel.Current.Init();
                     }
                 }
@@ -351,5 +337,6 @@ namespace GitUI
                 }
             }
 		}
+
 	}
 }

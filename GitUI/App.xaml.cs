@@ -16,7 +16,6 @@ namespace GitUI
     {
         public App()
         {
-#if (!DEBUG)
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 String resourceName = "GitUI.Resources." + new AssemblyName(args.Name).Name + ".dll";
@@ -30,7 +29,6 @@ namespace GitUI
                     return Assembly.Load(assemblyData);
                 }
             };
-#endif
         }
     }
 }

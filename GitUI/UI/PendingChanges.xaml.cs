@@ -218,14 +218,14 @@ namespace GitUI.UI
             {
                 //service.NoRefresh = true;
                 ClearUI();
-                service.NoRefresh = false;
+                //service.NoRefresh = false;
                 return;
             }
 
             Action act = () =>
             {
                 lblMessage.Content = "Commit to: " + tracker.CurrentBranch;
-                service.NoRefresh = true;
+                //service.NoRefresh = true;
                 ShowStatusMessage("Getting changed files ...");
 
                 Stopwatch stopwatch = new Stopwatch();
@@ -283,9 +283,7 @@ namespace GitUI.UI
                 //else
                 //    this.label4.Visibility = Visibility.Collapsed;
 
-                service.NoRefresh = false;
-                service.lastTimeRefresh = DateTime.Now; //important!!
-
+                //service.NoRefresh = false;
             };
 
             this.Dispatcher.BeginInvoke(act, DispatcherPriority.ApplicationIdle);
@@ -341,7 +339,6 @@ namespace GitUI.UI
             {
                 tracker.StageFile(System.IO.Path.Combine(this.tracker.WorkingDirectory, item.FileName));
                 ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
-                service.lastTimeRefresh = DateTime.Now;
             }
 
             bool hasStaged = tracker == null ? false :

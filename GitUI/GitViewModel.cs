@@ -11,21 +11,6 @@ using System.Diagnostics;
 
 namespace GitUI
 {
-	public static class HistoryViewCommands
-	{
-		public static readonly RoutedUICommand CloseCommitDetails = new RoutedUICommand("CloseCommitDetails", "CloseCommitDetails", typeof(MainWindow));
-		public static readonly RoutedUICommand OpenCommitDetails = new RoutedUICommand("OpenCommitDetails", "OpenCommitDetails", typeof(MainWindow));
-		public static readonly RoutedUICommand SelectCommit = new RoutedUICommand("SelectCommit", "SelectCommit", typeof(MainWindow));
-		public static readonly RoutedUICommand CompareCommits = new RoutedUICommand("CompareCommits", "CompareCommits", typeof(MainWindow));
-		public static readonly RoutedUICommand ExportGraph = new RoutedUICommand("ExportGraph", "ExportGraph", typeof(MainWindow));
-		public static readonly RoutedUICommand RefreshGraph = new RoutedUICommand("RefreshGraph", "RefreshGraph", typeof(MainWindow));
-		public static readonly RoutedUICommand ScrollToCommit = new RoutedUICommand("ScrollToCommit", "ScrollToCommit", typeof(MainWindow));
-		public static readonly RoutedUICommand GraphLoaded = new RoutedUICommand("GraphLoaded", "GraphLoaded", typeof(MainWindow));
-		public static readonly RoutedUICommand PendingChanges = new RoutedUICommand("PendingChanges", "PendingChanges", typeof(MainWindow));
-		public static readonly RoutedUICommand ShowMessage = new RoutedUICommand("ShowMessage", "ShowMessage", typeof(MainWindow));
-		public static readonly RoutedUICommand OpenRepository = new RoutedUICommand("OpenRepository", "OpenRepository", typeof(MainWindow));
-	}
-
 	public class GitViewModel
 	{
 		#region singleton
@@ -51,17 +36,16 @@ namespace GitUI
 		public event EventHandler GraphChanged = delegate { };
 		private GitFileStatusTracker tracker;
 		private string workingDirectory;
-		private bool showSimplifiedView;
 
 		public GitFileStatusTracker Tracker { get { return tracker; } }
 		public string WorkingDirectory { get { return workingDirectory; } }
 		public bool ShowSimplifiedView
 		{
-			get { return showSimplifiedView; }
+            get { return tracker.RepositoryGraph.IsSimplified; }
 			set
 			{
-				showSimplifiedView = value;
-				Refresh(true);
+                tracker.RepositoryGraph.IsSimplified = value;
+                GraphChanged(this, null); 
 			}
 		}
 
@@ -81,7 +65,6 @@ namespace GitUI
 			timer = new DispatcherTimer();
 			timer.Interval = TimeSpan.FromMilliseconds(500);
 			timer.Tick += new EventHandler(timer_Tick);
-			timer.Start();
 		}
 
         private string TryFindFile(string[] paths)
@@ -102,7 +85,9 @@ namespace GitUI
 
 			if (Directory.Exists(directory))
 			{
-				fileSystemWatcher = new FileSystemWatcher(directory);
+                if (fileSystemWatcher != null) { fileSystemWatcher.Dispose();  }
+
+                fileSystemWatcher = new FileSystemWatcher(directory);
 				fileSystemWatcher.IncludeSubdirectories = true;
 				//fileSystemWatcher.Created += new FileSystemEventHandler(fileSystemWatcher_Changed);
 				fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
@@ -110,77 +95,76 @@ namespace GitUI
 				fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
 				fileSystemWatcher.EnableRaisingEvents = true;
 			}
+
+            GraphChanged(this, null);
 		}
+
+        private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            NeedRefresh = true;
+        }
 
 		internal static void OpenGitBash()
 		{
 			GitBash.OpenGitBash(Current.WorkingDirectory);
 		}
 
-		#region Refresh
+        #region Refresh
 
-		internal DateTime lastTimeRefresh = DateTime.Now.AddDays(-1);
-		internal DateTime nextTimeRefresh = DateTime.Now.AddDays(-1);
+        internal bool needRefresh, noRefresh;
 
-		private void fileSystemWatcher_Changed(object source, FileSystemEventArgs e)
-		{
-			if (!NoRefresh)
-			{
-				double delta = DateTime.Now.Subtract(lastTimeRefresh).TotalMilliseconds;
-				if (delta > 500)
-				{
-					NeedRefresh = true;
-					lastTimeRefresh = DateTime.Now;
-					nextTimeRefresh = DateTime.Now;
-				}
-			}
-		}
+        internal bool NeedRefresh
+        {
+            get { return needRefresh; }
+            set
+            {
+                needRefresh = !noRefresh && value;
+                if (needRefresh) Refresh();
+            }
+        }
 
-		internal bool NoRefresh;
-		private bool NeedRefresh;
+        internal bool NoRefresh
+        {
+            get { return noRefresh; }
+            set
+            {
+                noRefresh = value;
+                nextTimeRefresh = DateTime.Now.AddMilliseconds(388);
+            }
+        }
 
-		private void timer_Tick(Object sender, EventArgs args)
-		{
-			if (NeedRefresh && !NoRefresh)
-			{
-				double delta = DateTime.Now.Subtract(nextTimeRefresh).TotalMilliseconds;
-				if (delta > 200)
-				{
-					System.Diagnostics.Debug.WriteLine("$$$$ Refresh");
-					DisableAutoRefresh();
-					Refresh(false);
-					NoRefresh = false;
-					NeedRefresh = false;
-					nextTimeRefresh = DateTime.Now;
-				}
-			}
-		}
+        private DateTime nextTimeRefresh = DateTime.Now;
 
-		internal void Refresh(bool reload)
-		{
-			tracker.Refresh();
-			if (tracker.IsGit)
-				tracker.RepositoryGraph.IsSimplified = showSimplifiedView;
-			GraphChanged(this, reload ? new EventArgs() : null); // use non-null to force reload
-		}
+        private void Refresh()
+        {
+            if (NeedRefresh && !NoRefresh)
+            {
+                double delta = DateTime.Now.Subtract(nextTimeRefresh).TotalMilliseconds;
+                if (delta > 200)
+                {
+                    NoRefresh = true;
+                    NeedRefresh = false;
+                    timer.Start();
+                }
+            }
+        }
 
-		internal void EnableAutoRefresh()
-		{
-			timer.Start();
-			NoRefresh = false;
-			NeedRefresh = false;
-			lastTimeRefresh = DateTime.Now;
-		}
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            Debug.WriteLine("==== timer_Tick ");
+            timer.Stop();
 
-		internal void DisableAutoRefresh()
-		{
-			timer.Stop();
-			NoRefresh = true;
-			NeedRefresh = false;
-			lastTimeRefresh = DateTime.Now.AddMilliseconds(400);
-		}
+            RefreshToolWindows();
+            NoRefresh = false;
+        }
 
-		#endregion
+        internal void RefreshToolWindows()
+        {
+            tracker.Refresh();
+            GraphChanged(this, null); 
+        }
+
+        #endregion
 
 		#region Git commands
 
@@ -293,7 +277,6 @@ namespace GitUI
         }
 
         #endregion
-
 
     }
 }

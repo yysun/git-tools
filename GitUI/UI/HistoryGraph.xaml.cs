@@ -122,7 +122,7 @@ namespace GitScc.UI
                         hash = GetHashCode(commits);
                     }
 
-                    bool changed = lastHash == null ? hash != null : !lastHash.Equals(hash);
+                    bool changed = true; // lastHash == null ? hash != null : !lastHash.Equals(hash);
 
                     if (changed)
                     {
@@ -334,9 +334,8 @@ namespace GitScc.UI
                     Log.WriteLine("History Graph Show: {0}", ex.ToString());
                 }
 
-                //loading.Visibility = Visibility.Collapsed;
-
                 HistoryViewCommands.GraphLoaded.Execute(null, this);
+
             };
 
             this.Dispatcher.BeginInvoke(action, DispatcherPriority.Background);

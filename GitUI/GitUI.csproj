@@ -68,6 +68,7 @@
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
     <Compile Include="GitViewModel.cs" />
+    <Compile Include="HistoryViewCommands.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="UI\BottomToolBar.xaml.cs">
       <DependentUpon>BottomToolBar.xaml</DependentUpon>
