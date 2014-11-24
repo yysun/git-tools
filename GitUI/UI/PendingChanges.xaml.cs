@@ -328,7 +328,7 @@ namespace GitUI.UI
                 return true;
         }
 
-        private bool StageSelectedFiles(bool showWarning)
+        private void StageSelectedFiles()
         {
             var unstaged = this.dataGrid1.Items.Cast<GitFile>()
                                .Where(item => item.IsSelected && !item.IsStaged)
@@ -337,19 +337,9 @@ namespace GitUI.UI
             int i = 0;
             foreach (var item in unstaged)
             {
-                tracker.StageFile(System.IO.Path.Combine(this.tracker.WorkingDirectory, item.FileName));
+                tracker.StageFile(item.FileName);
                 ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
             }
-
-            bool hasStaged = tracker == null ? false :
-                             tracker.ChangedFiles.Any(f => f.IsStaged);
-
-            if (!hasStaged && showWarning)
-            {
-                MessageBox.Show("No file has been staged for commit.", "Commit",
-                    MessageBoxButton.OK, MessageBoxImage.Exclamation);
-            }
-            return hasStaged;
         }
 
         private void ShowStatusMessage(string msg)
@@ -524,6 +514,11 @@ namespace GitUI.UI
 
         private void btnPendingChanges_Click(object sender, RoutedEventArgs e)
         {
+            OnCommit();
+        }
+
+        internal void OnCommit()
+        {
             if (tracker == null) return;
 
             try
@@ -543,17 +538,49 @@ namespace GitUI.UI
                 }
 
                 var isAmend = chkAmend.IsChecked == true;
-                if (HasComments() && StageSelectedFiles(!isAmend))
-                {
-                    ShowStatusMessage("Committing ...");
-                    var id = tracker.Commit(Comments, isAmend, chkSignOff.IsChecked == true);
-                    ShowStatusMessage("Commit successfully. Commit Hash: " + id);
-                    ClearUI();
 
-                    HistoryViewCommands.CloseCommitDetails.Execute(this, null);
-                    HistoryViewCommands.RefreshGraph.Execute(this, null);
+                if (string.IsNullOrWhiteSpace(Comments))
+                {
+                    MessageBox.Show("Please enter comments for the commit.", "Commit",
+                        MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    return;
                 }
+
+                ShowStatusMessage("Staging files ...");
+                StageSelectedFiles();
+
+                if (!isAmend)
+                {
+                    tracker.Refresh();
+                    bool hasStaged = tracker == null ? false :
+                                     tracker.ChangedFiles.Any(f => f.IsStaged);
+                    if (!hasStaged)
+                    {
+                        MessageBox.Show("No file has been selected/staged for commit.", "Commit",
+                            MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                        return;
+                    }
+                }
+                else
+                {
+                    const string amendMsg = @"You are about to amend a commit that has tags or remotes, which could cause issues in local and remote repositories.
+
+Are you sure you want to continue?";
+
+                    if (tracker.CurrentCommitHasRefs() && MessageBox.Show(amendMsg, "Amend Last Commit",
+                        MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No)
+                    {
+                        return;
+                    }
+                }
+
+                var id = tracker.Commit(Comments, isAmend, chkSignOff.IsChecked == true);
+                ShowStatusMessage("Commit successfully. Commit Hash: " + id);
+                ClearUI();
+                
                 service.NoRefresh = false;
+
+                HistoryViewCommands.RefreshGraph.Execute(null, this);
             }
             catch (Exception ex)
             {
@@ -574,6 +601,8 @@ namespace GitUI.UI
         {
             this.service = GitViewModel.Current;
         }
+
+
     }
 
     public static class ExtHelper
