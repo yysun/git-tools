@@ -11,6 +11,7 @@ using Microsoft.Windows.Shell;
 using Mono.Options;
 using Gitscc;
 using System.Diagnostics;
+using System.Text;
 
 namespace GitUI
 {
@@ -212,7 +213,21 @@ namespace GitUI
 			var ret = msg.GitBashResult as GitBashResult;
 			if (ret == null) return;
 
-			txtMessage.Text = string.Format("{0} {1}", ret.Output, ret.Error);
+            int max_lines = (int) this.ActualHeight / 40;
+			var text = string.Format("{0} {1}", ret.Output, ret.Error);
+            var lines = text.Split('\n');
+            if (lines.Length > max_lines)
+            {
+                var sb = new StringBuilder();
+                for (int i = 0; i < max_lines-3; i++)
+                {
+                    sb.Append("\n" + lines[i]);
+                }
+                text = string.Format("{0}\n .......\n{1}\n{2}", 
+                    sb.ToString(), lines[lines.Length - 2], lines[lines.Length - 1]);
+            }
+
+            txtMessage.Text = text;
 			txtMessage.Foreground = new SolidColorBrush(
 				ret.HasError ? Colors.Red : Colors.Navy);
 
