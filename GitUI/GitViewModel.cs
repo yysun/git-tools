@@ -174,8 +174,17 @@ namespace GitUI
 		{
 			if (!GitBash.Exists) throw new GitException("git.exe is not found.");
 			if (this.Tracker == null) throw new GitException("Git repository is not found.");
-			var ret = GitBash.Run(cmd, this.Tracker.WorkingDirectory);
-            HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, null);
+            var ret = new GitBashResult { HasError = true };
+            try
+            {
+                ret = GitBash.Run(cmd, this.Tracker.WorkingDirectory);
+                HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, null);
+            }
+            catch (Exception ex)
+            {
+                ret.Error = ex.Message;
+                HistoryViewCommands.ShowMessage.Execute(new { GitBashResult = ret }, null);
+            }
             return ret;
 		}
 
@@ -261,10 +270,10 @@ namespace GitUI
             GitRun("stash pop");
         }
 
-        internal void MergeTool()
-        {
-            GitRun("mergetool");
-        }
+        //internal void MergeTool()
+        //{
+        //    GitRunCmd("mergetool");
+        //}
 
         internal void Rebase(string branchName)
         {
@@ -273,7 +282,7 @@ namespace GitUI
 
         internal void RebaseI(string id)
         {
-            GitRun("rebase -i @.." + id);
+            GitRun("rebase -i " + id + "~1");
         }
 
         #endregion

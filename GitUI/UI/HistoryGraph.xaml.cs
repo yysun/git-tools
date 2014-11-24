@@ -667,10 +667,10 @@ namespace GitScc.UI
             GitViewModel.Current.StashPop();
         }
 
-        private void menuMergeTool_Click(object sender, RoutedEventArgs e)
-        {
-            GitViewModel.Current.MergeTool();
-        }
+        //private void menuMergeTool_Click(object sender, RoutedEventArgs e)
+        //{
+        //    GitViewModel.Current.MergeTool();
+        //}
 
     }
 }

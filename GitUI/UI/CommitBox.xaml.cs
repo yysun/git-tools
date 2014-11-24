@@ -182,8 +182,8 @@ namespace GitScc.UI
 
         private void RebaseI_Click(object sender, RoutedEventArgs e)
         {
-            var result = MessageBox.Show("Are you sure you want to start interactive rebase from HEAD to " + 
-                txtId.Text + "?", "Warning",
+            var result = MessageBox.Show("Are you sure you want to start interactive rebase from " + 
+                txtId.Text + " to HEAD?", "Warning",
                 MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
@@ -191,6 +191,11 @@ namespace GitScc.UI
                 GitViewModel.Current.RebaseI(this.txtId.Text);
             }
 
+        }
+
+        private void CopyId_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(this.txtId.Text);
         }
 
     }

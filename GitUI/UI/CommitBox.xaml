@@ -35,12 +35,16 @@
 	</UserControl.Resources>
 	<UserControl.ContextMenu>
 		<ContextMenu>
-            <MenuItem Header="checkout" Click="CheckoutCommit_Click"/>            
-			<MenuItem Header="new tag" Click="NewTag_Click" />
+            <MenuItem Header="checkout" Click="CheckoutCommit_Click"/>
+            <Separator />
+            <MenuItem Header="new tag" Click="NewTag_Click" />
 			<MenuItem Header="new branch" Click="NewBranch_Click" />
+            <Separator />
             <MenuItem Header="cherry pick" Click="CherryPick_Click" />
-            <MenuItem Header="rebase -i" Click="RebaseI_Click" />
+            <!--<MenuItem Header="rebase -i" Click="RebaseI_Click" />-->
             <MenuItem Header="archive" Click="Export_Click" />
+            <Separator />
+            <MenuItem Header="copy id" Click="CopyId_Click" />
         </ContextMenu>
 	</UserControl.ContextMenu>    
 	<Grid x:Name="root" Height="120" Width="200" RenderTransformOrigin="0.5,0.5" MouseEnter="root_MouseEnter" MouseLeave="root_MouseLeave" MouseLeftButtonUp="root_MouseLeftButtonUp">

@@ -11,14 +11,17 @@
             <MenuItem Header="open ..." Click="menuOpen_Click" />
             <MenuItem Header="init" Click="menuInit_Click" x:Name="menuInit"/>
             <MenuItem Header="ignore" Click="menuEditGitIgnore_Click" x:Name="menuIgnore"/>
+            <Separator />
             <!--<MenuItem Header="clone" Click="menuClone_Click" />            
             <MenuItem Header="fetch" Click="menuFetch_Click" />
             <MenuItem Header="pull" Click="menuPull_Click" />
             <MenuItem Header="push" Click="menuPush_Click" />-->
             <MenuItem Header="stash" Click="menuStash_Click" x:Name="menuStash"/>
             <MenuItem Header="stash pop" Click="menuStashPop_Click" x:Name="menuStashPop" />
-            <MenuItem Header="mergetool" Click="menuMergeTool_Click" x:Name="menuMergeTool" />
+            <Separator />
+            <!--<MenuItem Header="mergetool" Click="menuMergeTool_Click" x:Name="menuMergeTool" />-->
             <MenuItem Header="refresh" Click="menuRefresh_Click" />
+            <Separator />
             <MenuItem Header="about" Click="menuAbout_Click" />
         </ContextMenu>
     </UserControl.ContextMenu>
