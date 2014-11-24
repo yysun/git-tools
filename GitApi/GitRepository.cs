@@ -326,7 +326,7 @@ namespace GitScc
         {
             get
             {
-                return this.IsGit ? FileExistsInGit("rebase-*", "applying") : false;
+                return this.IsGit && FileExistsInGit("rebase-*", "applying");
             }
         }
 
@@ -334,7 +334,7 @@ namespace GitScc
         {
             get
             {
-                return this.IsGit ? FileExistsInGit("rebase-*", "rebasing") : false;
+                return this.IsGit && FileExistsInGit("rebase-*", "rebasing");
             }
         }
 
@@ -342,7 +342,7 @@ namespace GitScc
         {
             get
             {
-                return this.IsGit && FileExistsInGit("git-rebase-todo");
+                return this.IsGit && FileExistsInGit("rebase-*", "git-rebase-todo");
             }
         }
 

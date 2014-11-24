@@ -5,6 +5,7 @@ using System.Text;
 using System.Diagnostics;
 using System.Configuration;
 using System.IO;
+using System.Threading;
 
 namespace GitScc
 {
@@ -66,11 +67,13 @@ namespace GitScc
 
             using (var process = Process.Start(pinfo))
             {
-                string output = process.StandardOutput.ReadToEnd();
-                string error = process.StandardError.ReadToEnd();
-                process.WaitForExit();
+                string output = null;
+                Thread thread = new Thread(_ => output = ReadStream(process.StandardOutput));
+                thread.Start();
+                var error = ReadStream(process.StandardError);
+                thread.Join();
 
-                //Debug.WriteLine(output);
+                process.WaitForExit();
 
                 result.HasError = process.ExitCode != 0;
                 result.Output = output;
@@ -78,6 +81,21 @@ namespace GitScc
 
                 return result;
             }
+        }
+
+        private static string ReadStream(StreamReader streamReader)
+        {
+            if (!streamReader.BaseStream.CanRead) return null;
+            StringBuilder sb = new StringBuilder();
+
+            var buffer = new byte[1024];
+            int len = 0;
+            while ((len = streamReader.BaseStream.Read(buffer, 0, buffer.Length)) != 0)
+            {
+                var buf = Encoding.UTF8.GetString(buffer, 0, len);
+                sb.Append(buf);
+            }
+            return sb.ToString();
         }
 
         public static void RunCmd(string args, string workingDirectory)
