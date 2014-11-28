@@ -327,7 +327,7 @@ namespace F1SYS.VsGitToolsPackage
 
         #region Git functions
 
-        internal void Refresh(GitRepository tracker, bool force=false)
+        internal void Refresh(GitRepository tracker)
         {
             this.tracker = tracker;
 
@@ -342,7 +342,7 @@ namespace F1SYS.VsGitToolsPackage
                 return;
             }
             
-            if (force) tracker.Refresh();
+            //if (force) tracker.Refresh();
             
 
             //service.NoRefresh = true;

@@ -99,9 +99,13 @@ namespace F1SYS.VsGitToolsPackage
                 this.Caption = Resources.ToolWindowTitle + " - " + gitRepository.CurrentBranch;
             }
 
-            if (force) hasFileSaved(); //just a reminder, refresh anyway
+            if (force)
+            {
+                hasFileSaved(); //just a reminder, refresh anyway
+                gitRepository.Refresh();
+            }
 
-            _Control.Refresh(gitRepository, force);
+            _Control.Refresh(gitRepository);
 
             var svc = this.GetService(typeof(IVsUIShell)) as IVsUIShell;
             svc.UpdateCommandUI(1);
