@@ -181,19 +181,14 @@ namespace GitUI.UI
             }
         }
 
-        private void GetSelectedFileFullName(Action<string> action, bool fileMustExists = true)
+        private void GetSelectedFiles(Action<string> action)
         {
             try
             {
-                var files = this.dataGrid1.SelectedItems.Cast<GitFile>()
-                    .Select(item=>System.IO.Path.Combine(this.tracker.WorkingDirectory, item.FileName))
-                    .ToList();
-
-                foreach (var fileName in files)
-                {
-                    if (fileMustExists && !File.Exists(fileName)) return;
-                    action(fileName);
-                }
+                this.dataGrid1.SelectedItems.Cast<GitFile>()
+                    .Select(item => item.FileName)
+                    .ToList()
+                    .ForEach(fileName => action(fileName));
             }
             catch (Exception ex)
             {
@@ -399,7 +394,7 @@ namespace GitUI.UI
 
         private void menuCompare_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFileFullName(fileName =>
+            GetSelectedFiles(fileName =>
             {
                 //service.CompareFile(fileName);
             });
@@ -407,7 +402,7 @@ namespace GitUI.UI
 
         private void menuUndo_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFileFullName(fileName =>
+            GetSelectedFiles(fileName =>
             {
                 GitFileStatus status = tracker.GetFileStatus(fileName);
                 if (status == GitFileStatus.Modified || status == GitFileStatus.Staged ||
@@ -420,36 +415,37 @@ namespace GitUI.UI
                         tracker.CheckOutFile(fileName);
                     }
                 }
-            }, false); // file must exists check flag is false
+            }); // file must exists check flag is false
         }
 
         private void menuStage_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFileFullName(fileName =>
+            GetSelectedFiles(fileName =>
             {
                 tracker.StageFile(fileName);
                 ShowStatusMessage("Staged file: " + fileName);
-            }, false);
+            });
         }
 
         private void menuUnstage_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFileFullName(fileName =>
+            GetSelectedFiles(fileName =>
             {
                 tracker.UnStageFile(fileName);
                 ShowStatusMessage("Un-staged file: " + fileName);
-            }, false);
+            });
         }
 
         private void menuDeleteFile_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFileFullName(fileName =>
+            GetSelectedFiles(fileName =>
             {
                 if (MessageBox.Show("Are you sure you want to delete file: " + Path.GetFileName(fileName),
                                    "Delete File",
                                    MessageBoxButton.YesNo,
                                    MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
+                    fileName = System.IO.Path.Combine(this.tracker.WorkingDirectory, fileName);
                     File.Delete(fileName);
                 }
             });
