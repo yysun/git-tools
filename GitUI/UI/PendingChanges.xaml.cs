@@ -202,18 +202,11 @@ namespace GitUI.UI
         DateTime lastTimeRefresh = DateTime.Now.AddDays(-1);
         internal void Refresh(GitFileStatusTracker tracker)
         {
-            this.label3.Content = "Changed files";
-
             this.tracker = tracker;
-            this.chkAmend.IsChecked = false;
-            this.chkSignOff.IsChecked = false;
-            this.chkNewBranch.IsChecked = false;
-
+   
             if (tracker == null)
             {
-                //service.NoRefresh = true;
                 ClearUI();
-                //service.NoRefresh = false;
                 return;
             }
 
@@ -257,12 +250,7 @@ namespace GitUI.UI
 
                     ShowStatusMessage("");
 
-                    var changed = tracker.ChangedFiles;
-                    this.label3.Content = string.Format("Changed files: ({0}) +{1} ~{2} -{3} !{4}", tracker.CurrentBranch,
-                        changed.Where(f => f.Status == GitFileStatus.New || f.Status == GitFileStatus.Added).Count(),
-                        changed.Where(f => f.Status == GitFileStatus.Modified || f.Status == GitFileStatus.Staged).Count(),
-                        changed.Where(f => f.Status == GitFileStatus.Deleted || f.Status == GitFileStatus.Removed).Count(),
-                        changed.Where(f => f.Status == GitFileStatus.Conflict).Count());
+                    this.label3.Content = string.Format("Changed files: ({0}) {1}", tracker.CurrentBranch, tracker.ChangedFilesStatus);
                 }
                 catch (Exception ex)
                 {
@@ -286,6 +274,11 @@ namespace GitUI.UI
 
         internal void ClearUI()
         {
+            this.label3.Content = "Changed files";
+            this.chkAmend.IsChecked = false;
+            this.chkSignOff.IsChecked = false;
+            this.chkNewBranch.IsChecked = false;
+
             this.dataGrid1.ItemsSource = null;
             this.textBoxComments.Document.Blocks.Clear();
             this.ClearEditor();

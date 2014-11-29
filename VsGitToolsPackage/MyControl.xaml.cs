@@ -331,20 +331,12 @@ namespace F1SYS.VsGitToolsPackage
         {
             this.tracker = tracker;
 
-            this.label3.Content = "Changed files";
-            this.chkAmend.IsChecked = false;
-            this.chkSignOff.IsChecked = false;
-            //this.chkNewBranch.IsChecked = false;
-
             if (tracker == null)
             {
                 ClearUI();
                 return;
             }
-            
-            //if (force) tracker.Refresh();
-            
-
+         
             //service.NoRefresh = true;
             //ShowStatusMessage("Getting changed files ...");
 
@@ -371,12 +363,7 @@ namespace F1SYS.VsGitToolsPackage
                     if (item != null) item.IsSelected = true;
                 });
 
-                var changed = tracker.ChangedFiles;
-                this.label3.Content = string.Format("Changed files:  +{0} ~{1} -{2} !{3}",
-                    changed.Where(f => f.Status == GitFileStatus.New || f.Status == GitFileStatus.Added).Count(),
-                    changed.Where(f => f.Status == GitFileStatus.Modified || f.Status == GitFileStatus.Staged).Count(),
-                    changed.Where(f => f.Status == GitFileStatus.Deleted || f.Status == GitFileStatus.Removed).Count(),
-                    changed.Where(f => f.Status == GitFileStatus.Conflict).Count());
+                this.label3.Content = string.Format("Changed files:  {0}", tracker.ChangedFilesStatus);
             }
             catch (Exception ex)
             {
@@ -401,6 +388,11 @@ namespace F1SYS.VsGitToolsPackage
 
         internal void ClearUI()
         {
+            this.label3.Content = "Changed files";
+            this.chkAmend.IsChecked = false;
+            this.chkSignOff.IsChecked = false;
+            //this.chkNewBranch.IsChecked = false;
+
             this.listView1.ItemsSource = null;
             this.textBoxComments.Document.Blocks.Clear();
             this.ClearEditor();
