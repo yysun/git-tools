@@ -1,4 +1,5 @@
 ﻿using GitScc;
+using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
 using System;
 using System.Collections.Generic;
@@ -438,9 +439,17 @@ namespace F1SYS.VsGitToolsPackage
 
         private void menuCompare_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFiles(fileName =>
+            GetSelectedFileName(fileName =>
             {
-                //service.CompareFile(fileName);
+                GitFileStatus status = this.tracker.GetFileStatus(fileName);
+                if (status == GitFileStatus.Modified || status == GitFileStatus.Staged)
+                {
+                    string tempFile = Path.GetFileName(fileName);
+                    tempFile = Path.Combine(Path.GetTempPath(), tempFile);
+                    this.tracker.SaveFileFromLastCommit(fileName, tempFile);
+                    fileName = Path.Combine(this.tracker.WorkingDirectory, fileName);
+                    toolWindow.DiffService.OpenComparisonWindow(tempFile, fileName);
+                }
             });
         }
 

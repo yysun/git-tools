@@ -50,6 +50,7 @@ namespace F1SYS.VsGitToolsPackage
                 return _Service;
             }
         }
+
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
@@ -116,6 +117,14 @@ namespace F1SYS.VsGitToolsPackage
             get 
             {
                 return this.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+            }
+        }
+
+        internal IVsDifferenceService DiffService
+        {
+            get
+            {
+                return (IVsDifferenceService) this.GetService(typeof(SVsDifferenceService));
             }
         }
 
