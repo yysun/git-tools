@@ -294,7 +294,7 @@ namespace VsGitToolsPackage.Tests
             tracker.CheckOutBranch("dev", true);
             Assert.AreEqual("dev", tracker.CurrentBranch);
         }
-/*
+
         [TestMethod]
         public void SaveFileFromRepositoryTest()
         {
@@ -305,13 +305,14 @@ namespace VsGitToolsPackage.Tests
             tracker.StageFile(tempFile);
             tracker.Commit("test");
 
-            tracker.SaveFileFromRepository(tempFile, tempFile + ".bk");
-            var newlines = File.ReadAllLines(tempFile + ".bk");
+            var tmp = Path.Combine(Path.GetTempPath(), tempFile) + ".bk";
+            tracker.SaveFileFromLastCommit(tempFile, tmp);
+            var newlines = File.ReadAllLines(tmp);
             Assert.AreEqual(lines[0], newlines[0]);
             Assert.AreEqual(lines[1], newlines[1]);
             Assert.AreEqual(lines[2], newlines[2]);
         }
-*/
+
         [TestMethod]
         public void CheckOutFileTest()
         {

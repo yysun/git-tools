@@ -584,6 +584,15 @@ namespace GitScc
             }
         }
 
+        public void SaveFileFromLastCommit(string fileName, string tempFile)
+        {
+            if (!this.isGit) return;
+            var head = GetBranchId("HEAD");
+            if (head != null)
+            {
+                GitBash.RunCmd(string.Format("show \"HEAD:{0}\" > \"{1}\"", fileName, tempFile), this.WorkingDirectory);
+            }
+        }
     }
 
     public class GitFileStatusTracker: GitRepository
