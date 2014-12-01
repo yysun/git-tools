@@ -566,7 +566,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void DiffEditor_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            int start = 1, column = 1;
+            int start = 1, column = 1; bool diff = false;
             try
             {
                 if (this.textView != null && diffLines != null && diffLines.Length > 0)
@@ -584,6 +584,7 @@ namespace F1SYS.VsGitToolsPackage
                             s = s.Substring(s.IndexOf('+') + 1);
                             s = s.Substring(0, s.IndexOf(','));
                             start += Convert.ToInt32(s) - 2;
+                            diff = true;
                             break;
                         }
                         else if (text.StartsWith("-"))
@@ -596,6 +597,7 @@ namespace F1SYS.VsGitToolsPackage
                         text = line >= 0 ? diffLines[line] : "";
                     }
                 }
+                if (!diff) start--;
             }
             catch (Exception ex)
             {
