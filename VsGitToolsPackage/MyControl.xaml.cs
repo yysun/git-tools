@@ -164,7 +164,7 @@ namespace F1SYS.VsGitToolsPackage
             if (checkBox != null)
                 return;
 
-            GetSelectedFiles((fileName) =>
+            GetSelectedFileName((fileName) =>
             {
                 OpenFile(fileName);
             });
@@ -612,6 +612,8 @@ namespace F1SYS.VsGitToolsPackage
 
         private void OpenFile(string fileName)
         {
+            fileName = System.IO.Path.Combine(this.tracker.WorkingDirectory, fileName);
+
             if (string.IsNullOrWhiteSpace(fileName)) return;
 
             fileName = fileName.Replace("/", "\\");
