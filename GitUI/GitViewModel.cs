@@ -194,9 +194,9 @@ namespace GitUI
 			GitBash.RunCmd(cmd, this.Tracker.WorkingDirectory);
 		}
 
-		internal void AddTag(string name, string id)
+        internal GitBashResult AddTag(string name, string id)
 		{
-            GitRun(string.Format("tag \"{0}\" {1}", name, id));
+            return GitRun(string.Format("tag \"{0}\" {1}", name, id));
 		}
 
 		internal GitBashResult GetTagId(string name)
@@ -204,9 +204,9 @@ namespace GitUI
 			return GitRun("show-ref refs/tags/" + name);
 		}
 
-		internal void DeleteTag(string name)
+        internal GitBashResult DeleteTag(string name)
 		{
-            GitRun("tag -d " + name);
+            return GitRun("tag -d " + name);
 		}
 
         internal GitBashResult AddBranch(string name, string id)
