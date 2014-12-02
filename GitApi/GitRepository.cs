@@ -16,6 +16,9 @@ namespace GitScc
         private bool isGit;
         private string branch;
         private IEnumerable<GitFile> changedFiles;
+        private IEnumerable<string> remotes;
+        private IDictionary<string, string> configs;
+
 
 		public string WorkingDirectory { get { return workingDirectory; } }
         public bool IsGit { get { return isGit; } }
@@ -31,6 +34,8 @@ namespace GitScc
             this.changedFiles = null;
             this.isGit = false;
             this.branch = null;
+            this.remotes = null;
+            this.configs = null;
 
             var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory); 
             if (!result.HasError && !result.Output.StartsWith("fatal:"))
@@ -593,11 +598,51 @@ namespace GitScc
                 GitBash.RunCmd(string.Format("show \"HEAD:{0}\" > \"{1}\"", fileName, tempFile), this.WorkingDirectory);
             }
         }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public IEnumerable<string> Remotes
+        {
+            get
+            {
+                if (remotes == null)
+                {
+                    var result = GitBash.Run("remote", this.WorkingDirectory);
+                    if (!result.HasError)
+                        remotes = result.Output.Split('\n').Where(s => !string.IsNullOrWhiteSpace(s));
+                }
+                return remotes;
+            }
+        }
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public IDictionary<string, string> Configs
+        {
+            get
+            {
+                if (configs == null)
+                {
+                    var result = GitBash.Run("config -l", this.WorkingDirectory);
+                    if (!result.HasError)
+                    {
+                        var lines = result.Output.Split('\n').Where(s => !string.IsNullOrWhiteSpace(s) && s.IndexOf("=") > 0).OrderBy(s => s);
+
+                        configs = new Dictionary<string, string>();
+                        foreach (var s in lines)
+                        {
+                            var pos = s.IndexOf("=");
+                            var key = s.Substring(0, pos);
+                            if (!configs.Keys.Contains(key))
+                                configs.Add(key, s.Substring(pos + 1));
+                        }
+                    }
+                }
+                return configs ?? new Dictionary<string, string>();
+            }
+        }
     }
 
     public class GitFileStatusTracker: GitRepository
     {
         public GitFileStatusTracker(string directory) : base(directory) { }
-
     }
 }
