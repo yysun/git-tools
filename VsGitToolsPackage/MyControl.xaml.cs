@@ -67,6 +67,8 @@ namespace F1SYS.VsGitToolsPackage
             this.DiffEditor.Content = null;
         }
 
+        string fileInEditor;
+
         private void ShowFile(string fileName)
         {
             try
@@ -80,8 +82,14 @@ namespace F1SYS.VsGitToolsPackage
             }
             finally
             {
-                File.Delete(fileName);
+                //File.Delete(fileName);
+                fileInEditor = fileName;
             }
+        }
+
+        internal void ReloadEditor()
+        {
+            ShowFile(fileInEditor);
         }
 
         #endregion
@@ -114,35 +122,34 @@ namespace F1SYS.VsGitToolsPackage
 
         private void listView1_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            ShowSelectedFile();
+        }
+
+        private void ShowSelectedFile()
+        {
             var fileName = GetSelectedFileName();
+
+            this.ClearEditor();
+
             if (fileName == null)
             {
-                this.ClearEditor();
                 diffLines = new string[0];
                 return;
             }
 
             try
             {
-                //var ret = tracker.DiffFile(fileName);
-                //ret = ret.Replace("\r", "").Replace("\n", "\r\n");
-
-                //var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
-                //File.WriteAllText(tmpFileName, ret);
-
                 var tmpFileName = tracker.DiffFile(fileName);
                 if (!string.IsNullOrWhiteSpace(tmpFileName) && File.Exists(tmpFileName))
                 {
                     if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
                     {
-                        Action action = () => this.DiffEditor.Content = "File is too big to display: " + fileName;
-                        Dispatcher.Invoke(action);
+                        this.DiffEditor.Content = "File is too big to display: " + fileName;
                     }
                     else
                     {
                         diffLines = File.ReadAllLines(tmpFileName);
-                        Action action = () => this.ShowFile(tmpFileName);
-                        Dispatcher.Invoke(action);
+                        this.ShowFile(tmpFileName);
                     }
                 }
             }
@@ -360,6 +367,8 @@ namespace F1SYS.VsGitToolsPackage
                 });
 
                 this.label3.Content = string.Format("Changed files:  {0}", tracker.ChangedFilesStatus);
+
+                ShowSelectedFile();
             }
             catch (Exception ex)
             {

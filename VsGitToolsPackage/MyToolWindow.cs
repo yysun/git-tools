@@ -30,7 +30,7 @@ namespace F1SYS.VsGitToolsPackage
     /// implementation of the IVsUIElementPane interface.
     /// </summary>
     [Guid("11dffb59-3169-48ac-9676-2916d06a36de")]
-    public class MyToolWindow : ToolWindowPane //, IOleCommandTarget
+    public class MyToolWindow : ToolWindowPane, IVsWindowFrameNotify3
     {
         IVsTextView _ViewAdapter;
         IVsTextBuffer _BufferAdapter;
@@ -54,7 +54,7 @@ namespace F1SYS.VsGitToolsPackage
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
-        public MyToolWindow() :
+        public MyToolWindow() : 
             base(null)
         {
             // Set the window title reading it from the resources.
@@ -423,6 +423,38 @@ namespace F1SYS.VsGitToolsPackage
             this.cachedEditorCommandTarget = null;
             this.cachedEditorFindTarget = null;
             this.invisibleEditor = null;
+        }
+        #endregion
+
+        #region IVsWindowFrameNotify3
+        public int OnClose(ref uint pgrfSaveOptions)
+        {
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
+
+        public int OnDockableChange(int fDockable, int x, int y, int w, int h)
+        {
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
+
+        public int OnMove(int x, int y, int w, int h)
+        {
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
+
+        public int OnShow(int fShow)
+        {
+            if (fShow == (int)__FRAMESHOW.FRAMESHOW_WinShown)
+            {
+               // _Control.Refresh(Service.Repository);
+                _Control.ReloadEditor();
+            }
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
+
+        public int OnSize(int x, int y, int w, int h)
+        {
+            return Microsoft.VisualStudio.VSConstants.S_OK;
         }
         #endregion
     }
