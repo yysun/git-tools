@@ -77,8 +77,8 @@ namespace GitScc
             if (string.IsNullOrEmpty(GitBashPath))
             {
                 GitBashPath = TryFindFile(new string[]{
-                    @"C:\Program Files\Git\bin\sh.exe",
-                    @"C:\Program Files (x86)\Git\bin\sh.exe",
+                    @"C:\Program Files\Git\bin\git.exe",
+                    @"C:\Program Files (x86)\Git\bin\git.exe",
                 });
             }
             if (string.IsNullOrEmpty(GitExtensionPath))
