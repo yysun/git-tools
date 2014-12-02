@@ -37,6 +37,7 @@ namespace F1SYS.VsGitToolsPackage
         {
             InitializeComponent();
             this.toolWindow = toolWindow;
+            this.gitConsole1.GitExePath =  GitSccOptions.Current.GitBashPath;  
         }
 
 
@@ -334,6 +335,7 @@ namespace F1SYS.VsGitToolsPackage
         internal void Refresh(GitRepository tracker)
         {
             this.tracker = tracker;
+            this.gitConsole1.tracker = tracker;
 
             if (tracker == null)
             {

@@ -159,6 +159,10 @@
     <Compile Include="DiffClassifier\DiffClassificationDefinitions.cs" />
     <Compile Include="DiffClassifier\DiffClassifier.cs" />
     <Compile Include="DiffClassifier\DiffClassifierProvider.cs" />
+    <Compile Include="GitConsole.xaml.cs">
+      <DependentUpon>GitConsole.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GitIntellisenseHelper.cs" />
     <Compile Include="GitToolCommands.cs" />
     <Compile Include="MyControl.xaml.cs">
       <DependentUpon>MyControl.xaml</DependentUpon>
@@ -243,6 +247,10 @@
     <Resource Include="Resources\UndoCheckout.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="GitConsole.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MyControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
