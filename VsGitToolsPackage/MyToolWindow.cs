@@ -446,7 +446,9 @@ namespace F1SYS.VsGitToolsPackage
         {
             if (fShow == (int)__FRAMESHOW.FRAMESHOW_WinShown)
             {
-               // _Control.Refresh(Service.Repository);
+                var svc = this.GetService(typeof(IVsUIShell)) as IVsUIShell;
+                svc.UpdateCommandUI(1);
+
                 _Control.ReloadEditor();
             }
             return Microsoft.VisualStudio.VSConstants.S_OK;
