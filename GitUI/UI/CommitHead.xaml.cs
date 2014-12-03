@@ -59,12 +59,26 @@ namespace GitScc.UI
             var branch = GitViewModel.Current.Tracker.CurrentBranch;
 
             var result = MessageBox.Show("Are you sure you want to rebase current branch: " + branch
-                + " on top of branch " + BranchName + "?", "Warning",
+                + " on top of branch: " + BranchName + "?", "Rebase",
                 MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
                 GitViewModel.Current.Rebase(BranchName);
+            }
+        }
+
+        private void Merge_Click(object sender, RoutedEventArgs e)
+        {
+            var branch = GitViewModel.Current.Tracker.CurrentBranch;
+
+            var result = MessageBox.Show("Are you sure you want to merge current branch: " + branch
+                + " with branch: " + BranchName + "?", "Merge",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                GitViewModel.Current.Merge(BranchName);
             }
         }
     }
