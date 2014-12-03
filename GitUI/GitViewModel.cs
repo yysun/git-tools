@@ -285,6 +285,10 @@ namespace GitUI
             GitRun("rebase -i " + id + "~1");
         }
 
+        internal void Merge(string branchName)
+        {
+            GitRun("merge " + branchName);
+        }
         #endregion
 
     }
