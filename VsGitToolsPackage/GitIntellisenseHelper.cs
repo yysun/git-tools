@@ -62,7 +62,7 @@ namespace GitScc.UI
         }
 
         static Dictionary<string, string[]> Commands = new Dictionary<string, string[]>{
-            {"^git$", new string[] {"add", "bisect", "branch", "checkout", "commit", "config", "diff", "fetch", "format-patch", "grep",   
+            {"^git$", new string[] {"add", "bisect", "branch", "checkout", "commit", "config", "diff", "fetch", "format-patch", "grep", "init",  
                                "log", "merge", "mv", "pull", "push", "rebase", "remote", "reset", "rm", "show", "status", "stash", "tag"}},
 
             {"^git bisect$", new string[] {"start|bad|good|skip|reset|help"}},

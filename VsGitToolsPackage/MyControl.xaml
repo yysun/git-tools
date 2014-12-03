@@ -8,7 +8,7 @@
              xmlns:vsui="clr-namespace:GitScc.PlatformUI"
              xmlns:gitconsole="clr-namespace:GitScc.UI"
              mc:Ignorable="d"
-             Foreground="{DynamicResource {x:Static vsfx:VsBrushes.CommandBarTextActiveKey}}"
+             Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
 			 Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
              d:DesignHeight="300" d:DesignWidth="800"
              Name="MyToolWindow" KeyDown="UserControl_KeyDown" Loaded="UserControl_Loaded">
@@ -30,7 +30,7 @@
             <ControlTemplate.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="#3399FF" />
-                    <Setter Property="Foreground" Value="{DynamicResource {x:Static vsfx:VsBrushes.WindowKey}}" />
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" />
                 </Trigger>
                 <MultiTrigger>
                     <MultiTrigger.Conditions>
@@ -140,10 +140,10 @@
 
         <Style x:Key="{x:Type RichTextBox}" TargetType="{x:Type RichTextBox}">
             <Setter Property="Foreground" Value="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" />
-            <Setter Property="Background" Value="{DynamicResource {x:Static vsfx:VsBrushes.WindowKey}}" />
+            <Setter Property="Background" Value="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" />
             <Style.Triggers>
                 <Trigger Property="IsFocused" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource {x:Static vsfx:VsBrushes.ComboBoxBackgroundKey}}" />
+                    <Setter Property="Background" Value="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -161,6 +161,7 @@
                 <Path Name="arrow" StrokeThickness="1" Style="{StaticResource {x:Type Path}}" Data="M5,5L10,10 15,5 5,5" />
             </DockPanel>
         </DataTemplate>
+        
     </UserControl.Resources>
 
     <Grid x:Name="Main" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -217,7 +218,7 @@
            
             <ListView Name="listView1" Grid.Row="3" Margin="6,0,6,10" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
 					  SelectedValuePath="FileName" KeyUp="listView1_KeyUp" PreviewKeyDown="listView1_PreviewKeyDown" ButtonBase.Click="listView1_Click" 
-                      Background="{DynamicResource {x:Static vsfx:VsBrushes.WindowKey}}">
+                      Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
                 <ListView.View>
                     <GridView AllowsColumnReorder="False">
                         <GridViewColumn Width="Auto">
@@ -269,16 +270,39 @@
             <Label Content="(If refreshing is slow, try turn off auto-refresh in Tools | Options)" Foreground="#FF333333" Height="28" HorizontalAlignment="Left" Margin="231,0,0,0" Name="label4" VerticalAlignment="Center" Grid.Row="2" Visibility="Collapsed" />
         </Grid>
 
-        <Grid Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
-              Background="{DynamicResource {x:Static vsfx:VsBrushes.WindowKey}}">
+        <Grid Grid.Column="2" Grid.Row="0" Grid.RowSpan="2">
 
             <!--<ContentControl x:Name="DiffEditor" MouseDoubleClick="DiffEditor_MouseDoubleClick"></ContentControl>-->
 
-            <TabControl Name="tabControl1">
+            <TabControl Name="tabControl1" Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Border Name="Border" BorderThickness="1,1,1,0" BorderBrush="Gainsboro" CornerRadius="4,4,0,0" Margin="2,0">
+                                        <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="10,2"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTabSelectedTextKey}}" />
+                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource {x:Static vsfx:VsBrushes.TitleBarActiveKey}}" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" />
+                                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
+
                 <TabItem Header="Diff View" Name="tabItem1">
                     <ContentControl x:Name="DiffEditor" MouseDoubleClick="DiffEditor_MouseDoubleClick"></ContentControl>
                 </TabItem>
-                <TabItem Header="Git Console" Name="tabItem2">
+                <TabItem Header="Git Console (beta)" Name="tabItem2">
                     <gitconsole:GitConsole x:Name="gitConsole1" />
                 </TabItem>
             </TabControl>
@@ -288,4 +312,5 @@
         <my:Settings HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="Settings" Grid.ColumnSpan="3" Grid.RowSpan="3" Visibility="Collapsed" />
 
     </Grid>
+    
 </UserControl>

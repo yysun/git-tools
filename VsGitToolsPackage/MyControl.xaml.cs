@@ -125,6 +125,7 @@ namespace F1SYS.VsGitToolsPackage
         private void listView1_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ShowSelectedFile();
+            tabControl1.SelectedIndex = 0;
         }
 
         private void ShowSelectedFile()

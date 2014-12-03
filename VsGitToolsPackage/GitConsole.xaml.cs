@@ -1,4 +1,6 @@
-﻿using System;
+﻿using GitScc.DataServices;
+using Microsoft.VisualStudio.Shell;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,7 +11,6 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using GitScc.DataServices;
 
 namespace GitScc.UI
 {
@@ -18,11 +19,11 @@ namespace GitScc.UI
     /// </summary>
     public partial class GitConsole : UserControl
     {
-
         private Brush BRUSH_PROMPT = new SolidColorBrush(Colors.Black);
-        private Brush BRUSH_ERROR  = new SolidColorBrush(Colors.Crimson);
-        private Brush BRUSH_OUTPUT = new SolidColorBrush(Colors.Navy);
+        private Brush BRUSH_ERROR  = new SolidColorBrush(Colors.Red);
+        private Brush BRUSH_OUTPUT = new SolidColorBrush(Colors.Green);
         private Brush BRUSH_HELP   = new SolidColorBrush(Colors.Black);
+
 
         private GitRepository _tracker;
         public GitRepository tracker
@@ -31,7 +32,9 @@ namespace GitScc.UI
             set
             {
                 this._tracker = value;
-                this.WorkingDirectory = this._tracker == null ? "" : this.tracker.WorkingDirectory;
+                this.WorkingDirectory = this._tracker == null ?
+                    Environment.GetFolderPath(Environment.SpecialFolder.Personal) :
+                    this.tracker.WorkingDirectory;
             } 
         }
 
@@ -44,8 +47,11 @@ namespace GitScc.UI
                 if (string.Compare(workingDirectory, value) != 0)
                 {
                     workingDirectory = value;
-                    prompt = string.Format("[{1}]>", workingDirectory,
-                        GitIntellisenseHelper.GetPrompt(tracker));
+
+                    prompt = _tracker == null || !_tracker.IsGit ?
+                        string.Format("[{0}]>", workingDirectory) :
+                        string.Format("[{0}]>", GitIntellisenseHelper.GetPrompt(tracker));
+                    
                     this.richTextBox1.Document.Blocks.Clear();
                     this.WritePrompt();
                     //ShowWaring();
@@ -115,6 +121,9 @@ namespace GitScc.UI
                 var text = new TextRange(richTextBox1.CaretPosition.GetLineStartPosition(0),
                     richTextBox1.CaretPosition).Text;
                 if (text.EndsWith(">")) e.Handled = true;
+            }
+            else if (e.Key == Key.C && Keyboard.Modifiers == ModifierKeys.Control)
+            {
             }
         }
 
@@ -186,6 +195,8 @@ USE AT YOUR OWN RISK.
 
         private void RunConsoleCommand(string command)
         {
+            BRUSH_HELP = BRUSH_PROMPT = this.richTextBox1.Foreground;
+
             isGit = true;
             if (!string.IsNullOrWhiteSpace(command) &&
                (commandHistory.Count == 0 || commandHistory.Last() != command))

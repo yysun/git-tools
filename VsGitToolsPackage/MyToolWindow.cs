@@ -77,6 +77,12 @@ namespace F1SYS.VsGitToolsPackage
             base.Content = new MyControl(this);
         }
 
+        protected override void Initialize()
+        {
+            base.Initialize();
+            InitializeEditor();
+        }
+
         internal void OnCommitCommand()
         {
             if (!hasFileSaved()) return;
