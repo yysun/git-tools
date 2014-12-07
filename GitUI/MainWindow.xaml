@@ -5,7 +5,7 @@
         xmlns:GitScc_UI="clr-namespace:GitScc.UI" x:Class="GitUI.MainWindow" Height="460" Width="800" 
         Loaded="Window_Loaded" PreviewKeyDown="Window_PreviewKeyDown"
         Icon="/GitUI;component/Resources/dragon.png"
-        AllowDrop="True" Drop="Window_Drop">
+        AllowDrop="True" Drop="Window_Drop" SizeChanged="Window_SizeChanged">
 
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static shell:SystemCommands.CloseWindowCommand}" Executed="_OnSystemCommandCloseWindow"/>

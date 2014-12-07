@@ -360,5 +360,16 @@ namespace GitUI
 
         }
 
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var mh = this.ActualHeight / 2 - 30;
+            var h = this.rootGrid.RowDefinitions[2].Height.Value;
+            if (h > mh)
+            {
+                this.rootGrid.RowDefinitions[2].Height = new GridLength(mh);
+                console_height = mh;
+            }
+        }
+
 	}
 }
