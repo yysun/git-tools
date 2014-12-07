@@ -510,6 +510,7 @@ Note: Undo file changes will restore the file(s) from the last commit.";
             if (string.IsNullOrWhiteSpace(Comments))
             {
                 Comments = tracker.LastCommitMessage;
+                //service.UndoCommit(); // not sure if this is a good idea
             }
         }
 

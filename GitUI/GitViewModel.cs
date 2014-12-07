@@ -275,6 +275,11 @@ namespace GitUI
             GitRun("stash drop");
         }
 
+        internal void UndoCommit()
+        {
+            GitRun("reset HEAD~1 --soft");
+        }
+
         //internal void MergeTool()
         //{
         //    GitRunCmd("mergetool");
@@ -295,6 +300,5 @@ namespace GitUI
             GitRun("merge " + branchName);
         }
         #endregion
-
     }
 }
