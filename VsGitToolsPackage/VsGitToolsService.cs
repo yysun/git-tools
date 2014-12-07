@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,16 +17,21 @@ namespace F1SYS.VsGitToolsPackage
     [Guid("8E86F257-5F3C-4E21-B08D-926029AAEECC")]
     public class VsGitToolsService : IDisposable,
         IVsSolutionEvents, 
-        IVsUpdateSolutionEvents2,
-        IVsFileChangeEvents
+        IVsUpdateSolutionEvents2
+        //IVsFileChangeEvents
     {
 
-        private uint _vsSolutionEventsCookie, _vsIVsFileChangeEventsCookie, _vsIVsUpdateSolutionEventsCookie;
-        private string lastMinotorFolder = "";
+        private uint _vsSolutionEventsCookie, _vsIVsUpdateSolutionEventsCookie;
+
+        //private uint _vsSolutionEventsCookie, _vsIVsFileChangeEventsCookie, _vsIVsUpdateSolutionEventsCookie;
+        //private string lastMinotorFolder = "";
+
         private DispatcherTimer timer;
 
         private VsGitToolsPackagePackage package;
         public GitRepository Repository {  get; private set; }
+
+        FileSystemWatcher fileSystemWatcher;
 
         private void OpenRepository()
         {
@@ -36,16 +42,22 @@ namespace F1SYS.VsGitToolsPackage
                 if (sol.GetSolutionInfo(out solutionDirectory, out solutionFile, out solutionUserOptions) == VSConstants.S_OK)
                 {
                     Repository = new GitRepository(solutionDirectory);
-                    var monitorFolder = solutionDirectory;
 
-                    IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
-                    if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
-                    {
-                        fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
-                    }
-                    fileChangeService.AdviseDirChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
-                    lastMinotorFolder = monitorFolder;
+                    //var monitorFolder = solutionDirectory;
+                    //IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
+                    //if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
+                    //{
+                    //    fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
+                    //}
+                    //fileChangeService.AdviseDirChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
+                    //lastMinotorFolder = monitorFolder;
                     // Debug.WriteLine("==== Start Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
+
+                    fileSystemWatcher = new FileSystemWatcher(solutionDirectory);
+                    fileSystemWatcher.IncludeSubdirectories = true;
+                    fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
+                    fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
+                    fileSystemWatcher.EnableRaisingEvents = true;
                 }
             }
             catch (Exception ex)
@@ -55,16 +67,31 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
+        private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
+        {
+            NeedRefresh = true;
+        }
+
         private void CloseRepository()
         {
             Repository = null;
-            if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
+
+            //if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
+            //{
+            //    IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
+            //    fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
+            //    // Debug.WriteLine("==== Stop Monitoring: " + _vsIVsFileChangeEventsCookie.ToString());
+            //    _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
+            //    lastMinotorFolder = "";
+            //}
+
+            if (fileSystemWatcher != null)
             {
-                IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
-                fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
-                // Debug.WriteLine("==== Stop Monitoring: " + _vsIVsFileChangeEventsCookie.ToString());
-                _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
-                lastMinotorFolder = "";
+                fileSystemWatcher.Deleted -= new FileSystemEventHandler(fileSystemWatcher_Changed);
+                fileSystemWatcher.Changed -= new FileSystemEventHandler(fileSystemWatcher_Changed);
+                fileSystemWatcher.EnableRaisingEvents = false;
+                fileSystemWatcher.Dispose();
+                fileSystemWatcher = null;
             }
         }
 
