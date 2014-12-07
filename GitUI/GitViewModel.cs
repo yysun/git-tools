@@ -300,5 +300,6 @@ namespace GitUI
             GitRun("merge " + branchName);
         }
         #endregion
+
     }
 }
