@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using GitScc.DataServices;
 using GitScc;
+using System.Text;
 
 namespace GitUI.UI
 {
@@ -239,6 +240,8 @@ namespace GitUI.UI
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.ErrorDialog = false;
                 startInfo.WorkingDirectory = WorkingDirectory;
+                startInfo.StandardOutputEncoding = Encoding.UTF8;
+                startInfo.StandardErrorEncoding = Encoding.UTF8;
 
                 using (Process process = Process.Start(startInfo))
                 using (ManualResetEvent mreOut = new ManualResetEvent(false), mreErr = new ManualResetEvent(false))

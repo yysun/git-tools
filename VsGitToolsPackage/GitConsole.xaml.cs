@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -239,6 +240,8 @@ namespace GitScc.UI
                 startInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 startInfo.ErrorDialog = false;
                 startInfo.WorkingDirectory = WorkingDirectory;
+                startInfo.StandardOutputEncoding = Encoding.UTF8;
+                startInfo.StandardErrorEncoding = Encoding.UTF8;
 
                 using (Process process = Process.Start(startInfo))
                 using (ManualResetEvent mreOut = new ManualResetEvent(false), mreErr = new ManualResetEvent(false))
