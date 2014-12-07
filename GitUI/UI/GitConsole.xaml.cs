@@ -115,7 +115,7 @@ namespace GitUI.UI
             {
                 var text = new TextRange(richTextBox1.CaretPosition.GetLineStartPosition(0),
                     richTextBox1.CaretPosition).Text;
-                if (text.EndsWith(">")) e.Handled = true;
+                if (text.EndsWith(">") && text.IndexOf(">") == text.Length-1) e.Handled = true;
             }
             else if (e.Key == Key.C && Keyboard.Modifiers == ModifierKeys.Control)
             {
