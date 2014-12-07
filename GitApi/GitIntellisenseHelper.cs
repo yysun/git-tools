@@ -6,15 +6,15 @@ using System.Text.RegularExpressions;
 using GitScc;
 using GitScc.DataServices;
 
-namespace GitScc.UI
+namespace GitScc
 {
     //Inspired by:
     //http://www.markembling.info/view/my-ideal-powershell-prompt-with-git-integration
     //https://github.com/dahlbyk/posh-git
 
-    class GitIntellisenseHelper
+    public class GitIntellisenseHelper
     {
-        internal static IEnumerable<string> GetOptions(GitRepository tracker, string command)
+        public static IEnumerable<string> GetOptions(GitRepository tracker, string command)
         {
             if (tracker == null) return new string[] { };
             var options = Commands.Where(i => Regex.IsMatch(command, i.Key)).Select(i => i.Value).FirstOrDefault();
@@ -47,18 +47,6 @@ namespace GitScc.UI
                 return options[0].Split('|');
             else
                 return options;
-        }
-
-        internal static string GetPrompt(GitRepository tracker)
-        {
-            if(tracker==null || !tracker.IsGit) return "No Git Repository";
-            var changed = tracker.ChangedFiles;
-            return string.Format("{0} +{1} ~{2} -{3} !{4}", tracker.CurrentBranch,
-                changed.Where(f=> f.Status == GitFileStatus.New || f.Status == GitFileStatus.Added).Count(),
-                changed.Where(f => f.Status == GitFileStatus.Modified || f.Status == GitFileStatus.Staged).Count(),
-                changed.Where(f => f.Status == GitFileStatus.Deleted || f.Status == GitFileStatus.Removed).Count(),
-                changed.Where(f => f.Status == GitFileStatus.Conflict).Count()
-            );
         }
 
         static Dictionary<string, string[]> Commands = new Dictionary<string, string[]>{

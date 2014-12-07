@@ -164,7 +164,6 @@
     <Compile Include="GitConsole.xaml.cs">
       <DependentUpon>GitConsole.xaml</DependentUpon>
     </Compile>
-    <Compile Include="GitIntellisenseHelper.cs" />
     <Compile Include="GitToolCommands.cs" />
     <Compile Include="MyControl.xaml.cs">
       <DependentUpon>MyControl.xaml</DependentUpon>

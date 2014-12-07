@@ -142,7 +142,7 @@ namespace GitScc.UI
         {
             var result = GitBash.Run("config credential.helper", this.WorkingDirectory);
 
-            if (!string.IsNullOrWhiteSpace(result.Output))
+            if (string.IsNullOrWhiteSpace(result.Output))
             {
                 WriteError("Git credential helper is not installed. Please download and installed from https://gitcredentialstore.codeplex.com/");
                 Action act = () =>

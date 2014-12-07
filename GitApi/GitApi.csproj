@@ -49,6 +49,7 @@
     <Compile Include="GitBash.cs" />
     <Compile Include="GitBashResult.cs" />
     <Compile Include="GitFileStatus.cs" />
+    <Compile Include="GitIntellisenseHelper.cs" />
     <Compile Include="GitRepository.cs" />
     <Compile Include="GitSccOptions.cs" />
     <Compile Include="Log.cs" />
