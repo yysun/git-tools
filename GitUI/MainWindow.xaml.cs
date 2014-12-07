@@ -31,10 +31,9 @@ namespace GitUI
 		{
 			this.Style = (Style)Resources["GradientStyle"];
 
-			//this.gitConsole.GitExePath = GitBash.GitExePath;
-			//this.rootGrid.RowDefinitions[0].Height = new GridLength(this.ActualHeight - 60);
-
-			this.gitViewModel = GitViewModel.Current;
+            this.gitViewModel = GitViewModel.Current;
+            this.gitConsole.GitExePath = GitBash.GitExePath;
+            this.rootGrid.RowDefinitions[2].Height = new GridLength(0);
 
 			if (gitViewModel.Tracker.IsGit)
 				this.Title = gitViewModel.Tracker.WorkingDirectory;
@@ -42,7 +41,11 @@ namespace GitUI
             this.gitViewModel.GraphChanged += gitViewModel_GraphChanged;
             gitViewModel_GraphChanged(this, null);
 
-			Action a1 = () => this.WindowState = WindowState.Maximized;
+            Action a1 = () =>
+            {
+                this.WindowState = WindowState.Maximized;
+                this.console_height = (this.ActualHeight - 60) * 0.5;
+            };
 			this.Dispatcher.BeginInvoke(a1, DispatcherPriority.ApplicationIdle);
 
 			var optionSet = new OptionSet()
@@ -77,21 +80,14 @@ namespace GitUI
 
                 if (gitViewModel.Tracker.IsGit)
                 {
-                    var changed = gitViewModel.Tracker.ChangedFiles;
-                    var prompt = string.Format("{4}:  +{0} ~{1} -{2} !{3}",
-                        changed.Where(f => f.Status == GitFileStatus.New || f.Status == GitFileStatus.Added).Count(),
-                        changed.Where(f => f.Status == GitFileStatus.Modified || f.Status == GitFileStatus.Staged).Count(),
-                        changed.Where(f => f.Status == GitFileStatus.Deleted || f.Status == GitFileStatus.Removed).Count(),
-                        changed.Where(f => f.Status == GitFileStatus.Conflict).Count(),
-                        gitViewModel.Tracker.CurrentBranch);
-
-                    this.txtPrompt.Text = prompt;
+                    this.txtPrompt.Text = gitViewModel.Tracker.ChangedFilesStatus;
                 }
 
                 this.Title = string.Format("{0} ({1})", this.txtRepo.Text, this.txtPrompt.Text);
 
                 this.graph.Show(gitViewModel.Tracker, true);
                 this.pendingChanges.Refresh(gitViewModel.Tracker);
+                this.gitConsole.Refresh(gitViewModel.Tracker);
 
                 //Action b = () => loading.Visibility = Visibility.Collapsed;
                 //this.Dispatcher.BeginInvoke(b, DispatcherPriority.Render);
@@ -352,6 +348,17 @@ namespace GitUI
                 }
             }
 		}
+
+        double console_height;
+        private void txtSettings_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var h = this.rootGrid.RowDefinitions[2].Height.Value;
+            this.rootGrid.RowDefinitions[2].Height = h > 0 ?
+                new GridLength(0) :
+                new GridLength(console_height);
+            console_height = h;
+
+        }
 
 	}
 }

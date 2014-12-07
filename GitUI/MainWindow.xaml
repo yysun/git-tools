@@ -64,11 +64,11 @@
     </Window.Resources>
     
     <Grid x:Name="rootGrid">
-        <!--<Grid.RowDefinitions>
+        <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="0"/>
-            <RowDefinition Height="0"/>
-        </Grid.RowDefinitions>-->
+        </Grid.RowDefinitions>
        
         <GitScc_UI:HistoryGraph HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="graph" Margin="0,90,0,0" />
 
@@ -94,14 +94,14 @@
                 <TranslateTransform/>
             </my:PendingChanges.RenderTransform>
         </my:PendingChanges>
+
+        <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch"
+              VerticalAlignment="Center" ResizeDirection="Rows" Height="4"/>
         
-        <!--<GridSplitter VerticalAlignment="Top" HorizontalAlignment="Stretch" Grid.Row="1"
-                      Height="4" Background="#FFAAAAAA"/>
-        
-        <my:GitConsole x:Name="gitConsole" VerticalAlignment="Stretch" Grid.Row="2"/>-->
+        <my:GitConsole x:Name="gitConsole" Grid.Row="2" Margin="10,2,10,10" />
 
         <GitScc_UI:Loading x:Name="loading"  HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
-        <TextBlock HorizontalAlignment="Left" Margin="15,0,0,20" x:Name="txtSettings" Text="v" VerticalAlignment="Bottom" Foreground="#FFEEEEEE" FontFamily="Wingdings" FontSize="18" />
+        <TextBlock HorizontalAlignment="Left" Margin="15,0,0,20" x:Name="txtSettings" Text="v" VerticalAlignment="Bottom" Foreground="#FF666666" FontFamily="Wingdings" FontSize="18" MouseUp="txtSettings_MouseUp"  />
         <TextBlock HorizontalAlignment="Right" Margin="0,0,25,25" x:Name="txtRepo" Text="(No Repo)" VerticalAlignment="Bottom" Foreground="#FF999999" TextAlignment="Right"/>
         <TextBlock HorizontalAlignment="Right" Margin="0,0,25,45" x:Name="txtPrompt" Text="(0 0 0 0)" VerticalAlignment="Bottom" Foreground="#FF999999" TextAlignment="Right" />
         <TextBlock Foreground="#FF990000" HorizontalAlignment="Right" Margin="0,0,30,60" x:Name="txtMessage" Text="" VerticalAlignment="Bottom" TextAlignment="Right" />
