@@ -91,7 +91,7 @@ namespace F1SYS.VsGitToolsPackage
 
         internal void ReloadEditor()
         {
-            ShowFile(fileInEditor);
+            if (fileInEditor != null) ShowFile(fileInEditor);
         }
 
         #endregion
@@ -125,7 +125,6 @@ namespace F1SYS.VsGitToolsPackage
         private void listView1_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ShowSelectedFile();
-            tabControl1.SelectedIndex = 0;
         }
 
         private void ShowSelectedFile()
@@ -335,15 +334,13 @@ namespace F1SYS.VsGitToolsPackage
 
         internal void Refresh(GitRepository tracker)
         {
-            this.tracker = tracker;
-            this.gitConsole1.tracker = tracker;
+            ClearUI();
 
-            if (tracker == null)
-            {
-                ClearUI();
-                return;
-            }
-         
+            this.tracker = tracker;
+            this.gitConsole1.Refresh(tracker);
+            
+            if (tracker == null) return;
+
             //service.NoRefresh = true;
             //ShowStatusMessage("Getting changed files ...");
 
@@ -370,7 +367,7 @@ namespace F1SYS.VsGitToolsPackage
                     if (item != null) item.IsSelected = true;
                 });
 
-                this.label3.Content = string.Format("Changed files:  {0}", tracker.ChangedFilesStatus);
+                this.label3.Content = string.Format("Git Status:  {0}", tracker.ChangedFilesStatus);
 
                 ShowSelectedFile();
             }
@@ -381,7 +378,6 @@ namespace F1SYS.VsGitToolsPackage
             }
 
             this.listView1.EndInit();
-
 
 
             //stopwatch.Stop();
@@ -397,7 +393,7 @@ namespace F1SYS.VsGitToolsPackage
 
         internal void ClearUI()
         {
-            this.label3.Content = "Changed files";
+            this.label3.Content = "Not a Git repository";
             this.chkAmend.IsChecked = false;
             this.chkSignOff.IsChecked = false;
             //this.chkNewBranch.IsChecked = false;

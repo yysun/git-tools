@@ -26,7 +26,7 @@ namespace GitScc.UI
 
 
         private GitRepository _tracker;
-        public GitRepository tracker
+        private GitRepository tracker
         {
             get { return _tracker; }
             set
@@ -46,15 +46,9 @@ namespace GitScc.UI
             {
                 if (string.Compare(workingDirectory, value) != 0)
                 {
-                    workingDirectory = value;
-
-                    prompt = _tracker == null || !_tracker.IsGit ?
-                        string.Format("[{0}]>", workingDirectory) :
-                        string.Format("[{0}]>", GitIntellisenseHelper.GetPrompt(tracker));
-                    
+                    workingDirectory = value;                  
                     this.richTextBox1.Document.Blocks.Clear();
-                    this.WritePrompt();
-                    //ShowWaring();
+                    prompt = ""; //force re-write prompt
                 }
             }
         }
@@ -144,21 +138,26 @@ namespace GitScc.UI
             return !text.Contains(">");
         }
 
-        private void ShowWaring()
+        private bool ShowWaring()
         {
-            WriteText(@"Welcome to Dragon console.", BRUSH_PROMPT);
-            WriteHelp();
-            WriteText(@"WARNING: Git commands that require interactive inputs are not working in this console. E.g. git mergetool, git push/pull with http(s) that need to enter password are not supported. Please use Git Bash instead.
+            var result = GitBash.Run("config credential.helper", this.WorkingDirectory);
 
-USE AT YOUR OWN RISK.
-", BRUSH_ERROR);
-
-            WritePrompt();
+            if (!string.IsNullOrWhiteSpace(result.Output))
+            {
+                WriteError("Git credential helper is not installed. Please download and installed from https://gitcredentialstore.codeplex.com/");
+                Action act = () =>
+                {
+                    WritePrompt();
+                };
+                this.Dispatcher.BeginInvoke(act, DispatcherPriority.ApplicationIdle);
+                return true;
+            }
+            return false;
         }
 
         private void WriteHelp()
         {
-            WriteText(@"Dragon console commands:
+            WriteText(@"Git console commands:
 
     cls:     clear the screen
     clear:   clear the screen
@@ -166,7 +165,7 @@ USE AT YOUR OWN RISK.
     git:     launch git bash
     git xxx: launch supported git command xxx
 ", BRUSH_HELP);
-            
+
         }
 
         #endregion
@@ -213,6 +212,11 @@ USE AT YOUR OWN RISK.
                         Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments):
                         this.WorkingDirectory);
                     return;
+                }
+                else if (command.StartsWith("git fetch") || command.StartsWith("git pull") || command.StartsWith("git push"))
+                {
+                    if (ShowWaring()) return;
+
                 }
                 else if (command.StartsWith("git "))
                 {
@@ -328,19 +332,16 @@ USE AT YOUR OWN RISK.
             this.richTextBox1.CaretPosition = this.richTextBox1.CaretPosition.DocumentEnd;
         }
 
-        void ReplacePrompt(object sender, EventArgs e)
+        void RefreshPrompt()
         {
-            var newprompt = string.Format("[{1}]>", workingDirectory,
-                GitIntellisenseHelper.GetPrompt(tracker));
+            var newprompt = _tracker == null || !_tracker.IsGit ?
+                string.Format("[{0}]>", "Not a Git repostiory") :
+                string.Format("[{0}]>", tracker.ChangedFilesStatus);
 
             if (prompt != newprompt)
             {
-                var command = GetCommand();
-                var last = this.richTextBox1.Document.Blocks.Last();
-                this.richTextBox1.Document.Blocks.Remove(last);
                 prompt = newprompt;
                 WritePrompt();
-                ChangePrompt(command, BRUSH_PROMPT);
                 lstOptions.Visibility = Visibility.Collapsed;
             }
         }
@@ -379,7 +380,7 @@ USE AT YOUR OWN RISK.
                 WritePrompt();
                 return true;
             }
-            else if (command == "help")
+            else if (command == "help" || command == "?")
             {
                 WriteHelp();
                 WritePrompt();
@@ -392,12 +393,6 @@ USE AT YOUR OWN RISK.
                 return true;
             }
             return false;
-        }
-
-        internal void Run(string command)
-        {
-            ChangePrompt(command, BRUSH_PROMPT);
-            RunCommand(command);
         }
 
         #endregion
@@ -462,5 +457,12 @@ USE AT YOUR OWN RISK.
         {
             this.richTextBox1.Focus();
         }
+
+        internal void Refresh(GitRepository tracker)
+        {
+            this.tracker = tracker;
+            RefreshPrompt();
+        }
+
     }
 }

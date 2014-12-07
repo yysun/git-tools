@@ -175,7 +175,7 @@ namespace GitScc
             get
             {
                 var changed = ChangedFiles;
-                return string.Format("Changed files:  +{0} ~{1} -{2} !{3}",
+                return string.Format(this.CurrentBranch + " +{0} ~{1} -{2} !{3}",
                     changed.Where(f => f.Status == GitFileStatus.New || f.Status == GitFileStatus.Added).Count(),
                     changed.Where(f => f.Status == GitFileStatus.Modified || f.Status == GitFileStatus.Staged).Count(),
                     changed.Where(f => f.Status == GitFileStatus.Deleted || f.Status == GitFileStatus.Removed).Count(),

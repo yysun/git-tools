@@ -73,7 +73,7 @@ namespace GitUI
                 //this.bottomToolBar.GitViewModel = GitViewModel.Current;
 
                 this.txtRepo.Text = gitViewModel.Tracker.WorkingDirectory;
-                this.txtPrompt.Text = "(no git repository)";
+                this.txtPrompt.Text = "(Not a Git repository)";
 
                 if (gitViewModel.Tracker.IsGit)
                 {
