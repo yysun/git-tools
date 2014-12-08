@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -25,6 +26,8 @@ namespace GitScc.UI
         private Brush BRUSH_OUTPUT = new SolidColorBrush(Colors.Green);
         private Brush BRUSH_HELP   = new SolidColorBrush(Colors.Black);
 
+        private Process process;
+        private StreamWriter inputWriter;
 
         private GitRepository _tracker;
         private GitRepository tracker
@@ -119,6 +122,8 @@ namespace GitScc.UI
             }
             else if (e.Key == Key.C && Keyboard.Modifiers == ModifierKeys.Control)
             {
+                StopProcess();
+                WritePrompt();
             }
         }
 
@@ -146,11 +151,7 @@ namespace GitScc.UI
             if (string.IsNullOrWhiteSpace(result.Output))
             {
                 WriteError("Git credential helper is not installed. Please download and installed from https://gitcredentialstore.codeplex.com/");
-                Action act = () =>
-                {
-                    WritePrompt();
-                };
-                this.Dispatcher.BeginInvoke(act, DispatcherPriority.ApplicationIdle);
+                WritePrompt();
                 return true;
             }
             return false;
@@ -195,6 +196,13 @@ namespace GitScc.UI
 
         private void RunConsoleCommand(string command)
         {
+
+            if (this.IsProcessRunning)
+            {
+                this.WriteInput(command);
+                return;
+            }
+
             BRUSH_HELP = BRUSH_PROMPT = this.richTextBox1.Foreground;
 
             isGit = true;
@@ -212,6 +220,7 @@ namespace GitScc.UI
                     GitBash.OpenGitBash(string.IsNullOrWhiteSpace(this.WorkingDirectory)?  
                         Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments):
                         this.WorkingDirectory);
+                    WritePrompt();
                     return;
                 }
                 else if (command.StartsWith("git fetch") || command.StartsWith("git pull") || command.StartsWith("git push"))
@@ -219,11 +228,11 @@ namespace GitScc.UI
                     if (ShowWaring()) return;
 
                 }
-                else if (command.StartsWith("git "))
-                {
-                    command = command.Substring(4);
-                    command = "/C \"\"" + GitExePath + "\" " + command + "\"";
-                }
+                //else if (command.StartsWith("git "))
+                //{
+                //    command = command.Substring(4);
+                //    command = "/C \"\"" + GitExePath + "\" " + command + "\"";
+                //}
                 else
                 {
                     command = "/C " + command;
@@ -232,7 +241,7 @@ namespace GitScc.UI
 
                 ProcessStartInfo startInfo = new ProcessStartInfo("cmd.exe");
                 startInfo.Arguments = command;
-                //startInfo.RedirectStandardInput = true;
+                startInfo.RedirectStandardInput = true;
                 startInfo.RedirectStandardError = true;
                 startInfo.RedirectStandardOutput = true;
                 startInfo.UseShellExecute = false;
@@ -243,23 +252,12 @@ namespace GitScc.UI
                 startInfo.StandardOutputEncoding = Encoding.UTF8;
                 startInfo.StandardErrorEncoding = Encoding.UTF8;
 
-                using (Process process = Process.Start(startInfo))
+                process = Process.Start(startInfo);
                 using (ManualResetEvent mreOut = new ManualResetEvent(false), mreErr = new ManualResetEvent(false))
                 {
+                    inputWriter = process.StandardInput;
+
                     flag = 0;
-
-                    //new ReadOutput(process.StandardOutput, mreOut, (c) =>
-                    //{
-                    //    Action act = () =>
-                    //    {
-                    //        TextRange range = new TextRange(richTextBox1.Document.ContentEnd, richTextBox1.Document.ContentEnd);
-                    //        range.Text = c.ToString();
-                    //        this.richTextBox1.CaretPosition = this.richTextBox1.CaretPosition.DocumentEnd;
-                    //        //this.richTextBox1.AppendText(c.ToString());
-                    //    };
-                    //    this.Dispatcher.BeginInvoke(act, DispatcherPriority.ApplicationIdle);
-                    //});
-
                     process.OutputDataReceived += (o, e) =>
                     {
                         if (e.Data == null)
@@ -290,16 +288,52 @@ namespace GitScc.UI
             }
         }
 
+        public bool IsProcessRunning
+        {
+            get
+            {
+                try
+                {
+                    return (process != null && process.HasExited == false);
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        public void StopProcess()
+        {
+            if (IsProcessRunning == false)
+                return;
+            process.Kill();
+        }
+
+        public void WriteInput(string input)
+        {
+            if (IsProcessRunning)
+            {
+                inputWriter.WriteLine(input);
+                inputWriter.Flush();
+            }
+        }
+
         void Done()
         {
             if (flag++ < 1)
             {
-                Action act = () =>
-                {
-                    WritePrompt();
-                };
-                this.Dispatcher.BeginInvoke(act, DispatcherPriority.ApplicationIdle);
+                WritePrompt();
             }
+        }
+
+        void WritePrompt()
+        {
+            Action act = () =>
+            {
+                WritePromptText();
+            };
+            this.Dispatcher.BeginInvoke(act, DispatcherPriority.ApplicationIdle);
         }
 
         void WriteError(string data)
@@ -349,7 +383,7 @@ namespace GitScc.UI
             }
         }
 
-        private void WritePrompt()
+        private void WritePromptText()
         {
             Paragraph para = new Paragraph();
             para.Margin = new Thickness(0, 10, 0, 0);
