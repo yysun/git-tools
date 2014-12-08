@@ -30,6 +30,10 @@ The same set of Git tools were developed in [Git Source Control Provider](https:
 
 ## Change Logs
 
+### 1.3.2
+
+* Fix diff is not highlighting issue
+
 ### 1.3.1
 
 * Fix System.IO.PathTooLongException issue when folder structure is deep
