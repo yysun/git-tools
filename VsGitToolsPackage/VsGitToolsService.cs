@@ -119,15 +119,18 @@ namespace F1SYS.VsGitToolsPackage
         {
             if (VSConstants.VSCOOKIE_NIL != _vsSolutionEventsCookie)
             {
-                IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution; 
-                sol.UnadviseSolutionEvents(_vsSolutionEventsCookie);
+                IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
+                if (sol != null)
+                {
+                    sol.UnadviseSolutionEvents(_vsSolutionEventsCookie);
+                }
                 _vsSolutionEventsCookie = VSConstants.VSCOOKIE_NIL;
             }
 
             if (VSConstants.VSCOOKIE_NIL != _vsIVsUpdateSolutionEventsCookie)
             {
                 var sbm = package.GetServiceEx<SVsSolutionBuildManager>() as IVsSolutionBuildManager2;
-                sbm.UnadviseUpdateSolutionEvents(_vsIVsUpdateSolutionEventsCookie);
+                if (sbm != null) sbm.UnadviseUpdateSolutionEvents(_vsIVsUpdateSolutionEventsCookie);
             }
         }
 
