@@ -37,7 +37,7 @@ namespace F1SYS.VsGitToolsPackage
     [ProvideAutoLoad(UIContextGuids.SolutionExists)]
     [ProvideAutoLoad(UIContextGuids.NoSolution)]
     [Guid(GuidList.guidVsGitToolsPackagePkgString)]
-    public sealed class VsGitToolsPackagePackage : Package, IOleCommandTarget
+    public sealed class VsGitToolsPackagePackage : Package, IOleCommandTarget, IDisposable
     {
         //private SccOnIdleEvent _OnIdleEvent = new SccOnIdleEvent();
         private VsGitToolsService service;
@@ -74,6 +74,28 @@ namespace F1SYS.VsGitToolsPackage
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Debug.WriteLine(String.Format(CultureInfo.CurrentUICulture, "Entering Dispose() of: {0}", this.ToString()));
+
+                //_OnIdleEvent.OnIdleEvent -= new OnIdleEvent(service.OnIdle);
+                //_OnIdleEvent.UnRegisterForIdleTimeCallbacks();
+
+                if (service != null)
+                {
+                    service.Dispose();
+                }
+            }
         }
 
         #region Package Members
@@ -158,17 +180,6 @@ namespace F1SYS.VsGitToolsPackage
 
             //_OnIdleEvent.RegisterForIdleTimeCallbacks(GetGlobalService(typeof(SOleComponentManager)) as IOleComponentManager);
             //_OnIdleEvent.OnIdleEvent += new OnIdleEvent(service.OnIdle);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            Debug.WriteLine(String.Format(CultureInfo.CurrentUICulture, "Entering Dispose() of: {0}", this.ToString()));
-
-            //_OnIdleEvent.OnIdleEvent -= new OnIdleEvent(service.OnIdle);
-            //_OnIdleEvent.UnRegisterForIdleTimeCallbacks();
-
-            base.Dispose(disposing);
-            service.Dispose();
         }
         #endregion
 

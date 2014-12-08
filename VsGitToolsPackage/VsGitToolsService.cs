@@ -117,20 +117,31 @@ namespace F1SYS.VsGitToolsPackage
 
         public void Dispose()
         {
-            if (VSConstants.VSCOOKIE_NIL != _vsSolutionEventsCookie)
-            {
-                IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
-                if (sol != null)
-                {
-                    sol.UnadviseSolutionEvents(_vsSolutionEventsCookie);
-                }
-                _vsSolutionEventsCookie = VSConstants.VSCOOKIE_NIL;
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            if (VSConstants.VSCOOKIE_NIL != _vsIVsUpdateSolutionEventsCookie)
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                var sbm = package.GetServiceEx<SVsSolutionBuildManager>() as IVsSolutionBuildManager2;
-                if (sbm != null) sbm.UnadviseUpdateSolutionEvents(_vsIVsUpdateSolutionEventsCookie);
+                if (VSConstants.VSCOOKIE_NIL != _vsSolutionEventsCookie)
+                {
+                    IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
+                    if (sol != null)
+                    {
+                        sol.UnadviseSolutionEvents(_vsSolutionEventsCookie);
+                    }
+                    _vsSolutionEventsCookie = VSConstants.VSCOOKIE_NIL;
+                }
+
+                if (VSConstants.VSCOOKIE_NIL != _vsIVsUpdateSolutionEventsCookie)
+                {
+                    var sbm = package.GetServiceEx<SVsSolutionBuildManager>() as IVsSolutionBuildManager2;
+                    if (sbm != null) sbm.UnadviseUpdateSolutionEvents(_vsIVsUpdateSolutionEventsCookie);
+                }
+
+                if (fileSystemWatcher != null) fileSystemWatcher.Dispose();
             }
         }
 
