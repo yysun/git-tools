@@ -87,6 +87,7 @@
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.9.0, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
@@ -155,6 +156,9 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DiffClassifier\DiffClassificationDefinitions.cs" />
+    <Compile Include="DiffClassifier\DiffClassifier.cs" />
+    <Compile Include="DiffClassifier\DiffClassifierProvider.cs" />
     <Compile Include="GitToolCommands.cs" />
     <Compile Include="MyControl.xaml.cs">
       <DependentUpon>MyControl.xaml</DependentUpon>
@@ -212,7 +216,7 @@
     <Resource Include="Resources\Compare.png" />
     <Resource Include="Resources\History.png" />
     <Resource Include="Resources\Loading.png" />
-    <Content Include="extension.vsixmanifest" />
+    <None Include="extension.vsixmanifest" />
     <Content Include="License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -251,12 +255,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DiffClassifier\DiffClassifier.csproj">
-      <Project>{bf205896-9741-4035-b0ba-4030c92036b6}</Project>
-      <Name>DiffClassifier</Name>
-      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3bTemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
-      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
-    </ProjectReference>
     <ProjectReference Include="..\GitApi\GitApi.csproj">
       <Project>{161e81e2-25e5-4134-8d2d-595419b1265b}</Project>
       <Name>GitApi</Name>
