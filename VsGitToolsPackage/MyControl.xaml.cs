@@ -334,13 +334,14 @@ namespace F1SYS.VsGitToolsPackage
 
         internal void Refresh(GitRepository tracker)
         {
-            ClearUI();
-
             this.tracker = tracker;
             this.gitConsole1.Refresh(tracker);
-            
-            if (tracker == null) return;
 
+            if (tracker == null)
+            {
+                ClearUI();
+                return;
+            }
             //service.NoRefresh = true;
             //ShowStatusMessage("Getting changed files ...");
 

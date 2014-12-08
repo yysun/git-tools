@@ -97,7 +97,9 @@ namespace F1SYS.VsGitToolsPackage
         internal void Refresh(bool force=false)
         {
             Debug.WriteLine("VS Git Tools - Refresh Git Changes Tool Windows ");
-            
+
+            this.Service.NeedRefresh = true;
+
             var gitRepository = Service.Repository;
 
             this.Caption = Resources.ToolWindowTitle;
@@ -116,6 +118,8 @@ namespace F1SYS.VsGitToolsPackage
 
             var svc = this.GetService(typeof(IVsUIShell)) as IVsUIShell;
             svc.UpdateCommandUI(1);
+
+            this.Service.NeedRefresh = false;
         }
 
         internal EnvDTE.DTE dte
