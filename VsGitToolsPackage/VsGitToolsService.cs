@@ -1,5 +1,6 @@
 ﻿using GitScc;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
@@ -29,42 +30,377 @@ namespace F1SYS.VsGitToolsPackage
         private DispatcherTimer timer;
 
         private VsGitToolsPackagePackage package;
-        public GitRepository Repository {  get; private set; }
+
+        public GitRepository Repository         
+        {
+            get
+            {
+                if (trackers.Count == 1) 
+                    return trackers[0];
+                else
+                    return GetTracker(GetSelectFileName());
+            }
+        }
+
+        private List<GitFileStatusTracker> trackers = new List<GitFileStatusTracker>();
+
+        internal GitFileStatusTracker GetTracker(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName)) return null;
+
+            return trackers.Where(t => t.IsGit &&
+                                  IsParentFolder(t.WorkingDirectory, fileName))
+                           .OrderByDescending(t => t.WorkingDirectory.Length)
+                           .FirstOrDefault();
+        }
+
+        #region get selected file
+        internal string GetSelectFileName()
+        {
+            var selectedNodes = GetSelectedNodes();
+            if (selectedNodes.Count <= 0) return null;
+            return GetFileName(selectedNodes[0].pHier, selectedNodes[0].itemid);
+        }
+
+        private string GetFileName(IVsHierarchy hierHierarchy, uint itemidNode)
+        {
+            if (itemidNode == VSConstants.VSITEMID_ROOT)
+            {
+                if (hierHierarchy == null)
+                    return GetSolutionFileName();
+                else
+                    return GetProjectFileName(hierHierarchy);
+            }
+            else
+            {
+                string fileName = null;
+                if (hierHierarchy.GetCanonicalName(itemidNode, out fileName) != VSConstants.S_OK) return null;
+                return GetCaseSensitiveFileName(fileName);
+            }
+        }
+
+        private string GetSolutionFileName()
+        {
+
+            IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
+            string solutionDirectory, solutionFile, solutionUserOptions;
+            if (sol.GetSolutionInfo(out solutionDirectory, out solutionFile, out solutionUserOptions) == VSConstants.S_OK)
+            {
+                return solutionFile;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private string GetProjectFileName(IVsHierarchy hierHierarchy)
+        {
+            if (!(hierHierarchy is IVsSccProject2)) return GetSolutionFileName();
+
+            var files = GetNodeFiles(hierHierarchy as IVsSccProject2, VSConstants.VSITEMID_ROOT);
+            string fileName = files.Count <= 0 ? null : files[0];
+
+            //try hierHierarchy.GetCanonicalName to get project name for web site
+            if (fileName == null)
+            {
+                if (hierHierarchy.GetCanonicalName(VSConstants.VSITEMID_ROOT, out fileName) != VSConstants.S_OK) return null;
+                return GetCaseSensitiveFileName(fileName);
+            }
+            return fileName;
+        }
+
+        public List<IVsSccProject2> GetLoadedControllableProjects()
+        {
+            var list = new List<IVsSccProject2>();
+
+            IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
+            list.Add(sol as IVsSccProject2);
+
+            Guid rguidEnumOnlyThisType = new Guid();
+            IEnumHierarchies ppenum = null;
+            ErrorHandler.ThrowOnFailure(sol.GetProjectEnum((uint)__VSENUMPROJFLAGS.EPF_LOADEDINSOLUTION, ref rguidEnumOnlyThisType, out ppenum));
+
+            IVsHierarchy[] rgelt = new IVsHierarchy[1];
+            uint pceltFetched = 0;
+            while (ppenum.Next(1, rgelt, out pceltFetched) == VSConstants.S_OK &&
+                   pceltFetched == 1)
+            {
+                IVsSccProject2 sccProject2 = rgelt[0] as IVsSccProject2;
+                if (sccProject2 != null)
+                {
+                    list.Add(sccProject2);
+                }
+            }
+
+            return list;
+        }
+
+        private IList<string> GetNodeFiles(IVsSccProject2 pscp2, uint itemid)
+        {
+            // NOTE: the function returns only a list of files, containing both regular files and special files
+            // If you want to hide the special files (similar with solution explorer), you may need to return 
+            // the special files in a hastable (key=master_file, values=special_file_list)
+
+            // Initialize output parameters
+            IList<string> sccFiles = new List<string>();
+            if (pscp2 != null)
+            {
+                CALPOLESTR[] pathStr = new CALPOLESTR[1];
+                CADWORD[] flags = new CADWORD[1];
+
+                if (pscp2.GetSccFiles(itemid, pathStr, flags) == 0)
+                {
+                    for (int elemIndex = 0; elemIndex < pathStr[0].cElems; elemIndex++)
+                    {
+                        IntPtr pathIntPtr = Marshal.ReadIntPtr(pathStr[0].pElems, elemIndex);
+
+
+                        String path = Marshal.PtrToStringAuto(pathIntPtr);
+                        sccFiles.Add(path);
+
+                        // See if there are special files
+                        if (flags.Length > 0 && flags[0].cElems > 0)
+                        {
+                            int flag = Marshal.ReadInt32(flags[0].pElems, elemIndex);
+
+                            if (flag != 0)
+                            {
+                                // We have special files
+                                CALPOLESTR[] specialFiles = new CALPOLESTR[1];
+                                CADWORD[] specialFlags = new CADWORD[1];
+
+                                pscp2.GetSccSpecialFiles(itemid, path, specialFiles, specialFlags);
+                                for (int i = 0; i < specialFiles[0].cElems; i++)
+                                {
+                                    IntPtr specialPathIntPtr = Marshal.ReadIntPtr(specialFiles[0].pElems, i * IntPtr.Size);
+                                    String specialPath = Marshal.PtrToStringAuto(specialPathIntPtr);
+
+                                    sccFiles.Add(specialPath);
+                                    Marshal.FreeCoTaskMem(specialPathIntPtr);
+                                }
+
+                                if (specialFiles[0].cElems > 0)
+                                {
+                                    Marshal.FreeCoTaskMem(specialFiles[0].pElems);
+                                }
+                            }
+                        }
+
+                        Marshal.FreeCoTaskMem(pathIntPtr);
+
+                    }
+                    if (pathStr[0].cElems > 0)
+                    {
+                        Marshal.FreeCoTaskMem(pathStr[0].pElems);
+                    }
+                }
+            }
+            else if (itemid == VSConstants.VSITEMID_ROOT)
+            {
+                sccFiles.Add(GetSolutionFileName());
+            }
+
+            return sccFiles;
+        }
+
+        private IList<VSITEMSELECTION> GetSelectedNodes()
+        {
+            // Retrieve shell interface in order to get current selection
+            IVsMonitorSelection monitorSelection = package.GetServiceEx<IVsMonitorSelection>() as IVsMonitorSelection;
+
+            Debug.Assert(monitorSelection != null, "Could not get the IVsMonitorSelection object from the services exposed by this project");
+
+            if (monitorSelection == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            List<VSITEMSELECTION> selectedNodes = new List<VSITEMSELECTION>();
+            IntPtr hierarchyPtr = IntPtr.Zero;
+            IntPtr selectionContainer = IntPtr.Zero;
+            try
+            {
+                // Get the current project hierarchy, project item, and selection container for the current selection
+                // If the selection spans multiple hierachies, hierarchyPtr is Zero
+                uint itemid;
+                IVsMultiItemSelect multiItemSelect = null;
+                ErrorHandler.ThrowOnFailure(monitorSelection.GetCurrentSelection(out hierarchyPtr, out itemid, out multiItemSelect, out selectionContainer));
+
+                if (itemid != VSConstants.VSITEMID_SELECTION)
+                {
+                    // We only care if there are nodes selected in the tree
+                    if (itemid != VSConstants.VSITEMID_NIL)
+                    {
+                        if (hierarchyPtr == IntPtr.Zero)
+                        {
+                            // Solution is selected
+                            VSITEMSELECTION vsItemSelection;
+                            vsItemSelection.pHier = null;
+                            vsItemSelection.itemid = itemid;
+                            selectedNodes.Add(vsItemSelection);
+                        }
+                        else
+                        {
+                            IVsHierarchy hierarchy = (IVsHierarchy)Marshal.GetObjectForIUnknown(hierarchyPtr);
+                            // Single item selection
+                            VSITEMSELECTION vsItemSelection;
+                            vsItemSelection.pHier = hierarchy;
+                            vsItemSelection.itemid = itemid;
+                            selectedNodes.Add(vsItemSelection);
+                        }
+                    }
+                }
+                else
+                {
+                    if (multiItemSelect != null)
+                    {
+                        // This is a multiple item selection.
+
+                        //Get number of items selected and also determine if the items are located in more than one hierarchy
+                        uint numberOfSelectedItems;
+                        int isSingleHierarchyInt;
+                        ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectionInfo(out numberOfSelectedItems, out isSingleHierarchyInt));
+                        bool isSingleHierarchy = (isSingleHierarchyInt != 0);
+
+                        // Now loop all selected items and add them to the list 
+                        Debug.Assert(numberOfSelectedItems > 0, "Bad number of selected itemd");
+                        if (numberOfSelectedItems > 0)
+                        {
+                            VSITEMSELECTION[] vsItemSelections = new VSITEMSELECTION[numberOfSelectedItems];
+                            ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectedItems(0, numberOfSelectedItems, vsItemSelections));
+                            foreach (VSITEMSELECTION vsItemSelection in vsItemSelections)
+                            {
+                                selectedNodes.Add(vsItemSelection);
+                            }
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                if (hierarchyPtr != IntPtr.Zero)
+                {
+                    Marshal.Release(hierarchyPtr);
+                }
+                if (selectionContainer != IntPtr.Zero)
+                {
+                    Marshal.Release(selectionContainer);
+                }
+            }
+
+            return selectedNodes;
+        }
+
+        private bool IsParentFolder(string folder, string fileName)
+        {
+            if (string.IsNullOrEmpty(folder) || string.IsNullOrEmpty(fileName) ||
+               !Directory.Exists(folder)) return false;
+
+            folder = folder.Replace("/", "\\");
+            fileName = fileName.Replace("/", "\\");
+
+            bool b = false;
+            var dir = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(fileName)));
+            while (!b && dir != null)
+            {
+                b = string.Compare(dir.FullName, folder, true) == 0;
+                dir = dir.Parent;
+            }
+            return b;
+        }
+
+        private string GetCaseSensitiveFileName(string fileName)
+        {
+            return fileName;
+        }
+
+        private void AddProject(IVsHierarchy pHierarchy)
+        {
+            string projectName = GetProjectFileName(pHierarchy);
+
+            if (string.IsNullOrEmpty(projectName)) return;
+            string projectDirecotry = Path.GetDirectoryName(projectName);
+
+            // Debug.WriteLine("==== Adding project: " + projectDirecotry);
+
+            var tracker = new GitFileStatusTracker(projectDirecotry);
+
+            if (!tracker.IsGit ||
+                 trackers.Any(t=>string.Compare(
+                     t.WorkingDirectory, 
+                     tracker.WorkingDirectory, true) == 0)) return;
+
+            if (tracker.IsGit) trackers.Add(tracker);
+
+            // Debug.WriteLine("==== Added git tracker: " + tracker.WorkingDirectory);
+
+        }
+        #endregion
 
         FileSystemWatcher fileSystemWatcher;
 
         private void OpenRepository()
         {
-            string solutionDirectory, solutionFile, solutionUserOptions;
+
+            trackers.Clear();
+
             try
             {
-                IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
-                if (sol.GetSolutionInfo(out solutionDirectory, out solutionFile, out solutionUserOptions) == VSConstants.S_OK)
+
+                var solutionFileName = GetSolutionFileName();
+                if (!string.IsNullOrEmpty(solutionFileName))
                 {
-                    Repository = new GitRepository(solutionDirectory);
+                    var solutionDirectory = Path.GetDirectoryName(solutionFileName);
+                    GetLoadedControllableProjects().ForEach(h => AddProject(h as IVsHierarchy));
 
-                    //var monitorFolder = solutionDirectory;
-                    //IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
-                    //if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
-                    //{
-                    //    fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
-                    //}
-                    //fileChangeService.AdviseDirChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
-                    //lastMinotorFolder = monitorFolder;
-                    // Debug.WriteLine("==== Start Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
-
+                    if (fileSystemWatcher != null) fileSystemWatcher.Dispose();
                     fileSystemWatcher = new FileSystemWatcher(solutionDirectory);
                     fileSystemWatcher.IncludeSubdirectories = true;
                     fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
                     fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
                     fileSystemWatcher.EnableRaisingEvents = true;
+
+                    Debug.WriteLine("==== Monitoring: " + solutionDirectory);
                 }
             }
             catch (Exception ex)
             {
-                Repository = null;
+                trackers.Clear();
                 Debug.WriteLine("VS Git Tools - OpenRepository raised excpetion: ", ex.ToString());
             }
+    
+            //string solutionDirectory, solutionFile, solutionUserOptions;
+            //try
+            //{
+            //    IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
+            //    if (sol.GetSolutionInfo(out solutionDirectory, out solutionFile, out solutionUserOptions) == VSConstants.S_OK)
+            //    {
+            //        //Repository = new GitRepository(solutionDirectory);
+
+
+            //        //var monitorFolder = solutionDirectory;
+            //        //IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
+            //        //if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
+            //        //{
+            //        //    fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
+            //        //}
+            //        //fileChangeService.AdviseDirChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
+            //        //lastMinotorFolder = monitorFolder;
+            //        // Debug.WriteLine("==== Start Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
+
+            //        fileSystemWatcher = new FileSystemWatcher(solutionDirectory);
+            //        fileSystemWatcher.IncludeSubdirectories = true;
+            //        fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
+            //        fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
+            //        fileSystemWatcher.EnableRaisingEvents = true;
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Repository = null;
+            //    Debug.WriteLine("VS Git Tools - OpenRepository raised excpetion: ", ex.ToString());
+            //}
         }
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -74,7 +410,8 @@ namespace F1SYS.VsGitToolsPackage
 
         private void CloseRepository()
         {
-            Repository = null;
+            //Repository = null;
+            trackers.Clear();
 
             //if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
             //{
@@ -328,7 +665,11 @@ namespace F1SYS.VsGitToolsPackage
 
         internal void RefreshToolWindows(bool force=false)
         {
-            if (Repository != null) Repository.Refresh();
+            //if (Repository != null) Repository.Refresh();
+
+            CloseRepository();
+            OpenRepository();
+
             var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
             if (toolWindow != null) toolWindow.Refresh(force);
         }
