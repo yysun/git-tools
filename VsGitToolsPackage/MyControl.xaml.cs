@@ -65,6 +65,7 @@ namespace F1SYS.VsGitToolsPackage
         {
             this.toolWindow.ClearEditor();
             this.DiffEditor.Content = null;
+            fileInEditor = null;
         }
 
         string fileInEditor;
