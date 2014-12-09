@@ -103,7 +103,7 @@ namespace F1SYS.VsGitToolsPackage
             if (force)
             {
                 hasFileSaved(); //just a reminder, refresh anyway
-                if (gitRepository != null) gitRepository.Refresh();
+                //if (gitRepository != null) gitRepository.Refresh();
             }
 
             _Control.Refresh(gitRepository);

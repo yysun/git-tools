@@ -326,11 +326,11 @@ namespace F1SYS.VsGitToolsPackage
             NoRefresh = false;
         }
 
-        private void RefreshToolWindows()
+        internal void RefreshToolWindows(bool force=false)
         {
             if (Repository != null) Repository.Refresh();
             var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
-            if (toolWindow != null) toolWindow.Refresh();
+            if (toolWindow != null) toolWindow.Refresh(force);
         }
 
         #endregion

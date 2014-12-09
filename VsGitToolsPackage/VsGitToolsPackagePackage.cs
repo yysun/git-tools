@@ -187,7 +187,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void OnRefreshCommand(object sender, EventArgs e)
         {
-            GetToolWindowPane<MyToolWindow>().Refresh(true);
+            service.RefreshToolWindows(true);
         }
 
         private void OnInitCommand(object sender, EventArgs e)
