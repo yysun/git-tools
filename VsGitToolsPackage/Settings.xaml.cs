@@ -71,7 +71,8 @@ namespace F1SYS.VsGitToolsPackage
                 txtMessage.Content = ex.Message;
             }
 
-            btnOK.IsEnabled = GitBash.Exists && txtMessage.Content.ToString().StartsWith("git version");
+            btnOK.IsEnabled = GitBash.Exists && txtMessage.Content != null
+                && txtMessage.Content.ToString().StartsWith("git version");
         }
 
         private void btnOK_Click(object sender, RoutedEventArgs e)
