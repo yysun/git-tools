@@ -465,20 +465,25 @@ namespace F1SYS.VsGitToolsPackage
 
         private void menuUndo_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFiles(fileName =>
+
+            const string deleteMsg = @"
+
+Note: Undo file changes will restore the file(s) from the last commit.";
+
+            var filesToUndo = new List<string>();
+
+            GetSelectedFiles(fileName => filesToUndo.Add(fileName));
+
+            string title = (filesToUndo.Count == 1) ? "Undo File Changes" : "Undo Files Changes for " + filesToUndo.Count + " Files?";
+            string message = (filesToUndo.Count == 1) ?
+                "Are you sure you want to undo changes to file: " + Path.GetFileName(filesToUndo.First()) + deleteMsg :
+                String.Format("Are you sure you want to undo changes to {0} files", filesToUndo.Count) + deleteMsg;
+
+            if (MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                GitFileStatus status = tracker.GetFileStatus(fileName);
-                if (status == GitFileStatus.Modified || status == GitFileStatus.Staged ||
-                    status == GitFileStatus.Deleted || status == GitFileStatus.Removed)
-                {
-                    if (MessageBox.Show("Are you sure you want to undo changes for " + Path.GetFileName(fileName) +
-                        " and restore a version from the last commit? ",
-                        "Undo Changes", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    {
-                        tracker.CheckOutFile(fileName);
-                    }
-                }
-            }); 
+                foreach (var fileName in filesToUndo)
+                    tracker.CheckOutFile(fileName);
+            }
         }
 
         private void menuStage_Click(object sender, RoutedEventArgs e)
@@ -501,17 +506,27 @@ namespace F1SYS.VsGitToolsPackage
 
         private void menuDeleteFile_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFiles(fileName =>
+
+            const string deleteMsg = @"
+
+Note: if the file is included project, you need to delete the file from project in solution explorer.";
+
+            var filesToDelete = new List<string>();
+
+            GetSelectedFiles(fileName => filesToDelete.Add(fileName));
+
+            string title = (filesToDelete.Count == 1) ? "Delete File" : "Delete " + filesToDelete.Count + " Files?";
+            string message = (filesToDelete.Count == 1) ?
+                "Are you sure you want to delete file: " + Path.GetFileName(filesToDelete.First()) + deleteMsg :
+                String.Format("Are you sure you want to delete {0} files", filesToDelete.Count) + deleteMsg;
+
+            if (MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                if (MessageBox.Show("Are you sure you want to delete file: " + Path.GetFileName(fileName),
-                                   "Delete File",
-                                   MessageBoxButton.YesNo,
-                                   MessageBoxImage.Question) == MessageBoxResult.Yes)
+                foreach (var fileName in filesToDelete)
                 {
-                    fileName = System.IO.Path.Combine(this.tracker.WorkingDirectory, fileName);
-                    File.Delete(fileName);
+                    File.Delete(Path.Combine(this.tracker.WorkingDirectory, fileName));
                 }
-            });
+            }
         }
 
         #endregion
