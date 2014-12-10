@@ -104,6 +104,10 @@ namespace GitUI
 			{
 				HistoryViewCommands.RefreshGraph.Execute(null, this);
 			}
+            else if (e.Key == Key.F2)
+            {
+                toogleGitConsole();
+            }
 		}
 
 		private void ExportGraph(object sender, ExecutedRoutedEventArgs e)
@@ -349,27 +353,39 @@ namespace GitUI
             }
 		}
 
+        #region toggle console
         double console_height;
         private void txtSettings_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            var h = this.rootGrid.RowDefinitions[2].Height.Value;
-            this.rootGrid.RowDefinitions[2].Height = h > 0 ?
-                new GridLength(0) :
-                new GridLength(console_height);
-            console_height = h;
-
+            toogleGitConsole();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            AdjustConsoleHeight();
+        }
+
+        private void AdjustConsoleHeight()
+        {
             var mh = this.ActualHeight / 2 - 30;
             var h = this.rootGrid.RowDefinitions[2].Height.Value;
-            if (h > mh)
+            if (h> 0 && h > mh)
             {
                 this.rootGrid.RowDefinitions[2].Height = new GridLength(mh);
                 console_height = mh;
             }
         }
 
-	}
+        private void toogleGitConsole()
+        {
+            var h = this.rootGrid.RowDefinitions[2].Height.Value;
+            this.rootGrid.RowDefinitions[2].Height = h > 0 ?
+                new GridLength(0) :
+                new GridLength(console_height);
+            console_height = h;
+            AdjustConsoleHeight();
+        }
+        #endregion
+
+    }
 }
