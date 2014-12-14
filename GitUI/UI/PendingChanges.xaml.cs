@@ -579,8 +579,12 @@ Are you sure you want to continue?";
                 ShowStatusMessage("Commit successfully. Commit Hash: " + id);
                 ClearUI();
                 
+                tracker.Refresh();
+                if (tracker.ChangedFiles.Count() == 0)
+                {
+                    HistoryViewCommands.CloseCommitDetails.Execute("PendingChanges", this);
+                }
                 service.NoRefresh = false;
-
                 HistoryViewCommands.RefreshGraph.Execute(null, this);
             }
             catch (Exception ex)
