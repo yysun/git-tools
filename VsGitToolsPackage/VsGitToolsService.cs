@@ -31,14 +31,25 @@ namespace F1SYS.VsGitToolsPackage
 
         private VsGitToolsPackagePackage package;
 
+        private GitRepository previousRepository;
+
         public GitRepository Repository         
         {
             get
             {
-                if (trackers.Count == 1) 
-                    return trackers[0];
-                else
-                    return GetTracker(GetSelectFileName());
+                var repo = trackers.Count == 1 ? 
+                    trackers[0]:
+                    GetTracker(GetSelectFileName());
+
+                if (repo == null) return previousRepository;
+                if (repo != previousRepository)
+                {
+                    WatchFileChanges(repo.WorkingDirectory);
+                    NeedRefresh = true;
+                }
+                
+                previousRepository = repo;
+                return repo;
             }
         }
 
@@ -48,8 +59,7 @@ namespace F1SYS.VsGitToolsPackage
         {
             if (string.IsNullOrEmpty(fileName)) return null;
 
-            return trackers.Where(t => t.IsGit &&
-                                  IsParentFolder(t.WorkingDirectory, fileName))
+            return trackers.Where(t => IsParentFolder(t.WorkingDirectory, fileName))
                            .OrderByDescending(t => t.WorkingDirectory.Length)
                            .FirstOrDefault();
         }
@@ -326,12 +336,12 @@ namespace F1SYS.VsGitToolsPackage
 
             var tracker = new GitFileStatusTracker(projectDirecotry);
 
-            if (!tracker.IsGit ||
-                 trackers.Any(t=>string.Compare(
+            if (string.IsNullOrEmpty(projectDirecotry) ||
+                 trackers.Any(t=> t.IsGit && string.Compare(
                      t.WorkingDirectory, 
                      tracker.WorkingDirectory, true) == 0)) return;
 
-            if (tracker.IsGit) trackers.Add(tracker);
+            trackers.Add(tracker);
 
             // Debug.WriteLine("==== Added git tracker: " + tracker.WorkingDirectory);
 
@@ -339,6 +349,18 @@ namespace F1SYS.VsGitToolsPackage
         #endregion
 
         FileSystemWatcher fileSystemWatcher;
+        private void WatchFileChanges(string folder)
+        {
+            Debug.WriteLine("==== Monitoring: " + folder);
+
+            UnWatchFileChanges();
+
+            fileSystemWatcher = new FileSystemWatcher(folder);
+            fileSystemWatcher.IncludeSubdirectories = true;
+            fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
+            fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
+            fileSystemWatcher.EnableRaisingEvents = true;
+        }
 
         private void OpenRepository()
         {
@@ -353,15 +375,8 @@ namespace F1SYS.VsGitToolsPackage
                 {
                     var solutionDirectory = Path.GetDirectoryName(solutionFileName);
                     GetLoadedControllableProjects().ForEach(h => AddProject(h as IVsHierarchy));
-
-                    if (fileSystemWatcher != null) fileSystemWatcher.Dispose();
-                    fileSystemWatcher = new FileSystemWatcher(solutionDirectory);
-                    fileSystemWatcher.IncludeSubdirectories = true;
-                    fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
-                    fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
-                    fileSystemWatcher.EnableRaisingEvents = true;
-
-                    Debug.WriteLine("==== Monitoring: " + solutionDirectory);
+                    
+                    //WatchFileChanges(solutionDirectory);
                 }
             }
             catch (Exception ex)
@@ -413,6 +428,9 @@ namespace F1SYS.VsGitToolsPackage
             //Repository = null;
             trackers.Clear();
 
+            previousRepository = null;
+            UnWatchFileChanges();
+
             //if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
             //{
             //    IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
@@ -421,7 +439,10 @@ namespace F1SYS.VsGitToolsPackage
             //    _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
             //    lastMinotorFolder = "";
             //}
+        }
 
+        private void UnWatchFileChanges()
+        {
             if (fileSystemWatcher != null)
             {
                 fileSystemWatcher.Deleted -= new FileSystemEventHandler(fileSystemWatcher_Changed);
