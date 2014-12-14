@@ -457,6 +457,9 @@ namespace GitScc
         public void AddIgnoreItem(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName)) return;
+
+            fileName = fileName.Replace("\\", "/");
+
             var ignoreFile = Path.Combine(WorkingDirectory, ".gitignore");
             if (!File.Exists(ignoreFile))
             {
