@@ -667,6 +667,11 @@ namespace GitScc.UI
             GitViewModel.Current.StashPop();
         }
 
+        private void menuStashDrop_Click(object sender, RoutedEventArgs e)
+        {
+            GitViewModel.Current.StashDrop();
+        }
+
         //private void menuMergeTool_Click(object sender, RoutedEventArgs e)
         //{
         //    GitViewModel.Current.MergeTool();

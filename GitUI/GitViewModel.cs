@@ -270,6 +270,11 @@ namespace GitUI
             GitRun("stash pop");
         }
 
+        internal void StashDrop()
+        {
+            GitRun("stash drop");
+        }
+
         //internal void MergeTool()
         //{
         //    GitRunCmd("mergetool");
