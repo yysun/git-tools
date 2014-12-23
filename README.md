@@ -30,6 +30,10 @@ The same set of Git tools were developed in [Git Source Control Provider](https:
 
 ## Change Logs
 
+### 1.4
+
+* Add git console
+
 ### 1.3.3
 
 * Add multiple git trackers
