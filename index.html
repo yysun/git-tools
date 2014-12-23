@@ -15,16 +15,16 @@
   <!--
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  -->
-  <link href='//fonts.googleapis.com/css?family=Open+Sans:400,700,300,100' rel='stylesheet' type='text/css'>
-  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-    .jumbotron { background-color: rgb(77,50,82); color: white}
-    .jumbotron h1 { margin:60px 0;}
-    .marketing a.btn { margin-bottom: 80px;}
-    .featurette { padding: 30px 0;}
-  </style>
+-->
+<link href='//fonts.googleapis.com/css?family=Open+Sans:400,700,300,100' rel='stylesheet' type='text/css'>
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  .jumbotron { background-color: rgb(77,50,82); color: white}
+  .jumbotron h1 { margin:40px 0;}
+  .marketing a.btn { margin-bottom: 80px;}
+  .featurette { padding: 30px 0;}
+</style>
   <!--[if lt IE 9]>
   <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
@@ -54,123 +54,106 @@
     <div class="jumbotron">
       <div class="container text-center">
         <h1>
-        Open Source Git Tools
+          Git Tools for Visual Studio
           <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&amp;business=KBCLF3PZD6C98&amp;lc=US&amp;item_name=Git%20Source%20Control%20Provider&amp;currency_code=USD&amp;bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted">
             <img alt="Donate" style="border:0px; vertical-align:middle" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" title="Donate" />
           </a>
         </h1>
-
-      <div class="container marketing">
-
-      <div class="row text-center">
-        <div class="col-lg-4">
-          <img class="img-circle" src="2013.png" alt="Generic placeholder image" style="width: 140px; height: 140px;">
-          <h2>Git Tools <br/>for Visual Studio</h2>
-          <p>Recommanded for Visual Studio 2013-2015 users</p>
-          <p><br/><img src="git-tools.png" class="img-rounded" width="360px"></p>
-          <p><a class="btn btn-default" href="https://visualstudiogallery.msdn.microsoft.com/48c3e91e-d1d7-4bf9-84dd-d3b97e2d5922" role="button">View details &raquo;</a></p>
-        </div><!-- /.col-lg-4 -->
-        <div class="col-lg-4">
-          <img class="img-circle" src="2008.png" alt="Generic placeholder image" style="width: 140px; height: 140px;">
-          <h2>Git Source Control Provider</h2>
-          <p>Recommanded for Visual Studio 2008-2012 users</p>
-          <p><br/><img src="gitscc.png" class="img-rounded" width="360px"></p>
-          <p><a class="btn btn-default" href="https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c" role="button">View details &raquo;</a></p>
-        </div><!-- /.col-lg-4 -->
-        <div class="col-lg-4">
-          <img class="img-circle" src="all.png" alt="Generic placeholder image" style="width: 140px; height: 140px;">
-          <h2>Git History <br/>Viewer</h2>
-          <p>Recommanded for all (non Visual Studio users too)</p>
-          <p><br/><img src="git-commits.png" class="img-rounded" width="360px"></p>
-          <p><a class="btn btn-default" href="#git-gv" role="button">View details &raquo;</a></p>
-        </div><!-- /.col-lg-4 -->
-      </div><!-- /.row -->
-
-    </div>
-
+      </div>
     </div> <!--/jumbotron-->
   </main>
 
   <!-- START THE FEATURETTES -->
   <div class="container featurettes">
-      <hr class="featurette-divider">
+    <hr class="featurette-divider">
 
-      <div class="row featurette">
-        <div class="col-md-6">
-          <h2 class="featurette-heading">Commit! <span class="text-muted">You deserve a good tool.</span></h2>
-          <p class="lead">Using Git, you commit a lot. The Git Changes Window inside Visual Studio detects the file changes and displays the diff in real time. You can select files to review the changes. It helps you create meaningful code history.</p>
-        </div>
-        <div class="col-md-6">
-          <img class="featurette-image img-responsive" src="main.png" alt="git changes">
-        </div>
+    <div class="row featurette">
+      <div class="col-md-6">
+        <h2 class="featurette-heading">Commit! <span class="text-muted">You deserve a good tool.</span></h2>
+        <p class="lead">Using Git, you commit a lot. The Git Changes Window inside Visual Studio detects the file changes and displays the diff in real time. You can select files to review the changes. It helps you create meaningful code history.</p>
+        <p>Besides the Blue theme, the Dark theme and Light theme are supported too.</p>
+        <p>
+          <img class="" src="main-2-s.png" alt="dark theme">
+        </p>
       </div>
-
-      <a name="git-gv"></a>
-      <hr class="featurette-divider">
-
-      <div class="row featurette">
-        <div class="col-md-6">
-          <img class="featurette-image img-responsive" src="git-gv.png" alt="git viewer">
-        </div>
-        <div class="col-md-6">
-          <h2 class="featurette-heading">Code History! <span class="text-muted">You can have a different view.</span></h2>
-          <p class="lead">The Git history viewer is a unique tool that displays the commits horizontally to help you understand the history. Its simplified view mode highlights the history structure by only showing important commits. It also can be used to view the details of each commit, blame file, create/delete branches and tag, merge, rebase, cherry-pick, stash and etc.</p>
-        </div>
+      <div class="col-md-6">
+        <img class="featurette-image img-responsive" src="main.png" alt="git changes">
       </div>
+    </div>
 
-      <hr class="featurette-divider">
+    <a name="git-gv"></a>
+    <hr class="featurette-divider">
 
-      <div class="row featurette">
-        <div class="col-md-6">
-          <h2 class="featurette-heading">Differences! <span class="text-muted">You can edit files in diff mode.</span></h2>
-          <p class="lead">From the Git Changes Window, you can launch the Visual Studio Diff Viewer with the committed version of file and the version being edited in it. It provides a clear view to see the changes/differences between the two versions. </p>
-        </div>
-        <div class="col-md-6">
-          <img class="featurette-image img-responsive" src="vs-diff.png" alt="vs diff">
-        </div>
+    <div class="row featurette">
+      <div class="col-md-6">
+        <img class="featurette-image img-responsive" src="git-gv.png" alt="git viewer">
       </div>
-
-      <a name="git-gv"></a>
-      <hr class="featurette-divider">
-
-      <div class="row featurette">
-        <div class="col-md-6">
-          <img class="featurette-image img-responsive" src="git-console.png" alt="git console">
-        </div>
-        <div class="col-md-6">
-          <h2 class="featurette-heading">Command It! <span class="text-muted">Run Git commands inside Visual Studio.</span></h2>
-          <p class="lead">Git is a feature rich and complicated system. There are many Git GUI tools, yet no tool is as good as running Git commands directly. Now you can run Git commands right inside Visual Studio. It even provides intellisense to the Git commands. E.g. It shows branch names when you need it. The Git console inside Visual Studio is coming soon in V1.4. </p>
-        </div>
+      <div class="col-md-6">
+        <h2 class="featurette-heading">Code History! <span class="text-muted">You can have a different view.</span></h2>
+        <p class="lead">The Git history viewer is a unique tool that displays the commits horizontally to help you understand the history. Its simplified view mode highlights the history structure by only showing important commits. It also can be used to view the details of each commit, blame file, create/delete branches and tag, merge, rebase, cherry-pick, stash and etc.</p>
+        <p>Git Viewer runs outside Visual Studio. It can be used for non Visual Studio projects. Node.js, Ruby, PHP, Cordova/PhoneGap and etc.</p>
       </div>
+    </div>
+
+    <hr class="featurette-divider">
+
+    <div class="row featurette">
+      <div class="col-md-6">
+        <h2 class="featurette-heading">Differences! <span class="text-muted">You can edit files in diff mode.</span></h2>
+        <p class="lead">From the Git Changes Window, you can launch the Visual Studio Diff Viewer with the committed version of file and the version being edited in it. It provides a clear view to see the changes/differences between the two versions. </p>
+      </div>
+      <div class="col-md-6">
+        <img class="featurette-image img-responsive" src="vs-diff.png" alt="vs diff">
+      </div>
+    </div>
+
+    <a name="git-gv"></a>
+    <hr class="featurette-divider">
+
+    <div class="row featurette">
+      <div class="col-md-6">
+        <img class="featurette-image img-responsive" src="git-console.png" alt="git console">
+      </div>
+      <div class="col-md-6">
+        <h2 class="featurette-heading">Command It! <span class="text-muted">Run Git commands inside Visual Studio.</span></h2>
+        <p class="lead">Git is a feature rich and complicated system. There are many Git GUI tools, yet no tool is as good as running Git commands directly. Now you can run Git commands right inside Visual Studio. It even provides intellisense to the Git commands. E.g. It shows branch names when you need it. The Git console inside Visual Studio comes in V1.4. </p>
+        <p>The embedded console can also run npm, grunt, gulp and etc.</p>
+        <p>
+          <img class="" src="console-gulp-s.png" alt="gulp">
+        </p>
+      </div>
+    </div>
   </div>
   <!-- /END THE FEATURETTES -->
 
   <div class="container">
-  <div class="row text-center">
+    <div class="row text-center">
 
-    <hr class="featurette-divider">
+      <hr class="featurette-divider">
 
-    <div>Note: <a href="http://code.google.com/p/msysgit">Git for Windows</a> is required in order to for the tools above. <a href="http://code.google.com/p/gitextensions">Git Extensions</a> or <a href="http://code.google.com/p/tortoisegit">TortoiseGit</a> are optional.</div>
+      <div>Note: <a href="http://code.google.com/p/msysgit">Git for Windows</a> is required in order to use the tools above. <a href="http://code.google.com/p/gitextensions">Git Extensions</a> or <a href="http://code.google.com/p/tortoisegit">TortoiseGit</a> are optional.</div>
 
-    <hr class="featurette-divider">
+      <hr class="featurette-divider">
 
-  	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <!-- Git Tools -->
-		<ins class="adsbygoogle"
-     style="display:inline-block;width:468px;height:15px;"
-     data-ad-client="ca-pub-8742734759101194"
-     data-ad-slot="1977386660"></ins>
-		<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-		<script>
-		  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-		  ga('create', 'UA-47666845-2', 'auto');
-		  ga('send', 'pageview');
-		</script>
-		<br/><br/><br/>
-  </div>
+      <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+      <!-- Git Tools -->
+      <ins class="adsbygoogle"
+      style="display:inline-block;width:468px;height:15px;"
+      data-ad-client="ca-pub-8742734759101194"
+      data-ad-slot="1977386660"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-47666845-2', 'auto');
+        ga('send', 'pageview');
+      </script>
+
+      <br/><br/><br/>
+    </div>
+
     <footer>
       <p class="pull-right"><a href="#">Back to top</a></p>
       <p>&copy; 2014 Yiyi Sun</p>
