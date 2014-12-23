@@ -63,7 +63,7 @@ namespace GitUI
 			});
 
 			timer = new DispatcherTimer();
-			timer.Interval = TimeSpan.FromMilliseconds(500);
+			timer.Interval = TimeSpan.FromMilliseconds(588);
 			timer.Tick += new EventHandler(timer_Tick);
 		}
 
@@ -129,7 +129,7 @@ namespace GitUI
             set
             {
                 noRefresh = value;
-                nextTimeRefresh = DateTime.Now.AddMilliseconds(388);
+                nextTimeRefresh = DateTime.Now.AddMilliseconds(600);
             }
         }
 
