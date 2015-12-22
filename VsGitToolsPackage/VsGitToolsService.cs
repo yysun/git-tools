@@ -355,11 +355,14 @@ namespace F1SYS.VsGitToolsPackage
 
             UnWatchFileChanges();
 
-            fileSystemWatcher = new FileSystemWatcher(folder);
-            fileSystemWatcher.IncludeSubdirectories = true;
-            fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
-            fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
-            fileSystemWatcher.EnableRaisingEvents = true;
+            if (!GitSccOptions.Current.DisableAutoRefresh)
+            {
+                fileSystemWatcher = new FileSystemWatcher(folder);
+                fileSystemWatcher.IncludeSubdirectories = true;
+                fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
+                fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
+                fileSystemWatcher.EnableRaisingEvents = true;
+            }
         }
 
         private void OpenRepository()
@@ -677,11 +680,17 @@ namespace F1SYS.VsGitToolsPackage
 
         private void timer_Tick(object sender, EventArgs e)
         {
-            Debug.WriteLine("==== timer_Tick ");
-            timer.Stop();
+            try
+            {
+                Debug.WriteLine("==== timer_Tick ");
+                timer.Stop();
 
-            RefreshToolWindows();
-            NoRefresh = false;
+                RefreshToolWindows();
+            }
+            finally
+            {
+                NoRefresh = false;
+            }
         }
 
         internal void RefreshToolWindows(bool force=false)

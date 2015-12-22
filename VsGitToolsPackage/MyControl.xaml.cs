@@ -384,10 +384,10 @@ namespace F1SYS.VsGitToolsPackage
             //stopwatch.Stop();
             //Debug.WriteLine("**** PendingChangesView Refresh: " + stopwatch.ElapsedMilliseconds);
 
-            //if (!GitSccOptions.Current.DisableAutoRefresh && stopwatch.ElapsedMilliseconds > 1000)
-            //    this.label4.Visibility = Visibility.Visible;
-            //else
-            //    this.label4.Visibility = Visibility.Collapsed;
+            if (GitSccOptions.Current.DisableAutoRefresh)
+                this.label4.Visibility = Visibility.Visible;
+            else
+                this.label4.Visibility = Visibility.Collapsed;
 
             //service.NoRefresh = false;
         }
