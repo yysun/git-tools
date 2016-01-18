@@ -30,6 +30,10 @@ The same set of Git tools were developed in [Git Source Control Provider](https:
 
 ## Change Logs
 
+### 1.4.2
+
+* Add try and catch to timer tick to prevent VS crashes
+
 ### 1.4.1
 
 * Fix .NET framework version issue in VS2015 CTP5
