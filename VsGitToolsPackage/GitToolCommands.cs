@@ -39,6 +39,9 @@ namespace GitScc
             new GitToolCommand("Switch", "/command:switch"), 
             new GitToolCommand("Sync", "/command:sync"), 
             new GitToolCommand("Tag", "/command:tag"), 
+            new GitToolCommand("Stash Save", "/command:stashsave"), 
+            new GitToolCommand("Stash Pop", "/command:stashpop"), 
+            new GitToolCommand("Stash List", "/command:reflog /ref:refs/stash"), 
         };
 
         internal static List<GitToolCommand> GitExtCommands = new List<GitToolCommand> { 
