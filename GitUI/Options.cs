@@ -1109,5 +1109,3 @@ namespace Mono.Options
 		}
 	}
 }
-
- 

@@ -1,19 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VsGitToolsPackage", "VsGitToolsPackage\VsGitToolsPackage.csproj", "{B867C32C-3C78-47E3-95DE-9A43B7AF1FA7}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C756204F-28E1-473A-8160-E697E3303F1B} = {C756204F-28E1-473A-8160-E697E3303F1B}
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E805C6B0-DCBB-4262-8B56-B6A96A78AA33}"
 	ProjectSection(SolutionItems) = preProject
 		IntegrationTests.testsettings = IntegrationTests.testsettings
 		License.txt = License.txt
 		README.md = README.md
 		UnitTests.testsettings = UnitTests.testsettings
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VsGitToolsPackage", "VsGitToolsPackage\VsGitToolsPackage.csproj", "{B867C32C-3C78-47E3-95DE-9A43B7AF1FA7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C756204F-28E1-473A-8160-E697E3303F1B} = {C756204F-28E1-473A-8160-E697E3303F1B}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VsGitToolsPackage.Tests", "VsGitToolsPackage.Tests\VsGitToolsPackage.Tests.csproj", "{0E10AFF0-4405-46C1-8FE6-802B17290576}"
