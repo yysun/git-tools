@@ -306,7 +306,7 @@ namespace GitUI.UI
                     process.Start();
                     HideConsoleWindow();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     process = null;
                 }
