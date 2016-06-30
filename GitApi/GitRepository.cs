@@ -95,6 +95,7 @@ namespace GitScc
 
         public void CheckOutBranch(string branch, bool createNew = false)
         {
+            this.branch = null;
             GitRun(string.Format("checkout {0} {1}", (createNew ? "-b" : ""), branch));
         }
 

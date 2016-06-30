@@ -16,7 +16,7 @@ namespace VsGitToolsPackage.Tests
 
         public GitRepositoryTest()
         {
-            GitBash.GitExePath = @"C:\Program Files (x86)\Git\bin\sh.exe";
+            GitBash.GitExePath = @"C:\Program Files\Git\bin\sh.exe";
             GitBash.UseUTF8FileNames = true;
         }
 
