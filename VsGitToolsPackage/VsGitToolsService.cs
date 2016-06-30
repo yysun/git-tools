@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -27,8 +28,6 @@ namespace F1SYS.VsGitToolsPackage
         //private uint _vsSolutionEventsCookie, _vsIVsFileChangeEventsCookie, _vsIVsUpdateSolutionEventsCookie;
         //private string lastMinotorFolder = "";
 
-        private DispatcherTimer timer;
-
         private VsGitToolsPackagePackage package;
 
         private GitRepository previousRepository;
@@ -45,7 +44,7 @@ namespace F1SYS.VsGitToolsPackage
                 if (repo != previousRepository)
                 {
                     WatchFileChanges(repo.WorkingDirectory);
-                    NeedRefresh = true;
+                    // NeedRefresh = true;
                 }
                 
                 previousRepository = repo;
@@ -378,8 +377,6 @@ namespace F1SYS.VsGitToolsPackage
                 {
                     var solutionDirectory = Path.GetDirectoryName(solutionFileName);
                     GetLoadedControllableProjects().ForEach(h => AddProject(h as IVsHierarchy));
-                    
-                    //WatchFileChanges(solutionDirectory);
                 }
             }
             catch (Exception ex)
@@ -387,61 +384,23 @@ namespace F1SYS.VsGitToolsPackage
                 trackers.Clear();
                 Debug.WriteLine("VS Git Tools - OpenRepository raised excpetion: ", ex.ToString());
             }
-    
-            //string solutionDirectory, solutionFile, solutionUserOptions;
-            //try
-            //{
-            //    IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
-            //    if (sol.GetSolutionInfo(out solutionDirectory, out solutionFile, out solutionUserOptions) == VSConstants.S_OK)
-            //    {
-            //        //Repository = new GitRepository(solutionDirectory);
-
-
-            //        //var monitorFolder = solutionDirectory;
-            //        //IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
-            //        //if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
-            //        //{
-            //        //    fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
-            //        //}
-            //        //fileChangeService.AdviseDirChange(monitorFolder, 1, this, out _vsIVsFileChangeEventsCookie);
-            //        //lastMinotorFolder = monitorFolder;
-            //        // Debug.WriteLine("==== Start Monitoring: " + monitorFolder + " " + _vsIVsFileChangeEventsCookie);
-
-            //        fileSystemWatcher = new FileSystemWatcher(solutionDirectory);
-            //        fileSystemWatcher.IncludeSubdirectories = true;
-            //        fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
-            //        fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
-            //        fileSystemWatcher.EnableRaisingEvents = true;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Repository = null;
-            //    Debug.WriteLine("VS Git Tools - OpenRepository raised excpetion: ", ex.ToString());
-            //}
+   
         }
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            NeedRefresh = true;
+            Debug.WriteLine("****==== File system changed [" + e.ChangeType.ToString() + "]" + e.FullPath);
+            if (!e.FullPath.EndsWith(".git") && !e.FullPath.EndsWith("index.lock") && !e.FullPath.EndsWith(".cache"))
+            {
+                NeedRefresh = true;
+            }
         }
 
         private void CloseRepository()
         {
-            //Repository = null;
             trackers.Clear();
-
             previousRepository = null;
             UnWatchFileChanges();
-
-            //if (VSConstants.VSCOOKIE_NIL != _vsIVsFileChangeEventsCookie)
-            //{
-            //    IVsFileChangeEx fileChangeService = package.GetServiceEx<SVsFileChangeEx>() as IVsFileChangeEx;
-            //    fileChangeService.UnadviseDirChange(_vsIVsFileChangeEventsCookie);
-            //    // Debug.WriteLine("==== Stop Monitoring: " + _vsIVsFileChangeEventsCookie.ToString());
-            //    _vsIVsFileChangeEventsCookie = VSConstants.VSCOOKIE_NIL;
-            //    lastMinotorFolder = "";
-            //}
         }
 
         private void UnWatchFileChanges()
@@ -469,11 +428,6 @@ namespace F1SYS.VsGitToolsPackage
             {
                 sbm.AdviseUpdateSolutionEvents(this, out _vsIVsUpdateSolutionEventsCookie);
             }
-
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(588);
-            timer.Tick += new EventHandler(timer_Tick);
-
         }
 
         public void Dispose()
@@ -659,49 +613,29 @@ namespace F1SYS.VsGitToolsPackage
                 double delta = DateTime.Now.Subtract(nextTimeRefresh).TotalMilliseconds;
                 if (delta > 200)
                 {
-                    //Debug.WriteLine("==== OnIdle: " + delta.ToString());
-
-                    //Stopwatch stopwatch = new Stopwatch();
-                    //stopwatch.Start();
-
                     NoRefresh = true;
                     NeedRefresh = false;
-
-                    //RefreshToolWindows();
-                    //NoRefresh = false;
-
-                    //stopwatch.Stop();
-                    //Debug.WriteLine("++++ UpdateNodesGlyphs: " + stopwatch.ElapsedMilliseconds);
-
-                    timer.Start();
+                    RefreshToolWindows();
                 }
-            }
-        }
-
-        private void timer_Tick(object sender, EventArgs e)
-        {
-            try
-            {
-                Debug.WriteLine("==== timer_Tick ");
-                timer.Stop();
-
-                RefreshToolWindows();
-            }
-            finally
-            {
-                NoRefresh = false;
             }
         }
 
         internal void RefreshToolWindows(bool force=false)
         {
-            //if (Repository != null) Repository.Refresh();
+            Debug.WriteLine("==== Refresh !!! ");
 
-            CloseRepository();
-            OpenRepository();
-
-            var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
-            if (toolWindow != null) toolWindow.Refresh(force);
+            var bgw = new BackgroundWorker();
+            bgw.DoWork += (_, __) =>
+            {
+                CloseRepository();
+                OpenRepository();
+            };
+            bgw.RunWorkerCompleted += (_, __) =>
+            {
+                var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
+                if (toolWindow != null) toolWindow.Refresh(force);
+            };
+            bgw.RunWorkerAsync();
         }
 
         #endregion
