@@ -8,6 +8,7 @@ using System.Windows.Input;
 using GitScc;
 using System.Windows.Threading;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace GitUI
 {
@@ -160,8 +161,16 @@ namespace GitUI
 
         internal void RefreshToolWindows()
         {
-            tracker.Refresh();
-            GraphChanged(this, null); 
+            var bgw = new BackgroundWorker();
+            bgw.DoWork += (_, __) =>
+            {
+                tracker.Refresh();
+            };
+            bgw.RunWorkerCompleted += (_, __) =>
+            {
+                GraphChanged(this, null);
+            };
+            bgw.RunWorkerAsync();
         }
 
         #endregion
