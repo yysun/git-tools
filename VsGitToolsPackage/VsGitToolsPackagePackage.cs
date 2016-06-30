@@ -286,7 +286,7 @@ namespace F1SYS.VsGitToolsPackage
         {
             var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, "Resources\\Dragon.exe");
-            var tmpPath = Path.Combine(Path.GetTempPath(), "Dragon.exe");
+            var tmpPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Dragon.exe");
 
             var needCopy = !File.Exists(tmpPath);
             if (!needCopy)
