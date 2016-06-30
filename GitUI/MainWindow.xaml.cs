@@ -333,7 +333,7 @@ namespace GitUI
 
 		private void _OnSystemCommandCloseWindow(object sender, ExecutedRoutedEventArgs e)
 		{
-			SystemCommands.CloseWindow(this);
+            Microsoft.Windows.Shell.SystemCommands.CloseWindow(this);
 		}
 
 		private void OpenRepository_Executed(object sender, ExecutedRoutedEventArgs e)
