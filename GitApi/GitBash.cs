@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Configuration;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace GitScc
 {
@@ -29,7 +30,8 @@ namespace GitScc
         }
 
         public static bool Exists { get { return !string.IsNullOrWhiteSpace(gitExePath) &&
-            File.Exists(gitExePath); } }
+            File.Exists(gitExePath); }
+        }
 
         public static GitBashResult Run(string args, string workingDirectory)
         {
@@ -67,11 +69,8 @@ namespace GitScc
 
             using (var process = Process.Start(pinfo))
             {
-                string output = null;
-                Thread thread = new Thread(_ => output = ReadStream(process.StandardOutput));
-                thread.Start();
+                var output = ReadStream(process.StandardOutput);
                 var error = ReadStream(process.StandardError);
-                thread.Join();
 
                 process.WaitForExit();
 
@@ -81,6 +80,7 @@ namespace GitScc
 
                 return result;
             }
+
         }
 
         private static string ReadStream(StreamReader streamReader)
@@ -166,4 +166,5 @@ namespace GitScc
 
         }
     }
+
 }
