@@ -88,7 +88,7 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        private string GetSolutionFileName()
+        public string GetSolutionFileName()
         {
 
             IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
@@ -390,7 +390,9 @@ namespace F1SYS.VsGitToolsPackage
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             Debug.WriteLine("****==== File system changed [" + e.ChangeType.ToString() + "]" + e.FullPath);
-            if (!e.FullPath.EndsWith(".git") && !e.FullPath.EndsWith("index.lock") && !e.FullPath.EndsWith(".cache"))
+
+            if (!(e.FullPath.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed) 
+                && !e.FullPath.EndsWith("index.lock") && !e.FullPath.EndsWith(".cache"))
             {
                 NeedRefresh = true;
             }

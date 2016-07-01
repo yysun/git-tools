@@ -102,7 +102,11 @@ namespace GitUI
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            NeedRefresh = true;
+            if (!(e.FullPath.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
+                && !e.FullPath.EndsWith("index.lock") && !e.FullPath.EndsWith(".cache"))
+            {
+                NeedRefresh = true;
+            }
         }
 
 		internal static void OpenGitBash()
