@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -426,18 +427,29 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        private void StageSelectedFiles()
+        private async Task StageSelectedFiles()
         {
             var unstaged = this.listView1.Items.Cast<GitFile>()
                                .Where(item => item.IsSelected && !item.IsStaged)
                                .ToArray();
             var count = unstaged.Length;
             int i = 0;
-            foreach (var item in unstaged)
+
+            //foreach (var item in unstaged)
+            //{
+            //    tracker.StageFile(item.FileName);
+            //    ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
+            //}
+
+            await Task.Run(new Action(() =>
             {
-                tracker.StageFile(item.FileName);
-                ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
-            }
+                foreach (var item in unstaged)
+                {
+                    tracker.StageFile(item.FileName);
+                    ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
+                }
+            }));
+
         }
 
         private void ShowStatusMessage(string msg)
@@ -587,7 +599,7 @@ Note: if the file is included project, you need to delete the file from project 
         {
             if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control)
             {
-                OnCommit();
+                toolWindow.OnCommitCommand();
             }
         }
 
@@ -681,25 +693,12 @@ Note: if the file is included project, you need to delete the file from project 
             Settings.Show();
         }
 
-        internal void OnCommit()
+        internal async void OnCommit()
         {
             if (tracker == null) return;
 
             try
             {
-                //service.NoRefresh = true;
-
-                //if (chkNewBranch.IsChecked == true)
-                //{
-                //    if (string.IsNullOrWhiteSpace(txtNewBranch.Text))
-                //    {
-                //        MessageBox.Show("Please enter new branch name.", "Commit",
-                //            MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                //        txtNewBranch.Focus();
-                //        return;
-                //    }
-                //    tracker.CheckOutBranch(txtNewBranch.Text, true);
-                //}
 
                 var isAmend = chkAmend.IsChecked == true;
 
@@ -711,7 +710,7 @@ Note: if the file is included project, you need to delete the file from project 
                 }
 
                 ShowStatusMessage("Staging files ...");
-                StageSelectedFiles();
+                await StageSelectedFiles();
 
                 if (!isAmend)
                 {
