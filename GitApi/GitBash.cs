@@ -69,9 +69,12 @@ namespace GitScc
 
             using (var process = Process.Start(pinfo))
             {
-                var output = ReadStream(process.StandardOutput);
+                // var output = ReadStream(process.StandardOutput);
+                var output = "";
+                Thread thread = new Thread(_ => output = ReadStream(process.StandardOutput));
+                thread.Start();
                 var error = ReadStream(process.StandardError);
-
+                thread.Join();
                 process.WaitForExit();
 
                 result.HasError = process.ExitCode != 0;
