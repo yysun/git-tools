@@ -129,6 +129,8 @@ namespace F1SYS.VsGitToolsPackage
 
         private void ShowSelectedFile()
         {
+            if (this.tabControl1.SelectedIndex != 0) this.tabControl1.SelectedIndex = 0;
+
             var fileName = GetSelectedFileName();
 
             this.ClearEditor();
