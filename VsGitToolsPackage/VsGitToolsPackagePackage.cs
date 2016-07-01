@@ -192,13 +192,17 @@ namespace F1SYS.VsGitToolsPackage
 
         private void OnInitCommand(object sender, EventArgs e)
         {
-            GitRepository.Init(repository.WorkingDirectory);
-            var ignoreFileName = Path.Combine(repository.WorkingDirectory, ".gitignore");
+            var dir = repository != null && repository.IsGit ?
+                repository.WorkingDirectory :
+                Path.GetDirectoryName(service.GetSolutionFileName());
+
+            GitRepository.Init(dir);
+            var ignoreFileName = Path.Combine(dir, ".gitignore");
             if (!File.Exists(ignoreFileName))
             {
                 File.WriteAllText(ignoreFileName, Resources.IgnoreFileContent);
             }
-            repository.Refresh();
+            service.RefreshToolWindows(true);
         }
 
         private void OnGitBashCommand(object sender, EventArgs e)
@@ -309,7 +313,7 @@ namespace F1SYS.VsGitToolsPackage
 
             if (File.Exists(tmpPath))
             {
-                Process.Start(tmpPath, "\"" + repository.WorkingDirectory + "\"");
+                Process.Start(tmpPath, "\"" + this.CurrentGitWorkingDirectory + "\"");
             }
         }
 
@@ -475,7 +479,7 @@ namespace F1SYS.VsGitToolsPackage
                 if (repository == null)
                 {
                     var dte = GetServiceEx<EnvDTE.DTE>() as EnvDTE.DTE;
-                    EnvDTE.Properties properties = dte.get_Properties("Environment", "ProjectsAndSolution"); 
+                    EnvDTE.Properties properties = dte.get_Properties("Environment", "ProjectsAndSolution");
                     EnvDTE.Property p = properties.Item("ProjectsLocation");
                     return p.Value as string;
                 }
