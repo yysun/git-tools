@@ -79,6 +79,9 @@ namespace F1SYS.VsGitToolsPackage {
         ///*.userosscache
         ///*.sln.docstates
         ///
+        ///# User-specific files (MonoDevelop/Xamarin Studio)
+        ///*.userprefs
+        ///
         ///# Build results
         ///[Dd]ebug/
         ///[Dd]ebugPublic/
@@ -86,25 +89,15 @@ namespace F1SYS.VsGitToolsPackage {
         ///[Rr]eleases/
         ///x64/
         ///x86/
-        ///build/
         ///bld/
         ///[Bb]in/
         ///[Oo]bj/
+        ///[Ll]og/
         ///
-        ///# Roslyn cache directories
-        ///*.ide/
-        ///
-        ///# MSTest test Results
-        ///[Tt]est[Rr]esult*/
-        ///[Bb]uild[Ll]og.*
-        ///
-        ///#NUNIT
-        ///*.VisualState.xml
-        ///TestResult.xml
-        ///
-        ///# Build Results of an ATL Project
-        ///[Dd]ebugPS/
-        ///[Rr]elease [rest of string was truncated]&quot;;.
+        ///# Visual Studio 2015 cache/options directory
+        ///.vs/
+        ///# Uncomment if you have tasks that create the project&apos;s static files in wwwroot
+        ///#ww [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string IgnoreFileContent {
             get {
