@@ -98,31 +98,32 @@ namespace F1SYS.VsGitToolsPackage
         internal void Refresh(bool force=false)
         {
             Debug.WriteLine("VS Git Tools - Refresh Git Changes Tool Windows ");
-            var gitRepository = Service.Repository;
-            
-            this.Caption = Resources.ToolWindowTitle;
-            if (gitRepository != null && gitRepository.IsGit)
-            {
-                this.Caption = Resources.ToolWindowTitle + " - " + gitRepository.CurrentBranch;
-            }
 
-            if (force)
+            // this will be called from background thread
+            _Control.Dispatcher.Invoke(new Action(() =>
             {
-                hasFileSaved(); //just a reminder, refresh anyway
-                //if (gitRepository != null) gitRepository.Refresh();
-            }
+                var gitRepository = Service.Repository;
 
-            _Control.Dispatcher.Invoke(new Action( () => {
+                this.Caption = Resources.ToolWindowTitle;
+                if (gitRepository != null && gitRepository.IsGit)
+                {
+                    this.Caption = Resources.ToolWindowTitle + " - " + gitRepository.CurrentBranch;
+                }
+
+                if (force)
+                {
+                    hasFileSaved(); //just a reminder, refresh anyway
+                                    //if (gitRepository != null) gitRepository.Refresh();
+                }
+
                 _Control.Refresh(gitRepository);
 
                 this.Service.NeedRefresh = false;
                 this.Service.NoRefresh = false;
+
+                var svc = this.GetService(typeof(IVsUIShell)) as IVsUIShell;
+                svc.UpdateCommandUI(1);
             }));
-            
-
-            var svc = this.GetService(typeof(IVsUIShell)) as IVsUIShell;
-            svc.UpdateCommandUI(1);
-
         }
 
         internal EnvDTE.DTE dte

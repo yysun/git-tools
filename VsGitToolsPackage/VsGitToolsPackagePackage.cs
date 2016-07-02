@@ -192,17 +192,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void OnInitCommand(object sender, EventArgs e)
         {
-            var dir = repository != null && repository.IsGit ?
-                repository.WorkingDirectory :
-                Path.GetDirectoryName(service.GetSolutionFileName());
-
-            GitRepository.Init(dir);
-            var ignoreFileName = Path.Combine(dir, ".gitignore");
-            if (!File.Exists(ignoreFileName))
-            {
-                File.WriteAllText(ignoreFileName, Resources.IgnoreFileContent);
-            }
-            service.RefreshToolWindows(true);
+            service.InitRepo();
         }
 
         private void OnGitBashCommand(object sender, EventArgs e)

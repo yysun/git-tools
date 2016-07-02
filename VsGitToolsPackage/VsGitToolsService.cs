@@ -301,6 +301,21 @@ namespace F1SYS.VsGitToolsPackage
             return selectedNodes;
         }
 
+        internal void InitRepo()
+        {
+            var dir = Repository != null && Repository.IsGit ?
+                Repository.WorkingDirectory :
+                Path.GetDirectoryName(GetSolutionFileName());
+
+            GitRepository.Init(dir);
+            var ignoreFileName = Path.Combine(dir, ".gitignore");
+            if (!File.Exists(ignoreFileName))
+            {
+                File.WriteAllText(ignoreFileName, Resources.IgnoreFileContent);
+            }
+            RefreshToolWindows(true);
+        }
+
         private bool IsParentFolder(string folder, string fileName)
         {
             if (string.IsNullOrEmpty(folder) || string.IsNullOrEmpty(fileName) ||
@@ -622,31 +637,23 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        internal async void RefreshToolWindows(bool force = false)
+        internal async Task RefreshToolWindows(bool force = false)
         {
+            var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
+            if (toolWindow == null) return;
+
             Debug.WriteLine("==== Refresh !!! ");
 
-            //var bgw = new BackgroundWorker();
-            //bgw.DoWork += (_, __) =>
-            //{
-            //    CloseRepository();
-            //    OpenRepository();
-            //};
-            //bgw.RunWorkerCompleted += (_, __) =>
-            //{
-            //    var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
-            //    if (toolWindow != null) toolWindow.Refresh(force);
-            //};
-            //bgw.RunWorkerAsync();
-
+            toolWindow.dte.StatusBar.Text = "Analyzing git reporsitory ...";
+            
             await Task.Run(() =>
             {
                 CloseRepository();
                 OpenRepository();
+                toolWindow.Refresh(force);
             });
 
-            var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
-            if (toolWindow != null) toolWindow.Refresh(force);
+            toolWindow.dte.StatusBar.Text = "";
         }
         #endregion
 

@@ -33,10 +33,19 @@ namespace GitScc
             File.Exists(gitExePath); }
         }
 
+        public static async Task<GitBashResult> RunAsync(string args, string workingDirectory)
+        {
+            GitBashResult ret = null;
+            await Task.Run(new Action(() => {
+                ret = Run(args, workingDirectory);
+            }));
+            return ret;
+        }
+
         public static GitBashResult Run(string args, string workingDirectory)
         {
-            Debug.WriteLine(string.Format("{2}>{0} {1}", gitExePath, args, workingDirectory));
-
+            Debug.WriteLine(string.Format("{2}>{0} {1}", "git", args, Thread.CurrentThread.ManagedThreadId));
+            
             if (string.IsNullOrWhiteSpace(gitExePath) || !File.Exists(gitExePath))
                 throw new GitException("Git Executable not found");
 
@@ -69,12 +78,12 @@ namespace GitScc
 
             using (var process = Process.Start(pinfo))
             {
-                // var output = ReadStream(process.StandardOutput);
                 var output = "";
-                Thread thread = new Thread(_ => output = ReadStream(process.StandardOutput));
+                Thread thread = new Thread(_ => output = process.StandardOutput.ReadToEnd());
                 thread.Start();
-                var error = ReadStream(process.StandardError);
+                var error = process.StandardError.ReadToEnd();
                 thread.Join();
+
                 process.WaitForExit();
 
                 result.HasError = process.ExitCode != 0;
@@ -84,21 +93,6 @@ namespace GitScc
                 return result;
             }
 
-        }
-
-        private static string ReadStream(StreamReader streamReader)
-        {
-            if (!streamReader.BaseStream.CanRead) return null;
-            StringBuilder sb = new StringBuilder();
-
-            var buffer = new byte[1024];
-            int len = 0;
-            while ((len = streamReader.BaseStream.Read(buffer, 0, buffer.Length)) != 0)
-            {
-                var buf = Encoding.UTF8.GetString(buffer, 0, len);
-                sb.Append(buf);
-            }
-            return sb.ToString();
         }
 
         public static void RunCmd(string args, string workingDirectory)
