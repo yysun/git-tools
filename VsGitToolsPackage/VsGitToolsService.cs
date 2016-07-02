@@ -622,24 +622,32 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        internal void RefreshToolWindows(bool force=false)
+        internal async void RefreshToolWindows(bool force = false)
         {
             Debug.WriteLine("==== Refresh !!! ");
 
-            var bgw = new BackgroundWorker();
-            bgw.DoWork += (_, __) =>
+            //var bgw = new BackgroundWorker();
+            //bgw.DoWork += (_, __) =>
+            //{
+            //    CloseRepository();
+            //    OpenRepository();
+            //};
+            //bgw.RunWorkerCompleted += (_, __) =>
+            //{
+            //    var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
+            //    if (toolWindow != null) toolWindow.Refresh(force);
+            //};
+            //bgw.RunWorkerAsync();
+
+            await Task.Run(() =>
             {
                 CloseRepository();
                 OpenRepository();
-            };
-            bgw.RunWorkerCompleted += (_, __) =>
-            {
-                var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
-                if (toolWindow != null) toolWindow.Refresh(force);
-            };
-            bgw.RunWorkerAsync();
-        }
+            });
 
+            var toolWindow = this.package.FindToolWindow(typeof(MyToolWindow), 0, false) as MyToolWindow;
+            if (toolWindow != null) toolWindow.Refresh(force);
+        }
         #endregion
 
     }
