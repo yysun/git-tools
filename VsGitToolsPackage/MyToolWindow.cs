@@ -100,7 +100,7 @@ namespace F1SYS.VsGitToolsPackage
             Debug.WriteLine("VS Git Tools - Refresh Git Changes Tool Windows ");
 
             // this will be called from background thread
-            _Control.Dispatcher.Invoke(new Action(() =>
+            _Control.Dispatcher.BeginInvoke(new Action(() =>
             {
                 var gitRepository = Service.Repository;
 
