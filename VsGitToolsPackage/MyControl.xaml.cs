@@ -345,12 +345,7 @@ namespace F1SYS.VsGitToolsPackage
                 ClearUI();
                 return;
             }
-            //service.NoRefresh = true;
-            //ShowStatusMessage("Getting changed files ...");
-
-            //Stopwatch stopwatch = new Stopwatch();
-            //stopwatch.Start();
-
+ 
             var selectedFile = GetSelectedFileName();
             var selectedFiles = this.listView1.Items.Cast<GitFile>()
                 .Where(i => i.IsSelected)
@@ -359,7 +354,6 @@ namespace F1SYS.VsGitToolsPackage
             this.listView1.BeginInit();
             try
             {
-
                 this.listView1.ItemsSource = tracker.ChangedFiles;
 
                 this.listView1.SelectedValue = selectedFile;
@@ -383,16 +377,10 @@ namespace F1SYS.VsGitToolsPackage
 
             this.listView1.EndInit();
 
-
-            //stopwatch.Stop();
-            //Debug.WriteLine("**** PendingChangesView Refresh: " + stopwatch.ElapsedMilliseconds);
-
             if (GitSccOptions.Current.DisableAutoRefresh)
                 this.label4.Visibility = Visibility.Visible;
             else
                 this.label4.Visibility = Visibility.Collapsed;
-
-            //service.NoRefresh = false;
         }
 
         internal void ClearUI()
@@ -427,30 +415,6 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        private async Task StageSelectedFiles()
-        {
-            var unstaged = this.listView1.Items.Cast<GitFile>()
-                               .Where(item => item.IsSelected && !item.IsStaged)
-                               .ToArray();
-            var count = unstaged.Length;
-            int i = 0;
-
-            //foreach (var item in unstaged)
-            //{
-            //    tracker.StageFile(item.FileName);
-            //    ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
-            //}
-
-            await Task.Run(new Action(() =>
-            {
-                foreach (var item in unstaged)
-                {
-                    tracker.StageFile(item.FileName);
-                    ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
-                }
-            }));
-
-        }
 
         private void ShowStatusMessage(string msg)
         {
@@ -693,7 +657,7 @@ Note: if the file is included project, you need to delete the file from project 
             Settings.Show();
         }
 
-        internal async void OnCommit()
+        internal async Task OnCommit()
         {
             if (tracker == null) return;
 
@@ -709,14 +673,18 @@ Note: if the file is included project, you need to delete the file from project 
                     return;
                 }
 
+                var unstaged = this.listView1.Items.Cast<GitFile>()
+                   .Where(item => item.IsSelected && !item.IsStaged);
+
+                var count = unstaged.Count();
+
                 ShowStatusMessage("Staging files ...");
-                await StageSelectedFiles();
 
                 if (!isAmend)
                 {
                     tracker.Refresh();
                     bool hasStaged = tracker == null ? false :
-                                     tracker.ChangedFiles.Any(f => f.IsStaged);
+                                     tracker.ChangedFiles.Any(f => f.IsStaged) || count > 0;
                     if (!hasStaged)
                     {
                         MessageBox.Show("No file has been selected/staged for commit.", "Commit",
@@ -737,11 +705,20 @@ Are you sure you want to continue?";
                     }
                 }
 
-                var id = tracker.Commit(Comments, isAmend, chkSignOff.IsChecked == true);
-                ShowStatusMessage("Commit successfully. Commit Hash: " + id);
-                ClearUI();
-                //service.NoRefresh = false;
+                int i = 1;
+                bool signoff = chkSignOff.IsChecked == true;
+                await Task.Run(() =>
+                {
+                    foreach (var item in unstaged)
+                    {
+                        tracker.StageFile(item.FileName);
+                        ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
+                    }
+                    var id = tracker.Commit(Comments, isAmend, signoff);
+                    ShowStatusMessage("Commit successfully. Commit Hash: " + id);
+                });
                 tracker.Refresh();
+                ClearUI();
                 toolWindow.Refresh();
             }
             catch (Exception ex)
