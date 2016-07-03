@@ -440,7 +440,7 @@ namespace F1SYS.VsGitToolsPackage
             });
         }
 
-        private void menuUndo_Click(object sender, RoutedEventArgs e)
+        private async void menuUndo_Click(object sender, RoutedEventArgs e)
         {
 
             const string deleteMsg = @"
@@ -456,29 +456,58 @@ Note: Undo file changes will restore the file(s) from the last commit.";
                 "Are you sure you want to undo changes to file: " + Path.GetFileName(filesToUndo.First()) + deleteMsg :
                 String.Format("Are you sure you want to undo changes to {0} files", filesToUndo.Count) + deleteMsg;
 
+
             if (MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                foreach (var fileName in filesToUndo)
-                    tracker.CheckOutFile(fileName);
+                this.toolWindow.Service.NoRefresh = true;
+                await Task.Run(() =>
+                {
+                    foreach (var fileName in filesToUndo)
+                    {
+                        tracker.CheckOutFile(fileName);
+                    }
+                });
+                this.toolWindow.Service.NoRefresh = false;
+                await this.toolWindow.Service.RefreshToolWindows();
             }
         }
 
-        private void menuStage_Click(object sender, RoutedEventArgs e)
+        private async void menuStage_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFiles(fileName =>
+            var unstaged = this.listView1.SelectedItems.Cast<GitFile>()
+               .Where(item => !item.IsStaged);
+
+            int i = 1, count = unstaged.Count();
+            this.toolWindow.Service.NoRefresh = true;
+            await Task.Run(() =>
             {
-                tracker.StageFile(fileName);
-                ShowStatusMessage("Staged file: " + fileName);
+                foreach (var item in unstaged)
+                { 
+                    tracker.StageFile(item.FileName);
+                    ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
+                }
             });
+            this.toolWindow.Service.NoRefresh = false;
+            await this.toolWindow.Service.RefreshToolWindows();
         }
 
-        private void menuUnstage_Click(object sender, RoutedEventArgs e)
+        private async void menuUnstage_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFiles(fileName =>
+            var staged = this.listView1.SelectedItems.Cast<GitFile>()
+               .Where(item => item.IsStaged);
+
+            int i = 1, count = staged.Count();
+            this.toolWindow.Service.NoRefresh = true;
+            await Task.Run(() =>
             {
-                tracker.UnStageFile(fileName);
-                ShowStatusMessage("Un-staged file: " + fileName);
+                foreach (var item in staged)
+                {
+                    tracker.UnStageFile(item.FileName);
+                    ShowStatusMessage(string.Format("Unstaged ({0}/{1}): {2}", i++, count, item.FileName));
+                }
             });
+            this.toolWindow.Service.NoRefresh = false;
+            await this.toolWindow.Service.RefreshToolWindows();
         }
 
         private void menuDeleteFile_Click(object sender, RoutedEventArgs e)
@@ -704,6 +733,7 @@ Are you sure you want to continue?";
                     }
                 }
 
+                this.toolWindow.Service.NoRefresh = true;
                 int i = 1;
                 bool signoff = chkSignOff.IsChecked == true;
                 await Task.Run(() =>
@@ -716,9 +746,9 @@ Are you sure you want to continue?";
                     var id = tracker.Commit(Comments, isAmend, signoff);
                     ShowStatusMessage("Commit successfully. Commit Hash: " + id);
                 });
-                tracker.Refresh();
                 ClearUI();
-                toolWindow.Refresh();
+                this.toolWindow.Service.NoRefresh = false;
+                await this.toolWindow.Service.RefreshToolWindows();
             }
             catch (Exception ex)
             {
