@@ -646,8 +646,8 @@ namespace F1SYS.VsGitToolsPackage
 
             Debug.WriteLine("==== Refresh !!! ");
 
+            await Task.Delay(800);
             toolWindow.dte.StatusBar.Text = "Analyzing git reporsitory ...";
-            
             await Task.Run(() =>
             {
                 CloseRepository();
