@@ -27,16 +27,7 @@ namespace GitScc
 		{
             this.workingDirectory = directory;
             Refresh();
-		}
-        public void Refresh()
-        {
-            this.repositoryGraph = null;
-            this.changedFiles = null;
             this.isGit = false;
-            this.branch = null;
-            this.remotes = null;
-            this.configs = null;
-
             var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory); 
             if (!result.HasError && !result.Output.StartsWith("fatal:"))
             {
@@ -44,6 +35,16 @@ namespace GitScc
                 result = GitBash.Run("rev-parse --is-inside-work-tree", WorkingDirectory);
                 isGit = string.Compare("true", result.Output.Trim(), true) == 0;
             }
+		}
+
+        public void Refresh()
+        {
+            this.repositoryGraph = null;
+            this.changedFiles = null;
+            this.branch = null;
+            this.remotes = null;
+            this.configs = null;
+
         }
 
 		#region Git commands
