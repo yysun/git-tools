@@ -103,7 +103,7 @@ namespace GitScc.DataServices
                     {
                         var fileName = Path.GetTempFileName();
 
-                        GitBash.RunCmd(string.Format("cat-file blob {0} > {1}", this.Id, fileName), this.Repository);
+                        GitBash.RunCmd(string.Format("cat-file blob {0} > \"{1}\"", this.Id, fileName), this.Repository);
 
                         content = File.ReadAllBytes(fileName);
 
