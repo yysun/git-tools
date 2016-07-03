@@ -345,6 +345,7 @@ namespace F1SYS.VsGitToolsPackage
 
             if (string.IsNullOrEmpty(projectName)) return;
             string projectDirecotry = Path.GetDirectoryName(projectName);
+            if (!Directory.Exists(Path.Combine(projectDirecotry, ".git"))) return;
 
             // Debug.WriteLine("==== Adding project: " + projectDirecotry);
 
@@ -391,6 +392,7 @@ namespace F1SYS.VsGitToolsPackage
                 if (!string.IsNullOrEmpty(solutionFileName))
                 {
                     var solutionDirectory = Path.GetDirectoryName(solutionFileName);
+                    trackers.Add(new GitFileStatusTracker(solutionDirectory));
                     GetLoadedControllableProjects().ForEach(h => AddProject(h as IVsHierarchy));
                 }
             }
@@ -404,7 +406,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            Debug.WriteLine("****==== File system changed [" + e.ChangeType.ToString() + "]" + e.FullPath);
+            // Debug.WriteLine("****==== File system changed [" + e.ChangeType.ToString() + "]" + e.FullPath);
 
             if (!(e.FullPath.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed) 
                 && !e.FullPath.EndsWith("index.lock") && !e.FullPath.EndsWith(".cache"))
@@ -650,7 +652,16 @@ namespace F1SYS.VsGitToolsPackage
             {
                 CloseRepository();
                 OpenRepository();
+
+                // cache branch and changed files
+                if (this.Repository != null && this.Repository.IsGit)
+                {
+                    var b = Repository.CurrentBranch;
+                    var c = Repository.ChangedFiles;
+                }
+
                 toolWindow.Refresh(force);
+                
             });
 
             toolWindow.dte.StatusBar.Text = "";
