@@ -302,7 +302,7 @@
                 <TabItem Header="Diff View" Name="tabItem1">
                     <ContentControl x:Name="DiffEditor" MouseDoubleClick="DiffEditor_MouseDoubleClick"></ContentControl>
                 </TabItem>
-                <TabItem Header="Git Console (beta)" Name="tabItem2">
+                <TabItem Header="Git Console" Name="tabItem2">
                     <gitconsole:GitConsole x:Name="gitConsole1" />
                 </TabItem>
             </TabControl>

@@ -11,13 +11,14 @@
                      PreviewKeyDown="richTextBox1_PreviewKeyDown" AcceptsReturn="False" AcceptsTab="False"
                      HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Visible"
                      Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
-		        	 Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
+		        	 Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" 
+                     GotFocus="richTextBox1_GotFocus">
             <FlowDocument></FlowDocument>
         </RichTextBox>
-        <ListBox Height="100" HorizontalAlignment="Left" Name="lstOptions" VerticalAlignment="Top" Width="120" Visibility="Collapsed" 
-                 MouseDoubleClick="lstOptions_MouseDoubleClick" PreviewKeyDown="lstOptions_PreviewKeyDown"
+        <ListBox Height="100" HorizontalAlignment="Left" Name="lstOptions" VerticalAlignment="Top" Width="120" Visibility="Collapsed" PreviewKeyDown="lstOptions_PreviewKeyDown"
                  IsTextSearchEnabled="True" TextSearch.TextPath="."
                  Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
-			     Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"/>
+			     Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" 
+                 MouseDoubleClick="lstOptions_MouseDoubleClick" MouseLeftButtonDown="lstOptions_MouseDoubleClick"/>
     </Grid>
 </UserControl>

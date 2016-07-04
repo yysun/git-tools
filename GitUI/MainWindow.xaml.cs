@@ -33,7 +33,8 @@ namespace GitUI
 
             this.gitViewModel = GitViewModel.Current;
             this.gitConsole.GitExePath = GitBash.GitExePath;
-            this.rootGrid.RowDefinitions[2].Height = new GridLength(0);
+            this.rootGrid.RowDefinitions[2].Height = new GridLength(this.ActualHeight / 3);
+            this.gitConsole.mainWindow = this;
 
 			if (gitViewModel.Tracker.IsGit)
 				this.Title = gitViewModel.Tracker.WorkingDirectory;
@@ -64,8 +65,10 @@ namespace GitUI
 
         void gitViewModel_GraphChanged(object sender, EventArgs e)
         {
-            Action a = () => loading.Visibility = Visibility.Visible;
-            this.Dispatcher.BeginInvoke(a, DispatcherPriority.Render);
+            //Action a = () => loading.Visibility = Visibility.Visible;
+            //this.Dispatcher.BeginInvoke(a, DispatcherPriority.Render);
+
+            this.ShowStatusMessage("Analyzing Git Repository ...");
 
             Action act = () =>
             {
@@ -387,5 +390,26 @@ namespace GitUI
         }
         #endregion
 
+        internal void ShowStatusMessage(string msg)
+        {
+            if (string.IsNullOrWhiteSpace(msg))
+            {
+                Action b = () =>
+                {
+                    loading.SetText("");
+                    loading.Visibility = Visibility.Collapsed;
+                };
+                this.Dispatcher.BeginInvoke(b, DispatcherPriority.Render);
+            }
+            else
+            {
+                Action a = () =>
+                {
+                    loading.SetText(msg);
+                    loading.Visibility = Visibility.Visible;
+                };
+                this.Dispatcher.BeginInvoke(a, DispatcherPriority.Render);
+            }
+        }
     }
 }

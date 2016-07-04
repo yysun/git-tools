@@ -1,4 +1,5 @@
-﻿using GitScc.DataServices;
+﻿using F1SYS.VsGitToolsPackage;
+using GitScc.DataServices;
 using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,6 @@ namespace GitScc.UI
         private StreamWriter inputWriter;
         private TextReader outputReader;
         private TextReader errorReader;
-
 
         private GitRepository _tracker;
         private GitRepository tracker
@@ -84,7 +84,6 @@ namespace GitScc.UI
             errorWorker.DoWork += errorWorker_DoWork;
         }
 
-
         #region keydown event
 
         string lastText = "";
@@ -93,7 +92,14 @@ namespace GitScc.UI
         {
             if (lstOptions.Visibility == Visibility.Visible)
             {
-                lstOptions.Focus();
+                if (e.Key == Key.Escape)
+                {
+                    this.HideOptions();
+                }
+                else
+                {
+                    lstOptions.Focus();
+                }
                 return;
             }
 
@@ -138,7 +144,7 @@ namespace GitScc.UI
             else if (e.Key == Key.Escape)
             {
                 ChangePrompt("", BRUSH_PROMPT);
-                lstOptions.Visibility = Visibility.Collapsed;
+                this.HideOptions();
             }
             else if (e.Key == Key.Back)
             {
@@ -153,6 +159,10 @@ namespace GitScc.UI
                     SendShutdownToConsole();
                     e.Handled = true;
                 }
+            }
+            else if (lstOptions.Visibility == Visibility.Visible)
+            {
+                //lstOptions.KeyDown()
             }
         }
 
@@ -238,11 +248,12 @@ namespace GitScc.UI
                     WritePrompt();
                     return;
                 }
-                else if (command.StartsWith("git fetch") || command.StartsWith("git pull") || command.StartsWith("git push"))
-                {
-                    if (ShowWaring()) return;
-                }
+                //else if (command.StartsWith("git fetch") || command.StartsWith("git pull") || command.StartsWith("git push"))
+                //{
+                //    if (ShowWaring()) return;
+                //}
 
+                
                 var idx = command.IndexOf(' ');
 
                 if (idx < 0)
@@ -263,6 +274,8 @@ namespace GitScc.UI
         #region From Console Control
         public void StartProcess(string fileName, string arguments)
         {
+            ShowStatusMessage("Running command ...");
+
             //  Create the process start info.
             var processStartInfo = new ProcessStartInfo(fileName, arguments);
 
@@ -286,14 +299,6 @@ namespace GitScc.UI
             process.StartInfo = processStartInfo;
             process.Exited += currentProcess_Exited;
 
-
-            //  Start the process.
-            //try
-            //{
-            //    process.Start();
-            //}
-            //catch
-            //{
             try
             {
                 processStartInfo.CreateNoWindow = false;
@@ -311,7 +316,6 @@ namespace GitScc.UI
             {
                 process = null;
             }
-            //}
 
             if (process == null)
             {
@@ -344,6 +348,8 @@ namespace GitScc.UI
             process = null;
 
             WritePrompt();
+
+            ShowStatusMessage("");
         }
 
         public bool IsProcessRunning
@@ -478,7 +484,7 @@ namespace GitScc.UI
 
             this.richTextBox1.ScrollToEnd();
             this.richTextBox1.CaretPosition = this.richTextBox1.CaretPosition.DocumentEnd;
-            this.lstOptions.Visibility = Visibility.Collapsed;
+            this.HideOptions();
 
             lastText = prompt;
         }
@@ -539,7 +545,7 @@ namespace GitScc.UI
                 top += this.Padding.Top;
                 lstOptions.SetCurrentValue(ListBox.MarginProperty, new Thickness(left, top, 0, 0));
                 lstOptions.ItemsSource = options;
-                lstOptions.Visibility = Visibility.Visible;
+                this.ShowOptions();
             }
         }
 
@@ -558,17 +564,19 @@ namespace GitScc.UI
             else if (e.Key == Key.Back || e.Key == Key.Escape)
             {
                 this.richTextBox1.Focus();
-                this.lstOptions.Visibility = Visibility.Collapsed;
+                this.HideOptions();
                 e.Handled = true;
             }
+
         }
 
         private void InsertText(string text)
         {
+            if (string.IsNullOrEmpty(text)) return;
             this.richTextBox1.Focus();
             this.richTextBox1.CaretPosition.InsertTextInRun(text);
             this.richTextBox1.CaretPosition = this.richTextBox1.CaretPosition.DocumentEnd;
-            this.lstOptions.Visibility = Visibility.Collapsed;
+            this.HideOptions();
         }
 
         #endregion
@@ -585,8 +593,9 @@ namespace GitScc.UI
             this.richTextBox1.Focus();
         }
 
-        internal void Refresh(GitRepository tracker)
+        internal void Refresh(GitRepository tracker, MyToolWindow toolWindow)
         {
+            this.toolWindow = toolWindow;
             this.tracker = tracker;
             RefreshPrompt();
         }
@@ -646,5 +655,26 @@ namespace GitScc.UI
         }
         #endregion
 
+        private void richTextBox1_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.HideOptions();
+        }
+
+        private void ShowOptions()
+        {
+            lstOptions.Visibility = Visibility.Visible;
+        }
+
+        private void HideOptions()
+        {
+            lstOptions.Visibility = Visibility.Collapsed;
+        }
+
+        private MyToolWindow toolWindow;
+        private void ShowStatusMessage(string msg)
+        {
+            Action action = () => { toolWindow.dte.StatusBar.Text = msg; };
+            Dispatcher.Invoke(action);
+        }
     }
 }

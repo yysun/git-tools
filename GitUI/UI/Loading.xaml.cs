@@ -23,5 +23,10 @@ namespace GitScc.UI
         {
             InitializeComponent();
         }
+
+        internal void SetText(string text)
+        {
+            this.text1.Text = text;
+        }
     }
 }

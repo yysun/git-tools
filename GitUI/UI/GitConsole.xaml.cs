@@ -93,7 +93,14 @@ namespace GitUI.UI
         {
             if (lstOptions.Visibility == Visibility.Visible)
             {
-                lstOptions.Focus();
+                if (e.Key == Key.Escape)
+                {
+                    this.HideOptions();
+                }
+                else
+                {
+                    lstOptions.Focus();
+                }
                 return;
             }
 
@@ -138,7 +145,7 @@ namespace GitUI.UI
             else if (e.Key == Key.Escape)
             {
                 ChangePrompt("", BRUSH_PROMPT);
-                lstOptions.Visibility = Visibility.Collapsed;
+                this.HideOptions();
             }
             else if (e.Key == Key.Back)
             {
@@ -238,10 +245,6 @@ namespace GitUI.UI
                     WritePrompt();
                     return;
                 }
-                else if (command.StartsWith("git fetch") || command.StartsWith("git pull") || command.StartsWith("git push"))
-                {
-                    if (ShowWaring()) return;
-                }
 
                 var idx = command.IndexOf(' ');
 
@@ -262,6 +265,8 @@ namespace GitUI.UI
         #region From Console Control
         public void StartProcess(string fileName, string arguments)
         {
+            ShowStatusMessage("Running Console Command ...");
+
             //  Create the process start info.
             var processStartInfo = new ProcessStartInfo(fileName, arguments);
 
@@ -286,33 +291,25 @@ namespace GitUI.UI
             process.Exited += currentProcess_Exited;
 
 
-            //  Start the process.
-            //try
-            //{
-            //    process.Start();
-            //}
-            //catch
-            //{
-                try
-                {
-                    processStartInfo.CreateNoWindow = false;
-                    processStartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            try
+            {
+                processStartInfo.CreateNoWindow = false;
+                processStartInfo.WindowStyle = ProcessWindowStyle.Minimized;
 
-                    var args = " /C " + fileName;
-                    if (!string.IsNullOrEmpty(arguments)) args += " " + arguments;
-                    processStartInfo.FileName = "cmd.exe";
-                    processStartInfo.Arguments = args;
-                    process.StartInfo = processStartInfo;
-                    process.Start();
-                    HideConsoleWindow();
-                }
-                catch (Exception)
-                {
-                    process = null;
-                }
-            //}
+                var args = " /C " + fileName;
+                if (!string.IsNullOrEmpty(arguments)) args += " " + arguments;
+                processStartInfo.FileName = "cmd.exe";
+                processStartInfo.Arguments = args;
+                process.StartInfo = processStartInfo;
+                process.Start();
+                HideConsoleWindow();
+            }
+            catch (Exception)
+            {
+                process = null;
+            }
 
-            if (process == null) 
+            if (process == null)
             {
                 this.WriteError("Failed to start process \"" + fileName + "\" with arguments \"" + arguments + "\"");
                 this.WritePrompt();
@@ -343,6 +340,8 @@ namespace GitUI.UI
             process = null;
 
             WritePrompt();
+
+            ShowStatusMessage("");
         }
 
         public bool IsProcessRunning
@@ -477,7 +476,7 @@ namespace GitUI.UI
 
             this.richTextBox1.ScrollToEnd();
             this.richTextBox1.CaretPosition = this.richTextBox1.CaretPosition.DocumentEnd;
-            this.lstOptions.Visibility = Visibility.Collapsed;
+            this.HideOptions();
 
             lastText = prompt;
         }
@@ -538,7 +537,7 @@ namespace GitUI.UI
                 top += this.Padding.Top;
                 lstOptions.SetCurrentValue(ListBox.MarginProperty, new Thickness(left, top, 0, 0));
                 lstOptions.ItemsSource = options;
-                lstOptions.Visibility = Visibility.Visible;
+                ShowOptions();
             }
         }
 
@@ -557,7 +556,7 @@ namespace GitUI.UI
             else if (e.Key == Key.Back || e.Key == Key.Escape)
             {
                 this.richTextBox1.Focus();
-                this.lstOptions.Visibility = Visibility.Collapsed;
+                this.HideOptions();
                 e.Handled = true;
             }
         }
@@ -567,7 +566,7 @@ namespace GitUI.UI
             this.richTextBox1.Focus();
             this.richTextBox1.CaretPosition.InsertTextInRun(text);
             this.richTextBox1.CaretPosition = this.richTextBox1.CaretPosition.DocumentEnd;
-            this.lstOptions.Visibility = Visibility.Collapsed;
+            this.HideOptions();
         }
 
         #endregion
@@ -645,5 +644,20 @@ namespace GitUI.UI
         }
         #endregion
 
+        private void ShowOptions()
+        {
+            lstOptions.Visibility = Visibility.Visible;
+        }
+
+        private void HideOptions()
+        {
+            lstOptions.Visibility = Visibility.Collapsed;
+        }
+
+        internal MainWindow mainWindow;
+        private void ShowStatusMessage(string msg)
+        {
+            mainWindow.ShowStatusMessage(msg);
+        }
     }
 }

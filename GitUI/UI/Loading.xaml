@@ -24,7 +24,7 @@
                 <Image Source="/GitUI;component/Resources/Loading.png" Width="32" Height="32" />
             </Canvas>
 
-            <TextBlock Text="Analyzing Git repository ..." FontSize="12" Foreground="White" VerticalAlignment="Center" />
+            <TextBlock Text="Analyzing Git repository ..." FontSize="12" Foreground="White" VerticalAlignment="Center" x:Name="text1" />
 
         </StackPanel>
     </Border>

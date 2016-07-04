@@ -337,7 +337,7 @@ namespace F1SYS.VsGitToolsPackage
         internal void Refresh(GitRepository tracker)
         {
             this.tracker = tracker;
-            this.gitConsole1.Refresh(tracker);
+            this.gitConsole1.Refresh(tracker, toolWindow);
 
             if (tracker == null)
             {
