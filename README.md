@@ -24,11 +24,19 @@ The same set of Git tools were developed in [Git Source Control Provider](https:
 
 ## Compile Source Code
 
-* Install [Visual Studio 2013 SDK](http://www.microsoft.com/en-ca/download/details.aspx?id=40758)
 * Get source code: _git clone https://github.com/yysun/git-tools.git_
-* Open the solution and compile in Visual Studio 2013
+* Open the solution and compile in Visual Studio 2015
 
 ## Change Logs
+
+### 1.5.0
+
+* Use background thread to refresh git changes
+* Use background thread to stage mutiple files
+* Ignore .git, index.lock and .cache file changes
+* Copy Dragon.exe to Documents folder instead of Temp folder
+* Support VS community and Enterprise Editions
+* Bug fixes
 
 ### 1.4.2
 
