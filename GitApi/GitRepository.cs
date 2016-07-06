@@ -18,6 +18,7 @@ namespace GitScc
         private IEnumerable<GitFile> changedFiles;
         private IEnumerable<string> remotes;
         private IDictionary<string, string> configs;
+        private IEnumerable<GitFile> ignored;
 
 
 		public string WorkingDirectory { get { return workingDirectory; } }
@@ -44,7 +45,7 @@ namespace GitScc
             this.branch = null;
             this.remotes = null;
             this.configs = null;
-
+            this.ignored = null;
         }
 
 		#region Git commands
@@ -202,6 +203,26 @@ namespace GitScc
                     }
                 }
                 return changedFiles;
+            }
+        }
+
+        public IEnumerable<GitFile> Ignored
+        {
+            get
+            {
+                if (ignored == null)
+                {
+                    try
+                    {
+                        var result = GitBash.Run("status --porcelain -z --ignored", WorkingDirectory);
+                        ignored = ParseGitStatus(result.Output).Where(f => f.Status == GitFileStatus.Ignored);
+                    }
+                    catch
+                    {
+                        ignored = new GitFile[] { };
+                    }
+                }
+                return ignored;
             }
         }
 
@@ -478,6 +499,17 @@ namespace GitScc
                     sw.Write(fileName);
                 }
             }
+        }
+
+        public bool IsIgnored(string fullPath)
+        {
+            foreach(var item in this.Ignored)
+            {
+                var name = Path.GetFullPath(Path.Combine(WorkingDirectory, item.FileName));
+                if (Directory.Exists(name) && fullPath.StartsWith(name)) return true;
+                if (string.Compare(fullPath, name, true) == 0) return true;
+            }
+            return false;
         }
 
         public void CheckOutFile(string fileName)

@@ -9,6 +9,7 @@ using GitScc;
 using System.Windows.Threading;
 using System.Diagnostics;
 using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace GitUI
 {
@@ -50,7 +51,6 @@ namespace GitUI
 			}
 		}
 
-		DispatcherTimer timer;
 		FileSystemWatcher fileSystemWatcher;
 
 		private GitViewModel()
@@ -63,9 +63,6 @@ namespace GitUI
 					@"C:\Program Files (x86)\Git\bin\sh.exe",
 			});
 
-			timer = new DispatcherTimer();
-			timer.Interval = TimeSpan.FromMilliseconds(588);
-			timer.Tick += new EventHandler(timer_Tick);
 		}
 
         private string TryFindFile(string[] paths)
@@ -102,8 +99,9 @@ namespace GitUI
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (!(e.FullPath.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
-                && !e.FullPath.EndsWith("index.lock") && !e.FullPath.EndsWith(".cache"))
+            var name = Path.GetFullPath(e.FullPath);
+            if (!(name.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
+                && !name.EndsWith("index.lock") && !this.tracker.IsIgnored(name))
             {
                 NeedRefresh = true;
             }
@@ -149,32 +147,32 @@ namespace GitUI
                 {
                     NoRefresh = true;
                     NeedRefresh = false;
-                    timer.Start();
+                    RefreshToolWindows();
                 }
             }
         }
 
-        private void timer_Tick(object sender, EventArgs e)
-        {
-            Debug.WriteLine("==== timer_Tick ");
-            timer.Stop();
 
-            RefreshToolWindows();
-            NoRefresh = false;
-        }
 
-        internal void RefreshToolWindows()
+        internal async Task RefreshToolWindows()
         {
-            var bgw = new BackgroundWorker();
-            bgw.DoWork += (_, __) =>
+            await Task.Delay(300);
+
+            await Task.Run(() =>
             {
-                tracker.Refresh();
-            };
-            bgw.RunWorkerCompleted += (_, __) =>
-            {
+                this.tracker.Refresh();
+
+                // cache branch and changed files
+                if (this.tracker != null && this.tracker.IsGit)
+                {
+                    var b = tracker.CurrentBranch;
+                    var c = tracker.ChangedFiles;
+                }
+
                 GraphChanged(this, null);
-            };
-            bgw.RunWorkerAsync();
+                NoRefresh = false;
+
+            });
         }
 
         #endregion

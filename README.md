@@ -31,9 +31,9 @@ The same set of Git tools were developed in [Git Source Control Provider](https:
 
 ### 1.5.0
 
-* Use background thread to refresh git changes
-* Use background thread to stage mutiple files
-* Ignore .git, index.lock and .cache file changes
+* Performance enhancement: Use background thread to refresh git changes
+* Performance enhancement: Use background thread to stage mutiple files
+* Performance enhancement: Not to refresh if the changed files are ignored by git
 * Copy Dragon.exe to Documents folder instead of Temp folder
 * Support VS community and Enterprise Editions
 * Bug fixes
