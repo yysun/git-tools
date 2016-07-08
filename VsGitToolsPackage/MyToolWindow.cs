@@ -85,7 +85,12 @@ namespace F1SYS.VsGitToolsPackage
 
         internal void OnCommitCommand()
         {
-            if (!hasFileSaved()) return;
+            this._Service.NoRefresh = true;
+            if (!hasFileSaved())
+            {
+                this._Service.NoRefresh = false;
+                return;
+            }
             _Control.OnCommit();
         }
 

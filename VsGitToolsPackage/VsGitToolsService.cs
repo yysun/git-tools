@@ -406,9 +406,9 @@ namespace F1SYS.VsGitToolsPackage
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-
             var name = Path.GetFullPath(e.FullPath);
-            if (!(name.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
+            if (!NoRefresh && this.Repository !=null &&
+                !(name.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
                 && !name.EndsWith("index.lock") && !this.Repository.IsIgnored(name))
             {
                 Debug.WriteLine("****==== File system changed [" + e.ChangeType.ToString() + "]" + e.FullPath);
@@ -648,6 +648,7 @@ namespace F1SYS.VsGitToolsPackage
             Debug.WriteLine("==== Refresh !!! ");
 
             if(!force) await Task.Delay(800);
+
             toolWindow.dte.StatusBar.Text = "Analyzing git reporsitory ...";
             await Task.Run(() =>
             {
@@ -657,8 +658,9 @@ namespace F1SYS.VsGitToolsPackage
                 // cache branch and changed files
                 if (this.Repository != null && this.Repository.IsGit)
                 {
-                    var b = Repository.CurrentBranch;
-                    var c = Repository.ChangedFiles;
+                    var b = this.Repository != null ? Repository.CurrentBranch : null;
+                    var c = this.Repository != null ? Repository.ChangedFiles : null;
+                    var i = this.Repository != null ? Repository.Ignored : null;
                 }
 
                 toolWindow.Refresh(force);
