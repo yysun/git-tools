@@ -51,7 +51,8 @@ namespace GitUI
 			}
 		}
 
-		FileSystemWatcher fileSystemWatcher;
+        DispatcherTimer timer;
+        FileSystemWatcher fileSystemWatcher;
 
 		private GitViewModel()
 		{
@@ -63,7 +64,10 @@ namespace GitUI
 					@"C:\Program Files (x86)\Git\bin\sh.exe",
 			});
 
-		}
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(588);
+            timer.Tick += new EventHandler(timer_Tick);
+        }
 
         private string TryFindFile(string[] paths)
         {
@@ -100,9 +104,9 @@ namespace GitUI
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             var name = Path.GetFullPath(e.FullPath);
-            if (!(name.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
-                && !name.EndsWith("index.lock") && !this.tracker.IsIgnored(name))
-            {
+            if (!noRefresh && this.tracker != null 
+                && !(name.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
+                && !name.EndsWith("index.lock") && !this.tracker.IsIgnored(name)) { 
                 NeedRefresh = true;
             }
         }
@@ -115,7 +119,7 @@ namespace GitUI
         #region Refresh
 
         internal bool needRefresh, noRefresh;
-
+ 
         internal bool NeedRefresh
         {
             get { return needRefresh; }
@@ -132,27 +136,28 @@ namespace GitUI
             set
             {
                 noRefresh = value;
-                nextTimeRefresh = DateTime.Now.AddMilliseconds(600);
             }
         }
-
-        private DateTime nextTimeRefresh = DateTime.Now;
 
         private void Refresh()
         {
             if (NeedRefresh && !NoRefresh)
             {
-                double delta = DateTime.Now.Subtract(nextTimeRefresh).TotalMilliseconds;
-                if (delta > 200)
-                {
-                    NoRefresh = true;
-                    NeedRefresh = false;
-                    RefreshToolWindows();
-                }
+                NoRefresh = true;
+                NeedRefresh = false;
+                timer.Stop();
+                timer.Start();
             }
         }
 
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            Debug.WriteLine("==== timer_Tick ");
+            timer.Stop();
 
+            RefreshToolWindows();
+            NoRefresh = false;
+        }
 
         internal async Task RefreshToolWindows()
         {

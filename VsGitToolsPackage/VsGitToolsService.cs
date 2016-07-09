@@ -28,6 +28,8 @@ namespace F1SYS.VsGitToolsPackage
         //private uint _vsSolutionEventsCookie, _vsIVsFileChangeEventsCookie, _vsIVsUpdateSolutionEventsCookie;
         //private string lastMinotorFolder = "";
 
+        private DispatcherTimer timer;
+
         private VsGitToolsPackagePackage package;
 
         private GitRepository previousRepository;
@@ -448,7 +450,12 @@ namespace F1SYS.VsGitToolsPackage
             {
                 sbm.AdviseUpdateSolutionEvents(this, out _vsIVsUpdateSolutionEventsCookie);
             }
+
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(588);
+            timer.Tick += new EventHandler(timer_Tick);
         }
+
 
         public void Dispose()
         {
@@ -620,24 +627,24 @@ namespace F1SYS.VsGitToolsPackage
             set
             {
                 noRefresh = value;
-                nextTimeRefresh = DateTime.Now.AddMilliseconds(600);
             }
         }
-
-        private DateTime nextTimeRefresh = DateTime.Now;
         
         private void Refresh()
         {
             if (NeedRefresh && !NoRefresh)
             {
-                double delta = DateTime.Now.Subtract(nextTimeRefresh).TotalMilliseconds;
-                if (delta > 200)
-                {
-                    NoRefresh = true;
-                    NeedRefresh = false;
-                    RefreshToolWindows();
-                }
+                NoRefresh = true;
+                NeedRefresh = false;
+                timer.Stop();
+                timer.Start();
             }
+        }
+
+        private void timer_Tick(object sender, EventArgs e)
+        {
+            timer.Stop();
+            RefreshToolWindows();
         }
 
         internal async Task RefreshToolWindows(bool force = false)
@@ -646,8 +653,6 @@ namespace F1SYS.VsGitToolsPackage
             if (toolWindow == null) return;
 
             Debug.WriteLine("==== Refresh !!! ");
-
-            if(!force) await Task.Delay(800);
 
             toolWindow.dte.StatusBar.Text = "Analyzing git reporsitory ...";
             await Task.Run(() =>
