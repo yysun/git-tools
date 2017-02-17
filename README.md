@@ -2,9 +2,16 @@
 
 ## Introduction
 
-This is a Visual Studio extension provides a git changes tool window, a graphical git history viewer and menus to launch Git Bash, Git Extenstions and TortoiseGit.
+This extension provides a git changes tool window, a graphical git history viewer and menus to launch Git Bash, Git Extenstions and TortoiseGit. It is the successor of Git Source Control Provider.
 
-The same set of Git tools were developed in [Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c) for Visual Studio 2008-2013. Since Visual Studio 2013, Microsoft has built Microsoft Git provider. There is only one source control provider can beused in Visual Studio at a time. This extension is a modification of [Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c). It removed the source control provider and contains the Git tools only, so that it makes the Git tools compatible with Microsoft Git provider.
+[Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c) has been providing Git tools to supports Visual Studio 2008-2015. 
+Since Visual Studio 2013, Microsoft has built the Microsoft Git provider into Visual Studio. Visual Studio can have only one active source control provider at a time. 
+In order to be compatible with Microsoft Git, this extension is a modification of Git Source Control Provider. It removed the source control provider part and only contains the Git tools, 
+so that it can run side by side with Microsoft Git. Git Source Control Provider is still available as a separate extension.
+
+The source code of this extension is available from [GitHub](https://github.com/yysun/git-tools). Forks and pull requests are welcome.
+
+For more information, please visit http://yysun.github.io/git-tools
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=KBCLF3PZD6C98&lc=US&item_name=Git%20Source%20Control%20Provider&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
@@ -25,9 +32,13 @@ The same set of Git tools were developed in [Git Source Control Provider](https:
 ## Compile Source Code
 
 * Get source code: _git clone https://github.com/yysun/git-tools.git_
-* Open the solution and compile in Visual Studio 2015
+* Open the solution and compile in Visual Studio 2017
 
 ## Change Logs
+
+### 1.6.0
+
+* Upgrade solution for VS 2017 RC, support VS 2017 RC
 
 ### 1.5.0
 
