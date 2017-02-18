@@ -145,9 +145,9 @@ namespace GitScc
             }
         }
 
-        public string DiffFile(string fileName)
+        public string DiffFile(string fileName, bool diffIndex = false)
         {
-            var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
+            var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), diffIndex ? ".cached.diff" : ".diff");
             try
             {
                 var status = GetFileStatus(fileName);
@@ -163,8 +163,14 @@ namespace GitScc
                     }
                     return tmpFileName;
                 }
-
-                GitBash.RunCmd(string.Format("diff HEAD -- \"{0}\" > \"{1}\"", fileName, tmpFileName), WorkingDirectory);
+                if (diffIndex)
+                {
+                    GitBash.RunCmd(string.Format("diff --cached -- \"{0}\" > \"{1}\"", fileName, tmpFileName), WorkingDirectory);
+                }
+                else
+                {
+                    GitBash.RunCmd(string.Format("diff HEAD -- \"{0}\" > \"{1}\"", fileName, tmpFileName), WorkingDirectory);
+                }
             }
             catch (Exception ex)
             {
@@ -559,7 +565,6 @@ namespace GitScc
 
             var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
             var fileNameRel = fileName;
-
             GitBash.RunCmd(string.Format("diff {2} {3} -- \"{0}\" > \"{1}\"", fileNameRel, tmpFileName, commitId1, commitId2), WorkingDirectory);
             return tmpFileName;
         }
