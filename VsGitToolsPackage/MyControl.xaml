@@ -126,13 +126,13 @@
                     <Setter Property="HorizontalContentAlignment" Value="Left" />
                     <Setter Property="VerticalContentAlignment" Value="Center" />
                     <Setter Property="Padding" Value="6,4,4,4" />
-                            <Setter Property="Foreground" Value="{DynamicResource {x:Static vsui:HeaderColors.DefaultTextBrushKey}}" />
-                            <Setter Property="Background" Value="{DynamicResource {x:Static vsui:HeaderColors.DefaultBrushKey}}" />
-                            <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsui:HeaderColors.SeparatorLineBrushKey}}" />
-                            <Setter Property="Template" Value="{StaticResource GridViewColumnHeaderTemplate2012}" />
+                    <Setter Property="Foreground" Value="{DynamicResource {x:Static vsui:HeaderColors.DefaultTextBrushKey}}" />
+                    <Setter Property="Background" Value="{DynamicResource {x:Static vsui:HeaderColors.DefaultBrushKey}}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource {x:Static vsui:HeaderColors.SeparatorLineBrushKey}}" />
+                    <Setter Property="Template" Value="{StaticResource GridViewColumnHeaderTemplate2012}" />
                 </Style>
             </Style.Resources>
-                    <Setter Property="ItemContainerStyle" Value="{StaticResource ListViewItemStyle2012}" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource ListViewItemStyle2012}" />
 
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="Background" Value="{DynamicResource {x:Static vsfx:VsBrushes.BackgroundKey}}" />
@@ -161,7 +161,7 @@
                 <Path Name="arrow" StrokeThickness="1" Style="{StaticResource {x:Type Path}}" Data="M5,5L10,10 15,5 5,5" />
             </DockPanel>
         </DataTemplate>
-        
+
     </UserControl.Resources>
 
     <Grid x:Name="Main" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -189,23 +189,15 @@
 
         <CheckBox Content="Sign off" HorizontalAlignment="Right" Margin="0,0,6,0" Name="chkSignOff" VerticalAlignment="Center"
                   Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"/>
-        
+
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="grid1">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-
-            <GridSplitter Grid.Row="1" Grid.ColumnSpan="2"
-						  VerticalAlignment="Top" HorizontalAlignment="Stretch" Name="gridSplitter2"
-						  Style="{StaticResource HorizontalGridSplitter}"/>
-
-            <Label Content="Changed Files:" HorizontalAlignment="Stretch" Name="label3" VerticalAlignment="Center"
-				   Margin="2,0,2,0" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
-				   Grid.Row="2" ToolTip="select file to commit, or right click to stage/unstage file" />
 
             <RichTextBox HorizontalAlignment="Stretch" Name="textBoxComments" VerticalAlignment="Stretch" Margin="6,0,6,4"
 					     AcceptsReturn="True" VerticalScrollBarVisibility="Visible" SpellCheck.IsEnabled="True">
@@ -215,10 +207,24 @@
                     </Style>
                 </RichTextBox.Resources>
             </RichTextBox>
-           
-            <ListView Name="listView1" Grid.Row="3" Margin="6,0,6,10" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
+
+            <GridSplitter Grid.Row="1" 
+						  VerticalAlignment="Top" HorizontalAlignment="Stretch" Name="gridSplitter2"
+						  Style="{StaticResource HorizontalGridSplitter}"/>
+
+            <Label Content="Auto refresh is disabled, use the Refresh button to load Git changes" Foreground="#FF333333" Height="28" HorizontalAlignment="Left" Margin="231,0,0,0" Name="label4" VerticalAlignment="Center" Grid.Row="2" Visibility="Collapsed" />
+
+            <Label Content="Changed Files:" HorizontalAlignment="Left" Name="label3" VerticalAlignment="Center"
+				   Margin="2,0,2,0" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
+				   Grid.Row="2" ToolTip="select file to commit, or right click to stage/unstage file" />
+
+            <CheckBox Content="Advanced Mode" HorizontalAlignment="Right" Margin="0,0,10,0" Name="chkAdvMode" VerticalAlignment="Center"
+                      Grid.Row="2" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
+                      HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Checked="chkAdvMode_Checked" Unchecked="chkAdvMode_Unchecked"/>
+
+            <ListView Grid.Row="3" Name="listView1" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
 					  SelectedValuePath="FileName" KeyUp="listView1_KeyUp" PreviewKeyDown="listView1_PreviewKeyDown" ButtonBase.Click="listView1_Click" 
-                      Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
+                      Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                 <ListView.View>
                     <GridView AllowsColumnReorder="False">
                         <GridViewColumn Width="Auto">
@@ -267,7 +273,103 @@
                 </ListView.ContextMenu>
             </ListView>
 
-            <Label Content="Auto refresh is disabled, use the Refresh button to load Git changes" Foreground="#FF333333" Height="28" HorizontalAlignment="Left" Margin="231,0,0,0" Name="label4" VerticalAlignment="Center" Grid.Row="2" Visibility="Collapsed" />
+            <Grid Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="gridAdvancedMode" Visibility="Collapsed">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="100" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Label Content="Unstaed Changes:" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+				   Margin="2,0,2,0" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
+				   ToolTip="select file to commit, or right click to stage/unstage file" />
+                
+                <ListView Grid.Row="1" Name="listUnstaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
+					  SelectedValuePath="FileName" KeyUp="listView1_KeyUp" PreviewKeyDown="listView1_PreviewKeyDown" ButtonBase.Click="listView1_Click" 
+                      Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="False">
+                            <GridViewColumn Width="Auto">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader Content="Staged" Tag="Staged" />
+                                </GridViewColumn.Header>
+                                <GridViewColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Name="checkBoxAllStaged" Click="checkBoxAllStaged_Click"
+										  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.HeaderTemplate>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Name="checkBoxSelected" Click="checkBoxSelected_Click" IsChecked="{Binding IsSelected}"
+											  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Status}" Width="Auto">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader Content="Status" Tag="Status" />
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding FileName}" Width="800">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader Content="File" Tag="FileName" />
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+                <GridSplitter Grid.Row="2"
+						  VerticalAlignment="Top" HorizontalAlignment="Stretch"
+						  Style="{StaticResource HorizontalGridSplitter}" />
+
+                <Label Grid.Row="3" Content="Staged Changs:" HorizontalAlignment="Left"
+				   Margin="2,0,2,0" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
+				  ToolTip="select file to commit, or right click to stage/unstage file" VerticalContentAlignment="Stretch" />
+
+                <ListView Grid.Row="4" Name="listStaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
+					  SelectedValuePath="FileName" KeyUp="listView1_KeyUp" PreviewKeyDown="listView1_PreviewKeyDown" ButtonBase.Click="listView1_Click" 
+                      Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="False">
+                            <GridViewColumn Width="Auto">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader Content="Staged" Tag="Staged" />
+                                </GridViewColumn.Header>
+                                <GridViewColumn.HeaderTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Name="checkBoxAllStaged" Click="checkBoxAllStaged_Click"
+										  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.HeaderTemplate>
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Name="checkBoxSelected" Click="checkBoxSelected_Click" IsChecked="{Binding IsSelected}"
+											  HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Status}" Width="Auto">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader Content="Status" Tag="Status" />
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding FileName}" Width="800">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader Content="File" Tag="FileName" />
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+
+
+                </ListView>
+
+            </Grid>
         </Grid>
 
         <Grid Grid.Column="2" Grid.Row="0" Grid.RowSpan="2">
@@ -306,11 +408,15 @@
                     <gitconsole:GitConsole x:Name="gitConsole1" />
                 </TabItem>
             </TabControl>
+            <Button Content="Stage selected" HorizontalAlignment="Right" Margin="0,4,10,0" Padding="10 0"
+                    Name="btnChunk" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
+                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
+                    VerticalAlignment="Top"/>
 
         </Grid>
 
         <my:Settings HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="Settings" Grid.ColumnSpan="3" Grid.RowSpan="3" Visibility="Collapsed" />
 
     </Grid>
-    
+
 </UserControl>

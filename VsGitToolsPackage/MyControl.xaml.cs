@@ -756,6 +756,18 @@ Are you sure you want to continue?";
                 ShowStatusMessage(ex.Message);
             }
         }
+
+        private void chkAdvMode_Checked(object sender, RoutedEventArgs e)
+        {
+            this.listView1.Visibility = Visibility.Collapsed;
+            this.gridAdvancedMode.Visibility = Visibility.Visible;
+        }
+
+        private void chkAdvMode_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.listView1.Visibility = Visibility.Visible;
+            this.gridAdvancedMode.Visibility = Visibility.Collapsed;
+        }
     }
 
     public static class ExtHelper
