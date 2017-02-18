@@ -30,6 +30,7 @@ namespace F1SYS.VsGitToolsPackage
         GitRepository tracker;
         //VsGitToolsService service;
 
+        private ListView activeListView;
         private MyToolWindow toolWindow;
         private IVsTextView textView;
         private string[] diffLines;
@@ -125,6 +126,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void listView1_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            this.activeListView = sender as ListView;
             ShowSelectedFile();
         }
 
@@ -143,7 +145,8 @@ namespace F1SYS.VsGitToolsPackage
             try
             {
                 if (this.tabControl1.SelectedIndex != 0) this.tabControl1.SelectedIndex = 0;
-                var tmpFileName = tracker.DiffFile(fileName);
+                var diffAgainstIndex = this.activeListView == this.listStaged;
+                var tmpFileName = tracker.DiffFile(fileName, diffAgainstIndex);
                 if (!string.IsNullOrWhiteSpace(tmpFileName) && File.Exists(tmpFileName))
                 {
                     if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
@@ -166,8 +169,9 @@ namespace F1SYS.VsGitToolsPackage
 
         private void listView1_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            this.activeListView = sender as ListView;
             // only enable double-click to open when exactly one item is selected
-            if (listView1.SelectedItems.Count != 1)
+            if (this.activeListView.SelectedItems.Count != 1)
                 return;
 
             // disable double-click to open for the checkbox
@@ -288,14 +292,20 @@ namespace F1SYS.VsGitToolsPackage
                 _currentSortedColumn.Column.HeaderTemplate = null;
         }
 
+        private void listView1_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            this.activeListView = sender as ListView;
+            ShowSelectedFile();
+        }
+
         #endregion
 
         #region Select File
         private string GetSelectedFileName()
         {
-            if (this.listView1.SelectedItems.Count == 0)
+            if (this.activeListView.SelectedItems.Count == 0)
                 return null;
-            var selectedItem = this.listView1.SelectedItems[0] as GitFile;
+            var selectedItem = this.activeListView.SelectedItems[0] as GitFile;
             if (selectedItem == null) return null;
             return selectedItem.FileName;
         }
@@ -339,6 +349,8 @@ namespace F1SYS.VsGitToolsPackage
             this.tracker = tracker;
             this.gitConsole1.Refresh(tracker, toolWindow);
 
+            if (this.activeListView == null) this.activeListView = this.listView1;
+
             if (tracker == null)
             {
                 ClearUI();
@@ -354,6 +366,8 @@ namespace F1SYS.VsGitToolsPackage
             try
             {
                 this.listView1.ItemsSource = tracker.ChangedFiles;
+                this.listStaged.ItemsSource =   tracker.ChangedFiles.Where(f => f.X != ' ' && f.X != '?');
+                this.listUnstaged.ItemsSource = tracker.ChangedFiles.Where(f => f.Y != ' ');
 
                 this.listView1.SelectedValue = selectedFile;
                 selectedFiles.ForEach(fn =>
@@ -768,6 +782,7 @@ Are you sure you want to continue?";
             this.listView1.Visibility = Visibility.Visible;
             this.gridAdvancedMode.Visibility = Visibility.Collapsed;
         }
+
     }
 
     public static class ExtHelper
