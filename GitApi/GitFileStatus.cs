@@ -24,6 +24,9 @@ namespace GitScc
 
     public class GitFile : INotifyPropertyChanged
     {
+        public char X { get; set; }
+        public char Y { get; set; }
+
         public GitFileStatus Status { get; set; }
         public string FileName { get; set; }
         public bool IsStaged {

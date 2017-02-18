@@ -281,7 +281,7 @@ namespace GitScc
                 char x = status[0];
                 char y = status.Length > 1 ? status[1] : ' ';
 
-                var gitFile = new GitFile { FileName = fileName.Trim() };
+                var gitFile = new GitFile { FileName = fileName.Trim(), X = x, Y = y  };
 
                 switch (x)
                 {
