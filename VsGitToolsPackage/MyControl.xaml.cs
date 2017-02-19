@@ -83,6 +83,16 @@ namespace F1SYS.VsGitToolsPackage
                     this.DiffEditor.Content = tuple.Item1;
                     this.textView = tuple.Item2;
                 }
+                pnlChangedFileTool.Visibility = Visibility.Collapsed;
+                pnlStagedFileTool.Visibility = Visibility.Collapsed;
+                if (this.activeListView == this.listUnstaged)
+                {
+                    pnlChangedFileTool.Visibility = Visibility.Visible;
+                }
+                else if (this.activeListView == this.listStaged)
+                {
+                    pnlStagedFileTool.Visibility = Visibility.Visible;
+                }
             }
             finally
             {
