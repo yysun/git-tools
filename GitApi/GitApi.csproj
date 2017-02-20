@@ -49,6 +49,7 @@
     <Compile Include="DataServices\GraphNode.cs" />
     <Compile Include="DataServices\Ref.cs" />
     <Compile Include="DataServices\RepositoryGraph.cs" />
+    <Compile Include="DiffHunk.cs" />
     <Compile Include="DiffTool.cs" />
     <Compile Include="GitBash.cs" />
     <Compile Include="GitBashResult.cs" />
