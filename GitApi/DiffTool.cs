@@ -11,87 +11,16 @@ namespace GitScc
 {
     public class DiffTool
     {
-        public bool HasChange(string text)
-        {
-            return text.StartsWith("+") || text.StartsWith("-");
-        }
 
-        public List<string> GetChanges(string[] diffLines, int startLine, int endLine)
-        {
-            var lines = new List<string>();
-
-            int min = Math.Min(startLine, endLine);
-            int max = Math.Max(startLine, endLine);
-            if (min < 4) min = 4;
-            if (max > diffLines.Length - 1) max = diffLines.Length - 1;
-            startLine = min;
-            endLine = max;
-
-            // find start of the change
-            string text = diffLines[min];
-            while (min > 4)
-            {
-                if (text.StartsWith("@@"))
-                {
-                    break;
-                }
-                else text = diffLines[--min];
-            }
-            if (min < 4) min = 4;
-
-            // find end of the change
-            text = diffLines[max];
-            while (max < diffLines.Length - 1)
-            {
-                if (text.StartsWith("@@"))
-                {
-                    max--;
-                    break;
-                }
-                else text = diffLines[++max];
-            }
-            if (max > diffLines.Length - 1) max = diffLines.Length - 1;
-
-
-            // add change scope
-            for (int i = min; i < startLine; i++)
-            {
-                var line = diffLines[i];
-                // ignore none selected changes
-                if (i == min || !HasChange(line))
-                {
-                    lines.Add(line);
-                }
-            }
-
-            // add changes
-            for (int i = startLine; i <= endLine; i++)
-            {
-                var line = diffLines[i];
-                lines.Add(line);
-            }
-
-            // add remaining scope
-            for (int i = endLine + 1; i <= max; i++)
-            {
-                var line = diffLines[i];
-                // ignore none selected changes
-                if (!HasChange(line))
-                {
-                    lines.Add(line);
-                }
-            }
-            return lines;
-        }
-
-        public List<DiffHunk> GetPatches(string[] diffLines, int startLine, int endLine)
+        // https://github.com/git-cola/git-cola/blob/d928ee9bcecc4fb56cc214ce135b27144d854940/cola/diffparse.py
+        public List<DiffHunk> GetHunks(string[] diffLines, int startLine, int endLine)
         {
             int min = Math.Min(startLine, endLine);
             int max = Math.Max(startLine, endLine);
             if (min < 1) min = 1;
-            if (max > diffLines.Length - 1) max = diffLines.Length - 1;
-            startLine = min;
-            endLine = max;
+            if (max > diffLines.Length) max = diffLines.Length;
+            startLine = min - 1;
+            endLine = max - 1;
 
             var patches = new List<DiffHunk>();
             var hunks = Parse(diffLines);
@@ -101,6 +30,45 @@ namespace GitScc
                 if (hunk.LastLineIndex < startLine) continue;
                 if (hunk.FirstLineIndex > endLine) break;
 
+                var lines = new List<string>();
+                var skipped = false;
+                var counts = new Dictionary<char, int> {
+                    { ' ', 0 },
+                    { '+', 0 },
+                    { '-', 0 },
+                    { '\\', 0 },
+                } ;
+                for(var i=0; i<hunk.Lines.Count(); i++)
+                {
+                    var line = hunk.Lines[i];
+                    if (line.Length == 0) continue;
+
+                    var lineIdx = hunk.FirstLineIndex + i;
+                    var type = line[0];
+
+                    if (lineIdx < startLine || lineIdx > endLine)
+                    {
+                        if (type == '+')
+                        {
+                            skipped = true;
+                            hunk.NewBlock[1] -= 1;
+                            continue;
+                        }
+                        else if (type == '-')
+                        {
+                            type = ' ';
+                            line = type + line.Substring(1);
+                            hunk.NewBlock[1] += 1;
+                        }
+                    }
+                    if (type == '\\' && skipped) continue;
+                    lines.Add(line);
+                    counts[type] += 1;
+                    skipped = false;
+                }
+
+                if (counts['+'] <= 0 && counts['-'] <= 0) continue;
+                hunk.Lines = lines;
                 patches.Add(hunk);
             }
             return patches;
@@ -120,9 +88,9 @@ namespace GitScc
                 if(match.Success)
                 {
                     hunk = new DiffHunk {
-                        FirstLineIndex = idx,
+                        FirstLineIndex = idx + 1,
                         Heading = match.Groups[3].Value,
-                        Lines = new List<string> { line },
+                        Lines = new List<string>(),
                         OldBlock = ParseRange(match.Groups[1].Value),
                         NewBlock = ParseRange(match.Groups[2].Value),
                     };
@@ -140,7 +108,6 @@ namespace GitScc
         {
             var ss = text.Split(',');
             return ss.Select(s => { return int.Parse(s); }).ToArray();
-
         }
     }
 }
