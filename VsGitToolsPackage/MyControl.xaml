@@ -410,33 +410,33 @@
                         
                         <StackPanel Name="pnlChangedFileTool" Margin="0,0,0,8" Orientation="Horizontal" Visibility="Collapsed">
                             <Button Content="Stage File" Padding="10 0"
-                    Name="btnStageFile" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
-                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
-                    VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    Name="btnStageFile" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
+                                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnStageFile_Click"/>
                             <Button Content="Stage Selected" Padding="10 0"
-                    Name="btnStageSelected" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
-                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
-                    VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    Name="btnStageSelected" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
+                                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnStageSelected_Click" IsEnabled="False"/>
                             <Button Content="Rest File" Padding="10 0"
-                    Name="btnResetFile" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
-                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
-                    VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    Name="btnResetFile" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
+                                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnResetFile_Click"/>
                             <Button Content="Reset Selected" Padding="10 0"
-                    Name="btnResetSelected" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
-                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
-                    VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    Name="btnResetSelected" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
+                                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnResetSelected_Click" IsEnabled="False"/>   
                         </StackPanel>
                         <StackPanel Name="pnlStagedFileTool" Margin="0,0,0,8" Orientation="Horizontal" Visibility="Collapsed">
                             <Button Content="Undo Stage File" Padding="10 0"
-                    Name="btnUnStageFile" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
-                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
-                    VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    Name="btnUnStageFile" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
+                                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnUnStageFile_Click"/>
                             <Button Content="Undo Stage Selected" Padding="10 0"
-                    Name="btnUnStageSelected" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
-                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
-                    VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    Name="btnUnStageSelected" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
+                                    Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnUnStageSelected_Click" IsEnabled="False"/>   
                         </StackPanel>
-                        <ContentControl Grid.Row="1" x:Name="DiffEditor" MouseDoubleClick="DiffEditor_MouseDoubleClick" />
+                        <ContentControl Grid.Row="1" x:Name="DiffEditor" MouseDoubleClick="DiffEditor_MouseDoubleClick" MouseUp="DiffEditor_MouseUp" />
                     </Grid>
                 </TabItem>
                 <TabItem Header="Git Console" Name="tabItem2" Margin="0,-3,0,3">

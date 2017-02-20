@@ -39,7 +39,7 @@ namespace F1SYS.VsGitToolsPackage
         {
             InitializeComponent();
             this.toolWindow = toolWindow;
-            this.gitConsole1.GitExePath =  GitSccOptions.Current.GitBashPath;  
+            this.gitConsole1.GitExePath = GitSccOptions.Current.GitBashPath;
         }
 
 
@@ -366,23 +366,23 @@ namespace F1SYS.VsGitToolsPackage
                 ClearUI();
                 return;
             }
- 
+
             var selectedFile = GetSelectedFileName();
-            var selectedFiles = this.listView1.Items.Cast<GitFile>()
+            var selectedFiles = this.activeListView.Items.Cast<GitFile>()
                 .Where(i => i.IsSelected)
                 .Select(i => i.FileName).ToList();
 
-            this.listView1.BeginInit();
+            //this.activeListView.BeginInit();
             try
             {
                 this.listView1.ItemsSource = tracker.ChangedFiles;
-                this.listStaged.ItemsSource =   tracker.ChangedFiles.Where(f => f.X != ' ' && f.X != '?');
+                this.listStaged.ItemsSource = tracker.ChangedFiles.Where(f => f.X != ' ' && f.X != '?');
                 this.listUnstaged.ItemsSource = tracker.ChangedFiles.Where(f => f.Y != ' ');
 
-                this.listView1.SelectedValue = selectedFile;
+                this.activeListView.SelectedValue = selectedFile;
                 selectedFiles.ForEach(fn =>
                 {
-                    var item = this.listView1.Items.Cast<GitFile>()
+                    var item = this.activeListView.Items.Cast<GitFile>()
                         .Where(i => i.FileName == fn)
                         .FirstOrDefault();
                     if (item != null) item.IsSelected = true;
@@ -398,7 +398,7 @@ namespace F1SYS.VsGitToolsPackage
                 this.DiffEditor.Content = ex.Message;
             }
 
-            this.listView1.EndInit();
+            //this.activeListView.EndInit();
 
             if (GitSccOptions.Current.DisableAutoRefresh)
                 this.label4.Visibility = Visibility.Visible;
@@ -506,7 +506,7 @@ Note: Undo file changes will restore the file(s) from the last commit.";
             await Task.Run(() =>
             {
                 foreach (var item in unstaged)
-                { 
+                {
                     tracker.StageFile(item.FileName);
                     ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
                 }
@@ -618,6 +618,25 @@ Note: if the file is included project, you need to delete the file from project 
                 toolWindow.OnCommitCommand();
             }
         }
+
+        private int[] GetEditorSelectionPosition()
+        {
+            int sl, sc, el, ec;
+            if (0 != textView.GetSelection(out sl, out sc, out el, out ec))
+            {
+                textView.GetCaretPos(out sl, out sc);
+                el = sl;
+            }
+            return new int[2] { sl +1, el + 1 };
+        }
+
+        private void DiffEditor_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var selectionPosition = this.GetEditorSelectionPosition();
+            var hasChanges = tracker.HasChanges(diffLines, selectionPosition[0], selectionPosition[1]);
+            btnResetSelected.IsEnabled = btnStageSelected.IsEnabled = btnUnStageSelected.IsEnabled = hasChanges;
+        }
+
 
         private void DiffEditor_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -793,6 +812,74 @@ Are you sure you want to continue?";
             this.gridAdvancedMode.Visibility = Visibility.Collapsed;
         }
 
+        private async void TryRun(Action act)
+        {
+            string message = "";
+            await Task.Run(() =>
+            {
+                try
+                {
+                    act();
+                }
+                catch (Exception ex)
+                {
+                    message = ex.Message;
+                    ShowStatusMessage(message);
+                }
+            });
+            if (message.Length > 0) MessageBox.Show(message, "Failed git apply", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void btnStageFile_Click(object sender, RoutedEventArgs e)
+        {
+            TryRun(() =>
+            {
+                this.tracker.Apply(diffLines, 1, diffLines.Length, true, false);
+            });
+        }
+
+        private void btnStageSelected_Click(object sender, RoutedEventArgs e)
+        {
+            TryRun(() =>
+            {
+                var selectionPosition = this.GetEditorSelectionPosition();
+                this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], true, false);
+            });
+        }
+
+        private void btnResetFile_Click(object sender, RoutedEventArgs e)
+        {
+            TryRun(() =>
+            {
+              this.tracker.Apply(diffLines, 1, diffLines.Length, false, true);
+            });
+        }
+
+        private void btnResetSelected_Click(object sender, RoutedEventArgs e)
+        {
+            TryRun(() =>
+            {
+                var selectionPosition = this.GetEditorSelectionPosition();
+                this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], false, true);
+            });
+        }
+
+        private void btnUnStageFile_Click(object sender, RoutedEventArgs e)
+        {
+            TryRun(() =>
+            {
+                this.tracker.Apply(diffLines, 1, diffLines.Length, true, true);
+            });
+        }
+
+        private void btnUnStageSelected_Click(object sender, RoutedEventArgs e)
+        {
+            TryRun(() =>
+            {
+                var selectionPosition = this.GetEditorSelectionPosition();
+                this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], true, true);
+            });
+        }
     }
 
     public static class ExtHelper

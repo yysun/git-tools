@@ -681,6 +681,53 @@ namespace GitScc
                 return configs ?? new Dictionary<string, string>();
             }
         }
+
+        private string FixEOL(string line)
+        {
+            line = line.TrimEnd();
+            if (line.Length == 0) line = " ";
+            return line + "\n";
+        }
+
+        public bool HasChanges(string[] diffLines, int startLine, int endLine)
+        {
+            var difftool = new DiffTool();
+            var hunks = difftool.GetHunks(diffLines, startLine, endLine);
+            return hunks.Count() > 0;
+        }
+
+        public void Apply(string[] diffLines, int startLine, int endLine, bool cached, bool reverse)
+        {
+            var difftool = new DiffTool();
+            var hunks = difftool.GetHunks(diffLines, startLine, endLine);
+            if (hunks.Count() <=0) throw new Exception("No change selected");
+
+            var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
+            using (var file = new StreamWriter(tmpFileName, false, Encoding.UTF8))
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    var line = diffLines[i];
+                    file.Write(FixEOL(line));
+                }
+                foreach (var hunk in hunks)
+                {
+                    var heading = $"@@ -{hunk.OldBlock[0]},{hunk.OldBlock[1]} +{hunk.NewBlock[0]},{hunk.NewBlock[1]} @@{hunk.Heading}";
+                    file.Write(FixEOL(heading));
+                    foreach(var line in hunk.Lines)
+                    {
+                        file.Write(FixEOL(line));
+                    }
+                }
+                file.Write('\n');
+            }
+            var cmd = "apply";
+            if (cached) cmd += " --cached";
+            if (reverse) cmd += " --reverse";
+            var result = GitBash.Run($"{cmd} \"{tmpFileName}\"", WorkingDirectory);
+            File.Delete(tmpFileName);
+            if (result.HasError) throw new GitException(result.Error);
+        }
     }
 
     public class GitFileStatusTracker: GitRepository
