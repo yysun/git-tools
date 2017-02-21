@@ -727,6 +727,23 @@ namespace GitScc
             File.Delete(tmpFileName);
             if (result.HasError) throw new GitException(result.Error);
         }
+
+        public void SetConfig(string name, string value)
+        {
+            GitBash.Run($"config --add {name} {value}", WorkingDirectory);
+        }
+
+        public void RemveConfig(string name)
+        {
+            GitBash.Run($"config --unset {name}", WorkingDirectory);
+        }
+
+        public string GetConfig(string name)
+        {
+            var result = GitBash.Run($"config --get {name}", WorkingDirectory);
+            return result.Output.Trim();
+        }
+
     }
 
     public class GitFileStatusTracker: GitRepository
