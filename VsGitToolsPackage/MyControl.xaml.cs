@@ -886,11 +886,18 @@ Are you sure you want to continue?";
 
         private void btnResetFile_Click(object sender, RoutedEventArgs e)
         {
-            var fileName = ((GitFile)this.activeListView.SelectedItem).FileName;
+            var file = ((GitFile)this.activeListView.SelectedItem);
+            var fileName = file.FileName;
             TryRun(() =>
             {
-                //this.tracker.Apply(diffLines, 1, diffLines.Length, false, true);
-                this.tracker.CheckOutFile(fileName);
+                if (file.Status == GitFileStatus.NotControlled || file.Status == GitFileStatus.New)
+                {
+                    File.Delete(Path.Combine(this.tracker.WorkingDirectory, fileName));
+                }
+                else
+                {
+                    this.tracker.CheckOutFile(fileName);
+                }
             });
         }
 
