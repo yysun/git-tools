@@ -124,7 +124,7 @@ namespace GitScc
             GitBash.Run("config core.ignorecase true", folderName);
         }
 
-        private bool IsBinaryFile(string fileName)
+        public bool IsBinaryFile(string fileName)
         {
             FileStream fs = File.OpenRead(fileName);
             try
@@ -145,32 +145,33 @@ namespace GitScc
             }
         }
 
-        public string DiffFile(string fileName, bool diffIndex = false)
+        public string DiffFileAdv(string fileName, bool diffIndex = false)
         {
             var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), diffIndex ? ".cached.diff" : ".diff");
             try
             {
-                var status = GetFileStatus(fileName);
-                if (status == GitFileStatus.NotControlled || status == GitFileStatus.New || status == GitFileStatus.Added)
-                {
-                    tmpFileName = Path.ChangeExtension(tmpFileName, Path.GetExtension(fileName));
-                    File.Copy(Path.Combine(WorkingDirectory, fileName), tmpFileName);
-
-                    if (IsBinaryFile(tmpFileName))
-                    {
-                        File.Delete(tmpFileName);
-                        File.WriteAllText(tmpFileName, "Binary file: " + fileName);
-                    }
-                    return tmpFileName;
-                }
                 if (diffIndex)
                 {
                     GitBash.RunCmd(string.Format("diff --cached -- \"{0}\" > \"{1}\"", fileName, tmpFileName), WorkingDirectory);
                 }
                 else
                 {
-                    GitBash.RunCmd(string.Format("diff HEAD -- \"{0}\" > \"{1}\"", fileName, tmpFileName), WorkingDirectory);
+                    GitBash.RunCmd(string.Format("diff -- \"{0}\" > \"{1}\"", fileName, tmpFileName), WorkingDirectory);
                 }
+            }
+            catch (Exception ex)
+            {
+                File.WriteAllText(tmpFileName, ex.Message);
+            }
+            return tmpFileName;
+        }
+
+        public string DiffFile(string fileName)
+        {
+            var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
+            try
+            {
+                GitBash.RunCmd(string.Format("diff HEAD -- \"{0}\" > \"{1}\"", fileName, tmpFileName), WorkingDirectory);
             }
             catch (Exception ex)
             {

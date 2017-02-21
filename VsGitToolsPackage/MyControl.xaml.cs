@@ -114,12 +114,14 @@ namespace F1SYS.VsGitToolsPackage
 
         private void listView1_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            this.activeListView = sender as ListView;
             if (e.Key == Key.Space)
                 e.Handled = true;
         }
 
         private void listView1_KeyUp(object sender, KeyEventArgs e)
         {
+            this.activeListView = sender as ListView;
             if (e.Key != Key.Space)
                 return;
 
@@ -155,10 +157,32 @@ namespace F1SYS.VsGitToolsPackage
             try
             {
                 if (this.tabControl1.SelectedIndex != 0) this.tabControl1.SelectedIndex = 0;
-                var diffAgainstIndex = this.activeListView == this.listStaged;
-                var tmpFileName = tracker.DiffFile(fileName, diffAgainstIndex);
+
+                string tmpFileName = "";
+
+                var status = tracker.GetFileStatus(fileName);
+                if (status == GitFileStatus.NotControlled || status == GitFileStatus.New)
+                {
+                    tmpFileName = Path.Combine(tracker.WorkingDirectory, fileName);
+                }
+                else
+                {
+                    if (this.activeListView == listView1)
+                    {
+                        tmpFileName = tracker.DiffFile(fileName);
+                    }
+                    else
+                    {
+                        var diffAgainstIndex = this.activeListView == this.listStaged;
+                        tmpFileName = tracker.DiffFileAdv(fileName, diffAgainstIndex);
+                    }
+                }
                 if (!string.IsNullOrWhiteSpace(tmpFileName) && File.Exists(tmpFileName))
                 {
+                    if (tracker.IsBinaryFile(tmpFileName))
+                    {
+                        this.DiffEditor.Content = "File is binary that cannot be displayed: " + fileName;
+                    }
                     if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
                     {
                         this.DiffEditor.Content = "File is too big to display: " + fileName;
@@ -255,6 +279,7 @@ namespace F1SYS.VsGitToolsPackage
 
         private void listView1_Click(object sender, RoutedEventArgs e)
         {
+            this.activeListView = sender as ListView;
             GridViewColumnHeader header = e.OriginalSource as GridViewColumnHeader;
             if (header == null || header.Role == GridViewColumnHeaderRole.Padding)
                 return;
@@ -834,7 +859,8 @@ Are you sure you want to continue?";
         {
             TryRun(() =>
             {
-                this.tracker.Apply(diffLines, 1, diffLines.Length, true, false);
+                //this.tracker.Apply(diffLines, 1, diffLines.Length, true, false);
+                this.tracker.StageFile(((GitFile)this.activeListView.SelectedItem).FileName);
             });
         }
 
@@ -851,7 +877,8 @@ Are you sure you want to continue?";
         {
             TryRun(() =>
             {
-              this.tracker.Apply(diffLines, 1, diffLines.Length, false, true);
+                //this.tracker.Apply(diffLines, 1, diffLines.Length, false, true);
+                this.tracker.CheckOutFile(((GitFile)this.activeListView.SelectedItem).FileName);
             });
         }
 
@@ -868,7 +895,8 @@ Are you sure you want to continue?";
         {
             TryRun(() =>
             {
-                this.tracker.Apply(diffLines, 1, diffLines.Length, true, true);
+                //this.tracker.Apply(diffLines, 1, diffLines.Length, true, true);
+                this.tracker.UnStageFile(((GitFile)this.activeListView.SelectedItem).FileName);
             });
         }
 
