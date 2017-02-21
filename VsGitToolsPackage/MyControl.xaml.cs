@@ -869,6 +869,7 @@ Are you sure you want to continue?";
         private async void TryRun(Action act)
         {
             string message = "";
+            Mouse.OverrideCursor = Cursors.Wait;
             await Task.Run(() =>
             {
                 try
@@ -882,6 +883,7 @@ Are you sure you want to continue?";
                 }
             });
             if (message.Length > 0) MessageBox.Show(message, "Failed git apply", MessageBoxButton.OK, MessageBoxImage.Error);
+            Mouse.OverrideCursor = null;
         }
 
         private void btnStageFile_Click(object sender, RoutedEventArgs e)
