@@ -311,7 +311,7 @@
                             </GridViewColumn>
                             <GridViewColumn DisplayMemberBinding="{Binding Y}" Width="Auto">
                                 <GridViewColumn.Header>
-                                    <GridViewColumnHeader Content="Status" Tag="Status" />
+                                    <GridViewColumnHeader Tag="Status" />
                                 </GridViewColumn.Header>
                             </GridViewColumn>
                             <GridViewColumn DisplayMemberBinding="{Binding FileName}" Width="800">
@@ -355,7 +355,7 @@
                             </GridViewColumn>
                             <GridViewColumn DisplayMemberBinding="{Binding X}" Width="Auto">
                                 <GridViewColumn.Header>
-                                    <GridViewColumnHeader Content="Status" Tag="Status" />
+                                    <GridViewColumnHeader Tag="Status" />
                                 </GridViewColumn.Header>
                             </GridViewColumn>
                             <GridViewColumn DisplayMemberBinding="{Binding FileName}" Width="800">
