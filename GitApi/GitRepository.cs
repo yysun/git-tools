@@ -699,7 +699,7 @@ namespace GitScc
         public void Apply(string[] diffLines, int startLine, int endLine, bool cached, bool reverse)
         {
             var difftool = new DiffTool();
-            var hunks = difftool.GetHunks(diffLines, startLine, endLine);
+            var hunks = difftool.GetHunks(diffLines, startLine, endLine, reverse);
             if (hunks.Count() <=0) throw new Exception("No change selected");
 
             var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
@@ -719,11 +719,9 @@ namespace GitScc
                         file.Write(FixEOL(line));
                     }
                 }
-                file.Write('\n');
             }
             var cmd = "apply";
             if (cached) cmd += " --cached";
-            if (reverse) cmd += " --reverse";
             var result = GitBash.Run($"{cmd} \"{tmpFileName}\"", WorkingDirectory);
             File.Delete(tmpFileName);
             if (result.HasError) throw new GitException(result.Error);

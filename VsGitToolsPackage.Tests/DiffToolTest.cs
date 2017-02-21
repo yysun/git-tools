@@ -103,11 +103,11 @@ index ...
         {
             var hunks = tool.GetHunks(diffLines, 20, 20).ToArray();
             Assert.AreEqual(1, hunks.Length);
-            Assert.AreEqual(9, hunks[0].NewBlock[1]);
+            Assert.AreEqual(7, hunks[0].NewBlock[1]);
             Assert.AreEqual(8, hunks[0].Lines.Count());
             hunks = tool.GetHunks(diffLines, 21, 21).ToArray();
             Assert.AreEqual(1, hunks.Length);
-            Assert.AreEqual(11, hunks[0].NewBlock[1]);
+            Assert.AreEqual(9, hunks[0].NewBlock[1]);
             Assert.AreEqual(9, hunks[0].Lines.Count());
         }
     }
