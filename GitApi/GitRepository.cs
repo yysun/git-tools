@@ -708,8 +708,12 @@ namespace GitScc
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    var line = diffLines[i];
-                    file.Write(FixEOL(line));
+                    // Skip the line: index xxxx..xxxx
+                    if (i != 1)
+                    {
+                        var line = diffLines[i];
+                        file.Write(FixEOL(line));
+                    }
                 }
                 foreach (var hunk in hunks)
                 {
