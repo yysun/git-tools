@@ -181,12 +181,12 @@ namespace F1SYS.VsGitToolsPackage
                 {
                     if (tracker.IsBinaryFile(tmpFileName))
                     {
-                        this.DiffEditor.Content = "File is binary that cannot be displayed: " + fileName;
+                        this.DiffEditor.Content = $"File \"{fileName}\" is binary that cannot be displayed. Double click to to view.";
                     }
-                    if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
-                    {
-                        this.DiffEditor.Content = "File is too big to display: " + fileName;
-                    }
+                    //if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
+                    //{
+                    //    this.DiffEditor.Content = "File is too big to display: " + fileName;
+                    //}
                     else
                     {
                         diffLines = File.ReadAllLines(tmpFileName);
@@ -329,8 +329,11 @@ namespace F1SYS.VsGitToolsPackage
 
         private void listView1_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            this.activeListView = sender as ListView;
-            ShowSelectedFile();
+            if (this.activeListView != sender)
+            {
+                this.activeListView = sender as ListView;
+                ShowSelectedFile();
+            }
         }
 
         #endregion
@@ -646,11 +649,18 @@ Note: if the file is included project, you need to delete the file from project 
 
         private int[] GetEditorSelectionPosition()
         {
-            int sl, sc, el, ec;
-            if (0 != textView.GetSelection(out sl, out sc, out el, out ec))
+            int sl = 0, sc = 0, el = 0, ec = 0;
+            try
             {
-                textView.GetCaretPos(out sl, out sc);
-                el = sl;
+                if (0 != textView.GetSelection(out sl, out sc, out el, out ec))
+                {
+                    textView.GetCaretPos(out sl, out sc);
+                    el = sl;
+                }
+            }
+            catch(Exception ex)
+            {
+                ShowStatusMessage(ex.Message);
             }
             return new int[2] { sl +1, el + 1 };
         }
@@ -857,10 +867,11 @@ Are you sure you want to continue?";
 
         private void btnStageFile_Click(object sender, RoutedEventArgs e)
         {
-            TryRun(() =>
+           var fileName = ((GitFile)this.activeListView.SelectedItem).FileName;
+           TryRun(() =>
             {
                 //this.tracker.Apply(diffLines, 1, diffLines.Length, true, false);
-                this.tracker.StageFile(((GitFile)this.activeListView.SelectedItem).FileName);
+                this.tracker.StageFile(fileName);
             });
         }
 
@@ -875,10 +886,11 @@ Are you sure you want to continue?";
 
         private void btnResetFile_Click(object sender, RoutedEventArgs e)
         {
+            var fileName = ((GitFile)this.activeListView.SelectedItem).FileName;
             TryRun(() =>
             {
                 //this.tracker.Apply(diffLines, 1, diffLines.Length, false, true);
-                this.tracker.CheckOutFile(((GitFile)this.activeListView.SelectedItem).FileName);
+                this.tracker.CheckOutFile(fileName);
             });
         }
 
@@ -893,10 +905,11 @@ Are you sure you want to continue?";
 
         private void btnUnStageFile_Click(object sender, RoutedEventArgs e)
         {
+            var fileName = ((GitFile)this.activeListView.SelectedItem).FileName;
             TryRun(() =>
             {
                 //this.tracker.Apply(diffLines, 1, diffLines.Length, true, true);
-                this.tracker.UnStageFile(((GitFile)this.activeListView.SelectedItem).FileName);
+                this.tracker.UnStageFile(fileName);
             });
         }
 
