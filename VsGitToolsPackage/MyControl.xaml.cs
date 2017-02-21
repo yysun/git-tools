@@ -27,6 +27,8 @@ namespace F1SYS.VsGitToolsPackage
     /// </summary>
     public partial class MyControl : UserControl
     {
+        const string DISPLAY_MODE_NAME = "vd-git-tools.mode";
+
         GitRepository tracker;
         //VsGitToolsService service;
 
@@ -395,6 +397,8 @@ namespace F1SYS.VsGitToolsPackage
                 return;
             }
 
+            this.chkAdvMode.IsChecked = this.tracker.GetConfig(DISPLAY_MODE_NAME) == "advanced";
+
             var selectedFile = GetSelectedFileName();
             var selectedFiles = this.activeListView.Items.Cast<GitFile>()
                 .Where(i => i.IsSelected)
@@ -442,6 +446,9 @@ namespace F1SYS.VsGitToolsPackage
             //this.chkNewBranch.IsChecked = false;
 
             this.listView1.ItemsSource = null;
+            this.listStaged.ItemsSource = null;
+            this.listUnstaged.ItemsSource = null;
+
             this.textBoxComments.Document.Blocks.Clear();
             this.ClearEditor();
             var chk = this.listView1.FindVisualChild<CheckBox>("checkBoxAllStaged");
@@ -835,16 +842,28 @@ Are you sure you want to continue?";
             }
         }
 
-        private void chkAdvMode_Checked(object sender, RoutedEventArgs e)
+        private void SetSimpleMode()
+        {
+            this.listView1.Visibility = Visibility.Visible;
+            this.gridAdvancedMode.Visibility = Visibility.Collapsed;
+            if (this.tracker != null) this.tracker.SetConfig(DISPLAY_MODE_NAME, "simple");
+        }
+
+        private void SetAdvancedMode()
         {
             this.listView1.Visibility = Visibility.Collapsed;
             this.gridAdvancedMode.Visibility = Visibility.Visible;
+            if (this.tracker != null) this.tracker.SetConfig(DISPLAY_MODE_NAME, "advanced");
+        }
+
+        private void chkAdvMode_Checked(object sender, RoutedEventArgs e)
+        {
+            SetAdvancedMode();
         }
 
         private void chkAdvMode_Unchecked(object sender, RoutedEventArgs e)
         {
-            this.listView1.Visibility = Visibility.Visible;
-            this.gridAdvancedMode.Visibility = Visibility.Collapsed;
+            SetSimpleMode();
         }
 
         private async void TryRun(Action act)
