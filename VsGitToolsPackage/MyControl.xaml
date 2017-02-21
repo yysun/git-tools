@@ -290,6 +290,14 @@
                 <ListView Grid.Row="1" Name="listUnstaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
 					  SelectedValuePath="FileName" MouseUp="listView1_MouseUp"
                       Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                    
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Stage File" Click="menuStage_Click" />
+                            <MenuItem Header="Undo File Changes" Click="menuUndo_Click"/>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+                    
                     <ListView.View>
                         <GridView AllowsColumnReorder="False">
                             <GridViewColumn Width="0">
@@ -334,6 +342,13 @@
                 <ListView Grid.Row="4" Name="listStaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
 					  SelectedValuePath="FileName" MouseUp="listView1_MouseUp"
                       Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                    
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Un-Stage File" Click="menuUnstage_Click" />
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+                    
                     <ListView.View>
                         <GridView AllowsColumnReorder="False">
                             <GridViewColumn Width="0">

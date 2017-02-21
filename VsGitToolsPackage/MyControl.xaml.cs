@@ -504,16 +504,15 @@ namespace F1SYS.VsGitToolsPackage
 
             const string deleteMsg = @"
 
-Note: Undo file changes will restore the file(s) from the last commit.";
+Note: Changes that have not committed will be lost.";
 
-            var filesToUndo = new List<string>();
+            var filesToUndo = this.activeListView.SelectedItems.Cast<GitFile>();
+            if (filesToUndo.Count() <= 0) return;
 
-            GetSelectedFiles(fileName => filesToUndo.Add(fileName));
-
-            string title = (filesToUndo.Count == 1) ? "Undo File Changes" : "Undo Files Changes for " + filesToUndo.Count + " Files?";
-            string message = (filesToUndo.Count == 1) ?
-                "Are you sure you want to undo changes to file: " + Path.GetFileName(filesToUndo.First()) + deleteMsg :
-                String.Format("Are you sure you want to undo changes to {0} files", filesToUndo.Count) + deleteMsg;
+            string title = (filesToUndo.Count() == 1) ? "Undo File Changes" : "Undo Files Changes for " + filesToUndo.Count() + " Files?";
+            string message = (filesToUndo.Count() == 1) ?
+                "Are you sure you want to undo changes to file: " + Path.GetFileName(filesToUndo.First().FileName) + deleteMsg :
+                String.Format("Are you sure you want to undo changes to {0} files", filesToUndo.Count()) + deleteMsg;
 
 
             if (MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -521,9 +520,16 @@ Note: Undo file changes will restore the file(s) from the last commit.";
                 this.toolWindow.Service.NoRefresh = true;
                 await Task.Run(() =>
                 {
-                    foreach (var fileName in filesToUndo)
+                    foreach (var file in filesToUndo)
                     {
-                        tracker.CheckOutFile(fileName);
+                        if (file.Status == GitFileStatus.NotControlled || file.Status == GitFileStatus.New)
+                        {
+                            File.Delete(Path.Combine(this.tracker.WorkingDirectory, file.FileName));
+                        }
+                        else
+                        {
+                            this.tracker.CheckOutFile(file.FileName);
+                        }
                     }
                 });
                 this.toolWindow.Service.NoRefresh = false;
@@ -533,7 +539,7 @@ Note: Undo file changes will restore the file(s) from the last commit.";
 
         private async void menuStage_Click(object sender, RoutedEventArgs e)
         {
-            var unstaged = this.listView1.SelectedItems.Cast<GitFile>()
+            var unstaged = this.activeListView.SelectedItems.Cast<GitFile>()
                .Where(item => !item.IsStaged);
 
             int i = 1, count = unstaged.Count();
@@ -552,7 +558,7 @@ Note: Undo file changes will restore the file(s) from the last commit.";
 
         private async void menuUnstage_Click(object sender, RoutedEventArgs e)
         {
-            var staged = this.listView1.SelectedItems.Cast<GitFile>()
+            var staged = this.activeListView.SelectedItems.Cast<GitFile>()
                .Where(item => item.IsStaged);
 
             int i = 1, count = staged.Count();
