@@ -878,17 +878,18 @@ Are you sure you want to continue?";
 
         private void SetSimpleMode()
         {
-            this.listView1.Visibility = Visibility.Visible;
-            this.gridAdvancedMode.Visibility = Visibility.Collapsed;
-            this.pnlChangedFileTool.Visibility = Visibility.Collapsed;
-            this.pnlStagedFileTool.Visibility = Visibility.Collapsed;
+
+            if (this.listView1 != null) this.listView1.Visibility = Visibility.Visible;
+            if (this.gridAdvancedMode != null) this.gridAdvancedMode.Visibility = Visibility.Collapsed;
+            if (this.pnlChangedFileTool != null) this.pnlChangedFileTool.Visibility = Visibility.Collapsed;
+            if (this.pnlStagedFileTool != null) this.pnlStagedFileTool.Visibility = Visibility.Collapsed;
             if (this.tracker != null) this.tracker.SetConfig(DISPLAY_MODE_NAME, "simple");
         }
 
         private void SetAdvancedMode()
         {
-            this.listView1.Visibility = Visibility.Collapsed;
-            this.gridAdvancedMode.Visibility = Visibility.Visible;
+            if (this.listView1 != null) this.listView1.Visibility = Visibility.Collapsed;
+            if (this.gridAdvancedMode != null) this.gridAdvancedMode.Visibility = Visibility.Visible;
             if (this.tracker != null) this.tracker.SetConfig(DISPLAY_MODE_NAME, "advanced");
         }
 
