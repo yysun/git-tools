@@ -725,7 +725,7 @@ namespace GitScc
                     }
                 }
             }
-            var cmd = "apply";
+            var cmd = "apply --ignore-whitespace";
             if (cached) cmd += " --cached";
             var result = GitBash.Run($"{cmd} \"{tmpFileName}\"", WorkingDirectory);
             File.Delete(tmpFileName);
