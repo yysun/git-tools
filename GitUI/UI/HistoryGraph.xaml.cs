@@ -97,7 +97,10 @@ namespace GitScc.UI
         const int MAX_COMMITS = 200;
         const int PADDING = 50;
         const int GRID_HEIGHT = 180;
-        const int GRID_WIDTH = 300;
+        const int GRID_WIDTH = 280;
+        const int HEIGHT = 110;
+        const int WIDTH = 180;
+
         int maxX, maxY;
         string lastHash = null;
 
@@ -153,6 +156,9 @@ namespace GitScc.UI
                                     Refs = commit.Refs
                                 };
 
+                                box.Height = HEIGHT;
+                                box.Width = WIDTH;
+
                                 double left = GetScreenX(maxX - commit.Y);
                                 double top = GetScreenY(commit.X);
 
@@ -174,9 +180,8 @@ namespace GitScc.UI
                                         DataContext = head,
                                     };
 
-                                    Canvas.SetLeft(control, left + CommitBox.WIDTH + 4);
+                                    Canvas.SetLeft(control, left + WIDTH + 4);
                                     Canvas.SetTop(control, top + m++ * 30);
-
                                     this.canvasContainer.Children.Add(control);
 
                                 }
@@ -193,7 +198,6 @@ namespace GitScc.UI
 
                                     Canvas.SetLeft(control, left + m++ * 80); // TODO: get width of the control
                                     Canvas.SetTop(control, top - 24);
-
                                     this.canvasContainer.Children.Add(control);
                                 }
 
@@ -209,8 +213,7 @@ namespace GitScc.UI
                                     };
 
                                     Canvas.SetLeft(control, left + m++ * 100); // TODO: get width of the control
-                                    Canvas.SetTop(control, top + CommitBox.HEIGHT + 4);
-
+                                    Canvas.SetTop(control, top + HEIGHT + 4);
                                     this.canvasContainer.Children.Add(control);
                                 }
                                 #endregion
@@ -233,9 +236,9 @@ namespace GitScc.UI
                                 bool flip = links.Any(lnk => lnk.X1 == x2 && lnk.Y2 == y2 && lnk.X1 == lnk.X2);
 
                                 x1 = GetScreenX(maxX - x1);
-                                y1 = GetScreenY(y1) + CommitBox.HEIGHT / 2;
-                                x2 = GetScreenX(maxX - x2) + CommitBox.WIDTH;
-                                y2 = GetScreenY(y2) + CommitBox.HEIGHT / 2;
+                                y1 = GetScreenY(y1) + HEIGHT / 2;
+                                x2 = GetScreenX(maxX - x2) + WIDTH;
+                                y2 = GetScreenY(y2) + HEIGHT / 2;
 
                                 if (y1 == y2)
                                 {
@@ -252,7 +255,7 @@ namespace GitScc.UI
                                 }
                                 else if (y1 > y2 && !flip)
                                 {
-                                    var x3 = x2 - CommitBox.WIDTH / 2;
+                                    var x3 = x2 - WIDTH / 2;
                                     var path = new System.Windows.Shapes.Path
                                     {
                                         Stroke = new SolidColorBrush(Color.FromArgb(255, 153, 182, 209)),
@@ -282,7 +285,7 @@ namespace GitScc.UI
                                 }
                                 else
                                 {
-                                    var x3 = x1 + CommitBox.WIDTH / 2;
+                                    var x3 = x1 + WIDTH / 2;
                                     var path = new System.Windows.Shapes.Path
                                     {
                                         Stroke = new SolidColorBrush(Color.FromArgb(255, 153, 182, 209)),
