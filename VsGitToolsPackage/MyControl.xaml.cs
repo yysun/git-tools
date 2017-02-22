@@ -906,6 +906,7 @@ Are you sure you want to continue?";
         {
             string message = "";
             Mouse.OverrideCursor = Cursors.Wait;
+            this.toolWindow.Service.NoRefresh = true;
             await Task.Run(() =>
             {
                 try
@@ -919,6 +920,8 @@ Are you sure you want to continue?";
                 }
             });
             if (message.Length > 0) MessageBox.Show(message, "Failed git apply", MessageBoxButton.OK, MessageBoxImage.Error);
+            this.toolWindow.Service.NoRefresh = false;
+            await this.toolWindow.Service.RefreshToolWindows();
             Mouse.OverrideCursor = null;
         }
 
