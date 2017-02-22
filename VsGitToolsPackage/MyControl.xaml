@@ -222,7 +222,7 @@
                       Grid.Row="2" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
                       HorizontalContentAlignment="Right" VerticalContentAlignment="Center" Checked="chkAdvMode_Checked" Unchecked="chkAdvMode_Unchecked"/>
 
-            <ListView Grid.Row="3" Name="listView1" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
+            <ListView Grid.Row="3" Name="listView1" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"  Visibility="Collapsed"
                       SelectedValuePath="FileName" KeyUp="listView1_KeyUp" PreviewKeyDown="listView1_PreviewKeyDown" ButtonBase.Click="listView1_Click" 
                       Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" ScrollViewer.HorizontalScrollBarVisibility="Hidden" MouseUp="listView1_MouseUp">
                 <ListView.View>
@@ -273,7 +273,7 @@
                 </ListView.ContextMenu>
             </ListView>
 
-            <Grid Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="gridAdvancedMode" Visibility="Collapsed">
+            <Grid Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="gridAdvancedMode">
 
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -286,16 +286,21 @@
                 <Label Content="Changes:" HorizontalAlignment="Left" VerticalAlignment="Stretch"
                    Margin="2,0,2,0" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
                    ToolTip="select file to commit, or right click to stage/unstage file" />
+
+                <Button Content="Stage All" Padding="10 0"
+                        Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
+                        Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
+                        VerticalAlignment="Center" Margin="0,0,4,0" Click="menuStageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
                 
-                <ListView Grid.Row="1" Name="listUnstaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
+                <ListView Grid.Row="1" Name="listUnstaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick"
                       SelectedValuePath="FileName" MouseUp="listView1_MouseUp" ButtonBase.Click="listView1_Click"
                       Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                     
                     <ListView.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Stage File" Click="menuStage_Click" />
-                            <MenuItem Header="Stage All" Click="menuStageAll_Click" />
-                            <MenuItem Header="Undo File Changes" Click="menuUndo_Click"/>
+                            <!--<MenuItem Header="Stage All" Click="menuStageAll_Click" />-->
+                            <MenuItem Header="Reset File Changes" Click="menuUndo_Click"/>
                         </ContextMenu>
                     </ListView.ContextMenu>
                     
@@ -340,14 +345,19 @@
                    Margin="2,0,2,0" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
                   ToolTip="select file to commit, or right click to stage/unstage file" VerticalContentAlignment="Stretch" />
 
-                <ListView Grid.Row="4" Name="listStaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick" ContextMenuOpening="listView1_ContextMenuOpening"
+                <Button Grid.Row="3" Content="Un-Stage All" Padding="10 0"
+                        Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
+                        Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
+                        VerticalAlignment="Center" Margin="0,0,4,0" Click="menuUnstageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
+
+                <ListView Grid.Row="4" Name="listStaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick"
                       SelectedValuePath="FileName" MouseUp="listView1_MouseUp" ButtonBase.Click="listView1_Click"
                       Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                     
                     <ListView.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Un-Stage File" Click="menuUnstage_Click" />
-                            <MenuItem Header="Un-Stage All" Click="menuUnstageAll_Click" />
+                            <!--<MenuItem Header="Un-Stage All" Click="menuUnstageAll_Click" />-->
                         </ContextMenu>
                     </ListView.ContextMenu>
                     
@@ -444,11 +454,11 @@
                                     VerticalAlignment="Center" Margin="0,0,4,0" Click="btnResetSelected_Click"/>   
                         </StackPanel>
                         <StackPanel Name="pnlStagedFileTool" Margin="0,0,0,8" Orientation="Horizontal" Visibility="Collapsed">
-                            <Button Content="Undo Stage File" Padding="10 0"
+                            <Button Content="Un-Stage File" Padding="10 0"
                                     Name="btnUnStageFile" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
                                     Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
                                     VerticalAlignment="Center" Margin="0,0,4,0" Click="btnUnStageFile_Click"/>
-                            <Button Content="Undo Stage Selected" Padding="10 0"
+                            <Button Content="Un-Stage Selected" Padding="10 0"
                                     Name="btnUnStageSelected" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
                                     Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
                                     VerticalAlignment="Center" Margin="0,0,4,0" Click="btnUnStageSelected_Click"/>   
