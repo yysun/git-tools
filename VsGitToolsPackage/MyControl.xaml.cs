@@ -825,13 +825,32 @@ Note: if the file is included project, you need to delete the file from project 
 
                 var count = unstaged.Count();
 
+                var advancedMode = this.chkAdvMode.IsChecked == true;
+                var changed = this.activeListView.ItemsSource.Cast<GitFile>();
+
                 ShowStatusMessage("Staging files ...");
 
                 if (!isAmend)
                 {
                     tracker.Refresh();
-                    bool hasStaged = tracker == null ? false :
-                                     tracker.ChangedFiles.Any(f => f.IsStaged) || count > 0;
+                    bool hasStaged = false;
+
+                    if (advancedMode)
+                    {
+                        // advanced mode
+                        hasStaged = tracker == null ? false :
+                                    tracker.ChangedFiles.Any(f => f.X != ' ') || count > 0;
+
+                        // if nothing staged, staged to be all changes
+                        if (!hasStaged) hasStaged = changed.Count() > 0;
+                    }
+                    else
+                    {
+                        // simple mode
+                        hasStaged = tracker == null ? false :
+                                    tracker.ChangedFiles.Any(f => f.IsStaged) || count > 0;
+                    }
+
                     if (!hasStaged)
                     {
                         MessageBox.Show("No file has been selected/staged for commit.", "Commit",
@@ -855,12 +874,25 @@ Are you sure you want to continue?";
                 this.toolWindow.Service.NoRefresh = true;
                 int i = 1;
                 bool signoff = chkSignOff.IsChecked == true;
+
                 await Task.Run(() =>
                 {
-                    foreach (var item in unstaged)
+                    if (advancedMode)
                     {
-                        tracker.StageFile(item.FileName);
-                        ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
+                        // auto stage all changes if nothing is staged
+                        foreach (var item in changed)
+                        {
+                            tracker.StageFile(item.FileName);
+                            ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
+                        }
+                    }
+                    else
+                    {
+                        foreach (var item in unstaged)
+                        {
+                            tracker.StageFile(item.FileName);
+                            ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
+                        }
                     }
                     var id = tracker.Commit(Comments, isAmend, signoff);
                     ShowStatusMessage("Commit successfully. Commit Hash: " + id);
