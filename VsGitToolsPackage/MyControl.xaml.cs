@@ -706,6 +706,7 @@ Note: if the file is included project, you need to delete the file from project 
 
         private void DiffEditor_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            if (this.tracker == null) return;
             var selectionPosition = this.GetEditorSelectionPosition();
             var hasChanges = tracker.HasChanges(diffLines, selectionPosition[0], selectionPosition[1]);
             btnResetSelected.Visibility = btnStageSelected.Visibility = btnUnStageSelected.Visibility = 
