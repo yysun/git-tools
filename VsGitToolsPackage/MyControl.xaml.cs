@@ -127,10 +127,10 @@ namespace F1SYS.VsGitToolsPackage
             if (e.Key != Key.Space)
                 return;
 
-            var selectedItem = this.listView1.SelectedItem as GitFile;
+            var selectedItem = this.activeListView.SelectedItem as GitFile;
             if (selectedItem == null) return;
             var selected = !selectedItem.IsSelected;
-            foreach (var item in this.listView1.SelectedItems)
+            foreach (var item in this.activeListView.SelectedItems)
             {
                 ((GitFile)item).IsSelected = selected;
             }
@@ -304,9 +304,9 @@ namespace F1SYS.VsGitToolsPackage
 
         private void Sort(GridViewColumnHeader header, ListSortDirection direction)
         {
-            if (listView1.ItemsSource != null)
+            if (activeListView.ItemsSource != null)
             {
-                ICollectionView view = CollectionViewSource.GetDefaultView(listView1.ItemsSource);
+                ICollectionView view = CollectionViewSource.GetDefaultView(activeListView.ItemsSource);
                 view.SortDescriptions.Clear();
                 view.SortDescriptions.Add(new SortDescription(header.Tag as string, direction));
                 view.Refresh();
@@ -315,6 +315,8 @@ namespace F1SYS.VsGitToolsPackage
 
         private void UpdateColumnHeaderTemplate(GridViewColumnHeader header, ListSortDirection direction)
         {
+            if (header.Column == null) return;
+
             // don't change the template if we're sorting by the check state
             GridViewColumn checkStateColumn = ((GridView)listView1.View).Columns[0];
             if (header.Column != checkStateColumn)
@@ -325,7 +327,8 @@ namespace F1SYS.VsGitToolsPackage
                     header.Column.HeaderTemplate = Resources["HeaderTemplateArrowDown"] as DataTemplate;
             }
 
-            if (_currentSortedColumn != null && _currentSortedColumn != header && _currentSortedColumn.Column != checkStateColumn)
+            if (_currentSortedColumn != null && _currentSortedColumn != header &&
+                _currentSortedColumn.Column != null && _currentSortedColumn.Column != checkStateColumn)
                 _currentSortedColumn.Column.HeaderTemplate = null;
         }
 
@@ -369,7 +372,7 @@ namespace F1SYS.VsGitToolsPackage
         {
             try
             {
-                this.listView1.SelectedItems.Cast<GitFile>()
+                this.activeListView.SelectedItems.Cast<GitFile>()
                     .Select(item => item.FileName)
                     .ToList()
                     .ForEach(fileName => action(fileName));
@@ -537,11 +540,8 @@ Note: Changes that have not committed will be lost.";
             }
         }
 
-        private async void menuStage_Click(object sender, RoutedEventArgs e)
+        private async void StageFiles(IEnumerable<GitFile> unstaged)
         {
-            var unstaged = this.activeListView.SelectedItems.Cast<GitFile>()
-               .Where(item => !item.IsStaged);
-
             int i = 1, count = unstaged.Count();
             this.toolWindow.Service.NoRefresh = true;
             await Task.Run(() =>
@@ -556,11 +556,23 @@ Note: Changes that have not committed will be lost.";
             await this.toolWindow.Service.RefreshToolWindows();
         }
 
-        private async void menuUnstage_Click(object sender, RoutedEventArgs e)
+        private void menuStageAll_Click(object sender, RoutedEventArgs e)
         {
-            var staged = this.activeListView.SelectedItems.Cast<GitFile>()
-               .Where(item => item.IsStaged);
+            var unstaged = this.activeListView.ItemsSource.Cast<GitFile>()
+               .Where(item => !item.IsStaged);
+            this.StageFiles(unstaged);
+        }
 
+        private void menuStage_Click(object sender, RoutedEventArgs e)
+        {
+            var unstaged = this.activeListView.SelectedItems.Cast<GitFile>()
+               .Where(item => !item.IsStaged);
+            this.StageFiles(unstaged);
+        }
+
+
+        private async void UnStageFiles(IEnumerable<GitFile> staged)
+        {
             int i = 1, count = staged.Count();
             this.toolWindow.Service.NoRefresh = true;
             await Task.Run(() =>
@@ -573,6 +585,20 @@ Note: Changes that have not committed will be lost.";
             });
             this.toolWindow.Service.NoRefresh = false;
             await this.toolWindow.Service.RefreshToolWindows();
+        }
+
+        private void menuUnstageAll_Click(object sender, RoutedEventArgs e)
+        {
+            var staged = this.activeListView.ItemsSource.Cast<GitFile>()
+               .Where(item => item.IsStaged);
+            this.UnStageFiles(staged);
+        }
+
+        private void menuUnstage_Click(object sender, RoutedEventArgs e)
+        {
+            var staged = this.activeListView.SelectedItems.Cast<GitFile>()
+               .Where(item => item.IsStaged);
+            this.UnStageFiles(staged);
         }
 
         private void menuDeleteFile_Click(object sender, RoutedEventArgs e)
@@ -682,7 +708,8 @@ Note: if the file is included project, you need to delete the file from project 
         {
             var selectionPosition = this.GetEditorSelectionPosition();
             var hasChanges = tracker.HasChanges(diffLines, selectionPosition[0], selectionPosition[1]);
-            btnResetSelected.IsEnabled = btnStageSelected.IsEnabled = btnUnStageSelected.IsEnabled = hasChanges;
+            btnResetSelected.Visibility = btnStageSelected.Visibility = btnUnStageSelected.Visibility = 
+                (hasChanges ? Visibility.Visible : Visibility.Collapsed);
         }
 
 
@@ -852,6 +879,8 @@ Are you sure you want to continue?";
         {
             this.listView1.Visibility = Visibility.Visible;
             this.gridAdvancedMode.Visibility = Visibility.Collapsed;
+            this.pnlChangedFileTool.Visibility = Visibility.Collapsed;
+            this.pnlStagedFileTool.Visibility = Visibility.Collapsed;
             if (this.tracker != null) this.tracker.SetConfig(DISPLAY_MODE_NAME, "simple");
         }
 
