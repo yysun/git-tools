@@ -15,6 +15,7 @@ using System.Text;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows.Data;
 
 namespace GitUI.UI
 {
@@ -34,7 +35,7 @@ namespace GitUI.UI
         private StreamWriter inputWriter;
         private TextReader outputReader;
         private TextReader errorReader;
-        
+
 
         private GitRepository _tracker;
         private GitRepository tracker
@@ -97,49 +98,63 @@ namespace GitUI.UI
                 {
                     this.HideOptions();
                 }
-                else
-                {
-                    lstOptions.Focus();
-                }
-                return;
             }
-
             if (!IsCaretPositionValid())
             {
                 this.richTextBox1.CaretPosition = this.richTextBox1.CaretPosition.DocumentEnd;
                 return;
             }
 
-            if (e.Key == Key.Space)
+            if (e.Key == Key.Tab)
             {
-                var command = new TextRange(richTextBox1.CaretPosition.GetLineStartPosition(0),
-                   richTextBox1.CaretPosition).Text;
-                command = command.Substring(command.IndexOf(">") + 1).Trim();
-                ShowOptions(command);
-                return;
-            }
-
-            if (e.Key == Key.Enter)
-            {
-                var command = GetCommand();
-                if (this.IsProcessRunning)
+                if (lstOptions.Visibility == Visibility.Visible)
                 {
-                    this.WriteInput(command);
+                    InsertText(lstOptions.SelectedValue as string);
                 }
-                else
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Enter)
+            {
+                if (lstOptions.Visibility == Visibility.Visible)
                 {
-                    RunCommand(command);
+                    InsertText(lstOptions.SelectedValue as string);
                     e.Handled = true;
+                }
+                else { 
+                    var command = GetCommand();
+                    if (this.IsProcessRunning)
+                    {
+                        this.WriteInput(command);
+                    }
+                    else
+                    {
+                        RunCommand(command);
+                        e.Handled = true;
+                    }
                 }
             }
             else if (e.Key == Key.Up)
             {
-                GetCommand(--commandIdx);
+                if (lstOptions.Visibility == Visibility.Visible)
+                {
+                    lstOptions.SelectedIndex -= 1;
+                }
+                else
+                {
+                    GetCommand(commandIdx);
+                }
                 e.Handled = true;
             }
             else if (e.Key == Key.Down)
             {
-                GetCommand(++commandIdx);
+                if (lstOptions.Visibility == Visibility.Visible)
+                {
+                    lstOptions.SelectedIndex += 1;
+                }
+                else
+                {
+                    GetCommand(++commandIdx);
+                }
                 e.Handled = true;
             }
             else if (e.Key == Key.Escape)
@@ -163,6 +178,11 @@ namespace GitUI.UI
             }
         }
 
+        private void richTextBox1_KeyUp(object sender, KeyEventArgs e)
+        {
+            FilterOptions();
+        }
+
         private string GetCommand()
         {
             var command = new TextRange(
@@ -171,7 +191,7 @@ namespace GitUI.UI
                 richTextBox1.CaretPosition.GetLineStartPosition(0),
                 richTextBox1.CaretPosition.GetLineStartPosition(1) ?? this.richTextBox1.CaretPosition.DocumentEnd).Text;
 
-            command = command.Trim();
+            command = command.Replace("\r", "").Replace("\n", "");
             return command;
         }
 
@@ -248,7 +268,8 @@ namespace GitUI.UI
 
                 var idx = command.IndexOf(' ');
 
-                if(idx <0){
+                if (idx < 0)
+                {
                     StartProcess(command, null);
                 }
                 else
@@ -359,7 +380,6 @@ namespace GitUI.UI
             }
         }
 
-
         private void errorWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             var buffer = new char[1024];
@@ -378,7 +398,7 @@ namespace GitUI.UI
                 }
                 else break;
             }
-            System.Threading.Thread.Sleep(200);
+            //System.Threading.Thread.Sleep(200);
         }
 
         private void outputWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -396,7 +416,7 @@ namespace GitUI.UI
                 }
                 else break;
             }
-            System.Threading.Thread.Sleep(200);
+            //System.Threading.Thread.Sleep(200);
         }
 
         public void WriteInput(string input)
@@ -541,30 +561,58 @@ namespace GitUI.UI
             }
         }
 
-        private void lstOptions_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void FilterOptions()
+        {
+            var command = GetCommand();
+            if (command != null && command.IndexOf(' ') > 0)
+            {
+                var idx = command.LastIndexOf(' ');
+                var options = GetOptions(command.Substring(0, idx));
+                if (options != null && options.Any())
+                {
+                    Rect rect = this.richTextBox1.CaretPosition.GetCharacterRect(LogicalDirection.Forward);
+                    double d = this.ActualHeight - (rect.Y + lstOptions.Height + 12);
+                    double left = rect.X + 6;
+                    double top = d > 0 ? rect.Y + 12 : rect.Y - lstOptions.Height;
+                    left += this.Padding.Left;
+                    top += this.Padding.Top;
+                    lstOptions.SetCurrentValue(ListBox.MarginProperty, new Thickness(left, top, 0, 0));
+                    lstOptions.ItemsSource = options;
+
+                    var subcommand = command.Substring(idx + 1);
+                    var opts = options.Where(item => item.StartsWith(subcommand));
+                    lstOptions.ItemsSource = opts;
+                    lstOptions.Visibility = (opts.Count() > 0 && opts.First() != subcommand) ? 
+                        Visibility.Visible : Visibility.Collapsed;
+
+                    if (opts.Count() == 1) lstOptions.SelectedIndex = 0;
+                }
+                else
+                {
+                    HideOptions();
+                }
+            }
+            else
+            {
+                HideOptions();
+            }
+        }
+
+
+        private void lstOptions_Click(object sender, RoutedEventArgs e)
         {
             InsertText(lstOptions.SelectedValue as string);
         }
 
-        private void lstOptions_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter || e.Key == Key.Tab || e.Key == Key.Space)
-            {
-                InsertText(lstOptions.SelectedValue as string);
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Back || e.Key == Key.Escape)
-            {
-                this.richTextBox1.Focus();
-                this.HideOptions();
-                e.Handled = true;
-            }
-        }
-
         private void InsertText(string text)
         {
-            this.richTextBox1.Focus();
-            this.richTextBox1.CaretPosition.InsertTextInRun(text);
+            if (string.IsNullOrEmpty(text)) return;
+            var current = new TextRange(richTextBox1.CaretPosition.GetLineStartPosition(0),
+                richTextBox1.CaretPosition).Text;
+            var offset = current.LastIndexOf(' ') - current.Length + 1;
+            var textRange = new TextRange(this.richTextBox1.CaretPosition.GetPositionAtOffset(offset),
+                this.richTextBox1.CaretPosition.DocumentEnd);
+            textRange.Text = text;
             this.richTextBox1.CaretPosition = this.richTextBox1.CaretPosition.DocumentEnd;
             this.HideOptions();
         }
@@ -659,5 +707,6 @@ namespace GitUI.UI
         {
             mainWindow.ShowStatusMessage(msg);
         }
+
     }
 }
