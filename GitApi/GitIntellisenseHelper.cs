@@ -54,9 +54,9 @@ namespace GitScc
                                "log", "merge", "mv", "pull", "push", "rebase", "remote", "reset", "rm", "show", "status", "stash", "tag"}},
 
             {"^git bisect$", new string[] {"start|bad|good|skip|reset|help"}},
-            {"^git rebase$", new string[] {"-i|--interactive|--continue|--skip|--abort"}},
+            {"^git rebase$", new string[] {"*branches*"}},
+            {"^git merge$", new string[] {"*branches*"}},
             {"^git rebase -i$", new string[] {"HEAD~"}},
-            {"^git rebase --interactive$", new string[] {"HEAD~"}},
             
             {"^git remote$", new string[] {"add|rename|rm|set-head|set-branches|set-url|show|prune|update"}},
             {"^git stash$", new string[] {"list|save|show|apply|drop|pop|branch|clear|create"}},
@@ -72,7 +72,7 @@ namespace GitScc
             {"^git push$", new string[] {"*remotes*"}},
             {"^git push .+$", new string[] {"*branches*"}},
 
-            {"^git reset$", new string[] {"HEAD|--soft|--mixed|--hard|--merge|--keep"}},
+            {"^git reset$", new string[] {"HEAD~|--soft|--mixed|--hard|--merge|--keep"}},
             {"^git reset HEAD$", new string[] {"*commits*"}},
 
             {"^git config$", new string[] {"--global|--system|--local|--get|--add|--unset|--list|-l|--file"}},
