@@ -5,7 +5,7 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 mc:Ignorable="d" 
-			 d:DesignHeight="300" d:DesignWidth="800" KeyDown="UserControl_KeyDown" Loaded="UserControl_Loaded">
+			 d:DesignHeight="600" d:DesignWidth="800" KeyDown="UserControl_KeyDown" Loaded="UserControl_Loaded">
 	<UserControl.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
@@ -77,13 +77,34 @@
 						<GradientStop Color="White" Offset="1" />
 					</LinearGradientBrush>
 				</Grid.Background>
-				<TextBlock Text="Changes" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0,0,0" />
-			</Grid>
+                <StackPanel Name="pnlChangedFileTool" Margin="0,0,0,8" Orientation="Horizontal" Visibility="Collapsed">
+                    <Button Content="Stage File" Padding="10 0"
+                                    Name="btnStageFile" 
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnStageFile_Click"/>
+                    <Button Content="Stage Selected" Padding="10 0"
+                                    Name="btnStageSelected" 
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnStageSelected_Click"/>
+                    <Button Content="Rest File" Padding="10 0"
+                                    Name="btnResetFile" 
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnResetFile_Click"/>
+                    <Button Content="Reset Selected" Padding="10 0"
+                                    Name="btnResetSelected" 
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnResetSelected_Click"/>
+                </StackPanel>
+                <StackPanel Name="pnlStagedFileTool" Margin="0,0,0,8" Orientation="Horizontal" Visibility="Collapsed">
+                    <Button Content="Un-Stage File" Padding="10 0"
+                                    Name="btnUnStageFile"  
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnUnStageFile_Click"/>
+                    <Button Content="Un-Stage Selected" Padding="10 0"
+                                    Name="btnUnStageSelected"
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnUnStageSelected_Click"/>
+                </StackPanel>
+            </Grid>
 
 			<Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="grid1">
 
 				<Grid.RowDefinitions>
-					<RowDefinition Height="150" />
+					<RowDefinition Height="80" />
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="*" />
@@ -104,7 +125,7 @@
 					</RichTextBox.Resources>
 				</RichTextBox>
 
-				<DataGrid AutoGenerateColumns="False" Grid.Row="3" HorizontalAlignment="Stretch" Margin="10,0,10,10" Name="dataGrid1" VerticalAlignment="Stretch"
+				<DataGrid AutoGenerateColumns="False" Grid.Row="3" HorizontalAlignment="Stretch" Margin="10,0,10,10" Name="dataGrid1" VerticalAlignment="Stretch" Visibility="Collapsed"
 					  GridLinesVisibility="None"  Foreground="#FF333333" Sorting="dataGrid1_Sorting" IsReadOnly="True" SelectedValuePath="FileName"
 					  SelectionMode="Extended" SelectionChanged="dataGrid1_SelectionChanged" ContextMenuOpening="dataGrid1_ContextMenuOpening"
 					  CanUserResizeRows="False" CanUserDeleteRows="False" CanUserAddRows="False" CanUserReorderColumns="False" RowHeaderWidth="0" KeyDown="dataGrid1_KeyDown">
@@ -144,12 +165,129 @@
 						</ContextMenu>
 					</DataGrid.ContextMenu>
 				</DataGrid>
-				
-			</Grid>
 
-			<Grid Grid.Column="2" Grid.Row="1" Background="White">
-				<avalonEdit:TextEditor x:Name="DiffEditor" FontFamily="Consolas" FontSize="10pt"/>
-			</Grid>
+                <Grid Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="gridAdvancedMode">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="100" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Label Content="Changes:" HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                   Margin="10,0,0,0"
+                   ToolTip="select file to commit, or right click to stage/unstage file" />
+
+                    <Button Content="Stage All" Padding="10 0"
+                        VerticalAlignment="Center" Margin="0,0,4,0" Click="menuStageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
+
+                    <ListView Grid.Row="1" Name="listUnstaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick"
+                      SelectedValuePath="FileName" MouseUp="listView1_MouseUp" ButtonBase.Click="listView1_Click"
+                      VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Margin="10,0">
+
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Stage File" Click="menuStage_Click" />
+                                <!--<MenuItem Header="Stage All" Click="menuStageAll_Click" />-->
+                                <MenuItem Header="Reset File Changes" Click="menuUndo_Click"/>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="False">
+                                <GridViewColumn Width="0">
+                                    <GridViewColumn.Header>
+                                        <GridViewColumnHeader Content="Staged" Tag="Staged" />
+                                    </GridViewColumn.Header>
+                                    <GridViewColumn.HeaderTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Name="checkBoxAllStaged" Click="checkBoxAllStaged_Click"
+                                          HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.HeaderTemplate>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Name="checkBoxSelected" Click="checkBoxSelected_Click" IsChecked="{Binding IsSelected}"
+                                              HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding Y}" Width="Auto">
+                                    <GridViewColumn.Header>
+                                        <GridViewColumnHeader Tag="Status" />
+                                    </GridViewColumn.Header>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding FileName}" Width="800">
+                                    <GridViewColumn.Header>
+                                        <GridViewColumnHeader Content="File" Tag="FileName" Margin="0" HorizontalContentAlignment="Left" />
+                                    </GridViewColumn.Header>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+
+                    <GridSplitter Grid.Row="2" Grid.ColumnSpan="2"
+					  VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="4" Margin="0,5"/>
+
+                    <Label Grid.Row="3" Content="Staged Changes:" HorizontalAlignment="Left"
+                   Margin="10,0,0,0" 
+                  ToolTip="select file to commit, or right click to stage/unstage file" VerticalContentAlignment="Stretch" />
+
+                    <Button Grid.Row="3" Content="Un-Stage All" Padding="10 0"
+                        
+                        VerticalAlignment="Center" Margin="0,0,4,0" Click="menuUnstageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
+
+                    <ListView Grid.Row="4" Name="listStaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick"
+                      SelectedValuePath="FileName" MouseUp="listView1_MouseUp" ButtonBase.Click="listView1_Click"
+                      VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Margin="10,0">
+
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Un-Stage File" Click="menuUnstage_Click" />
+                                <!--<MenuItem Header="Un-Stage All" Click="menuUnstageAll_Click" />-->
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="False">
+                                <GridViewColumn Width="0">
+                                    <GridViewColumn.Header>
+                                        <GridViewColumnHeader Content="Staged" Tag="Staged" />
+                                    </GridViewColumn.Header>
+                                    <GridViewColumn.HeaderTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Name="checkBoxAllStaged" Click="checkBoxAllStaged_Click"
+                                          HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.HeaderTemplate>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Name="checkBoxSelected" Click="checkBoxSelected_Click" IsChecked="{Binding IsSelected}"
+                                              HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding X}" Width="Auto">
+                                    <GridViewColumn.Header>
+                                        <GridViewColumnHeader Tag="Status" />
+                                    </GridViewColumn.Header>
+                                </GridViewColumn>
+                                <GridViewColumn DisplayMemberBinding="{Binding FileName}" Width="800">
+                                    <GridViewColumn.Header>
+                                        <GridViewColumnHeader Content="File" Tag="FileName" HorizontalContentAlignment="Left" />
+                                    </GridViewColumn.Header>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Column="2" Grid.Row="1" Background="White" ButtonBase.Click="DiffEditor_Click">
+                <avalonEdit:TextEditor Grid.Row="1" x:Name="DiffEditor" FontFamily="Consolas" FontSize="10pt" />
+            </Grid>
 		</Grid>
 	</Grid>
 </UserControl>

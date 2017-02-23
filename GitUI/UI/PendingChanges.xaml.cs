@@ -16,6 +16,7 @@ using System.Xml;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Highlighting;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GitUI.UI
 {
@@ -24,6 +25,9 @@ namespace GitUI.UI
     /// </summary>
     public partial class PendingChanges : UserControl
     {
+        const string DISPLAY_MODE_NAME = "vd-git-tools.mode";
+        private ListView activeListView;
+
         GitFileStatusTracker tracker;
         GitViewModel service;
 
@@ -149,10 +153,72 @@ namespace GitUI.UI
                 }
                 this.DiffEditor.ShowLineNumbers = true;
                 this.DiffEditor.Load(fileName);
+
+                pnlChangedFileTool.Visibility = Visibility.Collapsed;
+                pnlStagedFileTool.Visibility = Visibility.Collapsed;
+                if (this.activeListView == this.listUnstaged)
+                {
+                    pnlChangedFileTool.Visibility = Visibility.Visible;
+                }
+                else if (this.activeListView == this.listStaged)
+                {
+                    pnlStagedFileTool.Visibility = Visibility.Visible;
+                }
             }
             finally
             {
                 File.Delete(fileName);
+            }
+        }
+
+        private void ShowSelectedFile()
+        {
+            var fileName = GetSelectedFileName();
+
+            this.ClearEditor();
+
+            if (fileName == null)
+            {
+                diffLines = new string[0];
+                return;
+            }
+
+            try
+            {
+                string tmpFileName = "";
+
+                var status = tracker.GetFileStatus(fileName);
+                if (status == GitFileStatus.NotControlled || status == GitFileStatus.New)
+                {
+                    tmpFileName = Path.Combine(tracker.WorkingDirectory, fileName);
+                }
+                else
+                {
+                    var diffAgainstIndex = this.activeListView == this.listStaged;
+                    tmpFileName = tracker.DiffFileAdv(fileName, diffAgainstIndex);
+                    
+                }
+                if (!string.IsNullOrWhiteSpace(tmpFileName) && File.Exists(tmpFileName))
+                {
+                    if (tracker.IsBinaryFile(tmpFileName))
+                    {
+                        this.DiffEditor.Text  = $"File \"{fileName}\" is binary that cannot be displayed.";
+                    }
+                    else if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
+                    {
+                        this.DiffEditor.Text = "File is too big to display: " + fileName;
+                    }
+                    else
+                    {
+                        diffLines = File.ReadAllLines(tmpFileName);
+                        this.ShowFile(tmpFileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+                ShowStatusMessage(message);
             }
         }
 
@@ -161,8 +227,9 @@ namespace GitUI.UI
         #region Select File
         private string GetSelectedFileName()
         {
-            if (this.dataGrid1.SelectedCells.Count == 0) return null;
-            var selectedItem = this.dataGrid1.SelectedCells[0].Item as GitFile;
+            if (this.activeListView.SelectedItems.Count == 0)
+                return null;
+            var selectedItem = this.activeListView.SelectedItems[0] as GitFile;
             if (selectedItem == null) return null;
             return selectedItem.FileName;
         }
@@ -186,7 +253,7 @@ namespace GitUI.UI
         {
             try
             {
-                this.dataGrid1.SelectedItems.Cast<GitFile>()
+                this.activeListView.SelectedItems.Cast<GitFile>()
                     .Select(item => item.FileName)
                     .ToList()
                     .ForEach(fileName => action(fileName));
@@ -196,6 +263,7 @@ namespace GitUI.UI
                 ShowStatusMessage(ex.Message);
             }
         }
+
         #endregion
 
         #region Git functions
@@ -204,7 +272,9 @@ namespace GitUI.UI
         internal void Refresh(GitFileStatusTracker tracker)
         {
             this.tracker = tracker;
-   
+
+            if (this.activeListView == null) this.activeListView = this.listStaged;
+
             if (tracker == null)
             {
                 ClearUI();
@@ -220,54 +290,67 @@ namespace GitUI.UI
                 Stopwatch stopwatch = new Stopwatch();
                 stopwatch.Start();
 
+                //var selectedFile = GetSelectedFileName();
+                //var selectedFiles = this.dataGrid1.Items.Cast<GitFile>()
+                //    .Where(i => i.IsSelected)
+                //    .Select(i => i.FileName).ToList();
+                //this.dataGrid1.BeginInit();
+
                 var selectedFile = GetSelectedFileName();
-                var selectedFiles = this.dataGrid1.Items.Cast<GitFile>()
+                var selectedFiles = this.activeListView.Items.Cast<GitFile>()
                     .Where(i => i.IsSelected)
                     .Select(i => i.FileName).ToList();
-
-                this.dataGrid1.BeginInit();
 
                 try
                 {
 
-                    this.dataGrid1.ItemsSource = tracker.ChangedFiles;
+                    //this.dataGrid1.ItemsSource = tracker.ChangedFiles;
 
-                    ICollectionView view = CollectionViewSource.GetDefaultView(this.dataGrid1.ItemsSource);
-                    if (view != null)
-                    {
-                        view.SortDescriptions.Clear();
-                        view.SortDescriptions.Add(new SortDescription(sortMemberPath, sortDirection));
-                        view.Refresh();
-                    }
+                    //ICollectionView view = CollectionViewSource.GetDefaultView(this.dataGrid1.ItemsSource);
+                    //if (view != null)
+                    //{
+                    //    view.SortDescriptions.Clear();
+                    //    view.SortDescriptions.Add(new SortDescription(sortMemberPath, sortDirection));
+                    //    view.Refresh();
+                    //}
 
-                    this.dataGrid1.SelectedValue = selectedFile;
+                    //this.dataGrid1.SelectedValue = selectedFile;
+                    //selectedFiles.ForEach(fn =>
+                    //{
+                    //    var item = this.dataGrid1.Items.Cast<GitFile>()
+                    //        .Where(i => i.FileName == fn)
+                    //        .FirstOrDefault();
+                    //    if (item != null) item.IsSelected = true;
+                    //});
+
+                    //ShowStatusMessage("");
+
+                    //this.label3.Content = string.Format("Changed files: ({0}) {1}", tracker.CurrentBranch, tracker.ChangedFilesStatus);
+
+
+                    this.listStaged.ItemsSource = tracker.ChangedFiles.Where(f => f.X != ' ' && f.X != '?');
+                    this.listUnstaged.ItemsSource = tracker.ChangedFiles.Where(f => f.Y != ' ');
+
+                    this.activeListView.SelectedValue = selectedFile;
                     selectedFiles.ForEach(fn =>
                     {
-                        var item = this.dataGrid1.Items.Cast<GitFile>()
+                        var item = this.activeListView.Items.Cast<GitFile>()
                             .Where(i => i.FileName == fn)
                             .FirstOrDefault();
                         if (item != null) item.IsSelected = true;
                     });
 
-                    ShowStatusMessage("");
+                    this.label3.Content = string.Format("Git Status:  {0}", tracker.ChangedFilesStatus);
 
-                    this.label3.Content = string.Format("Changed files: ({0}) {1}", tracker.CurrentBranch, tracker.ChangedFilesStatus);
                 }
                 catch (Exception ex)
                 {
                     ShowStatusMessage(ex.Message);
                 }
-                this.dataGrid1.EndInit();
+                //this.dataGrid1.EndInit();
 
                 stopwatch.Stop();
                 Debug.WriteLine("**** PendingChangesView Refresh: " + stopwatch.ElapsedMilliseconds);
-
-                //if (!GitSccOptions.Current.DisableAutoRefresh && stopwatch.ElapsedMilliseconds > 1000)
-                //    this.label4.Visibility = Visibility.Visible;
-                //else
-                //    this.label4.Visibility = Visibility.Collapsed;
-
-                //service.NoRefresh = false;
             };
 
             this.Dispatcher.BeginInvoke(act, DispatcherPriority.ApplicationIdle);
@@ -281,6 +364,9 @@ namespace GitUI.UI
             this.chkNewBranch.IsChecked = false;
 
             this.dataGrid1.ItemsSource = null;
+            this.listStaged.ItemsSource = null;
+            this.listUnstaged.ItemsSource = null;
+
             this.textBoxComments.Document.Blocks.Clear();
             this.ClearEditor();
             var chk = this.dataGrid1.FindVisualChild<CheckBox>("checkBoxAllStaged");
@@ -416,22 +502,64 @@ Note: Undo file changes will restore the file(s) from the last commit.";
             }
         }
 
+        private async void StageFiles(IEnumerable<GitFile> unstaged)
+        {
+            int i = 1, count = unstaged.Count();
+            service.NoRefresh = true;
+            await Task.Run(() =>
+            {
+                foreach (var item in unstaged)
+                {
+                    tracker.StageFile(item.FileName);
+                    ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
+                }
+            });
+            service.NoRefresh = false;
+            HistoryViewCommands.RefreshGraph.Execute(null, this);
+        }
+
+        private void menuStageAll_Click(object sender, RoutedEventArgs e)
+        {
+            var unstaged = this.activeListView.ItemsSource.Cast<GitFile>()
+               .Where(item => !item.IsStaged);
+            this.StageFiles(unstaged);
+        }
+
         private void menuStage_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFiles(fileName =>
+            var unstaged = this.activeListView.SelectedItems.Cast<GitFile>()
+               .Where(item => !item.IsStaged);
+            this.StageFiles(unstaged);
+        }
+
+        private async void UnStageFiles(IEnumerable<GitFile> staged)
+        {
+            int i = 1, count = staged.Count();
+            service.NoRefresh = true;
+            await Task.Run(() =>
             {
-                tracker.StageFile(fileName);
-                ShowStatusMessage("Staged file: " + fileName);
+                foreach (var item in staged)
+                {
+                    tracker.UnStageFile(item.FileName);
+                    ShowStatusMessage(string.Format("Unstaged ({0}/{1}): {2}", i++, count, item.FileName));
+                }
             });
+            service.NoRefresh = false;
+            HistoryViewCommands.RefreshGraph.Execute(null, this);
+        }
+
+        private void menuUnstageAll_Click(object sender, RoutedEventArgs e)
+        {
+            var staged = this.activeListView.ItemsSource.Cast<GitFile>()
+               .Where(item => item.IsStaged);
+            this.UnStageFiles(staged);
         }
 
         private void menuUnstage_Click(object sender, RoutedEventArgs e)
         {
-            GetSelectedFiles(fileName =>
-            {
-                tracker.UnStageFile(fileName);
-                ShowStatusMessage("Un-staged file: " + fileName);
-            });
+            var staged = this.activeListView.SelectedItems.Cast<GitFile>()
+               .Where(item => item.IsStaged);
+            this.UnStageFiles(staged);
         }
 
         private void menuDeleteFile_Click(object sender, RoutedEventArgs e)
@@ -454,6 +582,92 @@ Note: Undo file changes will restore the file(s) from the last commit.";
                     File.Delete(Path.Combine(this.tracker.WorkingDirectory, fileName));
                 }
             }
+        }
+
+        #endregion
+
+        #region listView1
+        private GridViewColumnHeader _currentSortedColumn;
+        private ListSortDirection _lastSortDirection;
+        //private T FindAncestorOfType<T>(DependencyObject dependencyObject)
+        //    where T : DependencyObject
+        //{
+        //    for (var current = dependencyObject; current != null; current = VisualTreeHelper.GetParent(current))
+        //    {
+        //        T typed = current as T;
+        //        if (typed != null)
+        //            return typed;
+        //    }
+
+        //    return null;
+        //}
+
+        private void listView1_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void listView1_Click(object sender, RoutedEventArgs e)
+        {
+            this.activeListView = sender as ListView;
+            GridViewColumnHeader header = e.OriginalSource as GridViewColumnHeader;
+            if (header == null || header.Role == GridViewColumnHeaderRole.Padding)
+                return;
+
+            ListSortDirection direction = ListSortDirection.Ascending;
+            if (header == _currentSortedColumn && _lastSortDirection == ListSortDirection.Ascending)
+                direction = ListSortDirection.Descending;
+
+            Sort(header, direction);
+            UpdateColumnHeaderTemplate(header, direction);
+            _currentSortedColumn = header;
+            _lastSortDirection = direction;
+        }
+
+        private void SortCurrentColumn()
+        {
+            if (_currentSortedColumn != null)
+                Sort(_currentSortedColumn, _lastSortDirection);
+        }
+
+        private void Sort(GridViewColumnHeader header, ListSortDirection direction)
+        {
+            if (activeListView.ItemsSource != null)
+            {
+                ICollectionView view = CollectionViewSource.GetDefaultView(activeListView.ItemsSource);
+                view.SortDescriptions.Clear();
+                view.SortDescriptions.Add(new SortDescription(header.Tag as string, direction));
+                view.Refresh();
+            }
+        }
+
+        private void UpdateColumnHeaderTemplate(GridViewColumnHeader header, ListSortDirection direction)
+        {
+            if (header.Column == null) return;
+
+            if (direction == ListSortDirection.Ascending)
+                header.Column.HeaderTemplate = Resources["HeaderTemplateArrowUp"] as DataTemplate;
+            else
+                header.Column.HeaderTemplate = Resources["HeaderTemplateArrowDown"] as DataTemplate;
+
+            if (_currentSortedColumn != null && _currentSortedColumn != header &&
+                _currentSortedColumn.Column != null)
+                _currentSortedColumn.Column.HeaderTemplate = null;
+        }
+
+        private void listView1_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (this.activeListView != sender)
+            {
+                this.activeListView = sender as ListView;
+                ShowSelectedFile();
+            }
+        }
+
+        private void listView1_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.activeListView = sender as ListView;
+            ShowSelectedFile();
         }
 
         #endregion
@@ -519,14 +733,12 @@ Note: Undo file changes will restore the file(s) from the last commit.";
             OnCommit();
         }
 
-        internal void OnCommit()
+        internal async void OnCommit()
         {
             if (tracker == null) return;
 
             try
             {
-                service.NoRefresh = true;
-
                 if (chkNewBranch.IsChecked == true)
                 {
                     if (string.IsNullOrWhiteSpace(txtNewBranch.Text))
@@ -548,16 +760,19 @@ Note: Undo file changes will restore the file(s) from the last commit.";
                     return;
                 }
 
+                var changed = this.listUnstaged.ItemsSource.Cast<GitFile>();
+                var count = changed.Count();
+
                 ShowStatusMessage("Staging files ...");
-                StageSelectedFiles();
 
                 if (!isAmend)
                 {
                     tracker.Refresh();
                     bool hasStaged = tracker == null ? false :
-                                     tracker.ChangedFiles.Any(f => f.IsStaged);
+                                     tracker.ChangedFiles.Any(f => f.X != ' ');
                     if (!hasStaged)
                     {
+                        hasStaged = count > 0;
                         MessageBox.Show("No file has been selected/staged for commit.", "Commit",
                             MessageBoxButton.OK, MessageBoxImage.Exclamation);
                         return;
@@ -576,8 +791,26 @@ Are you sure you want to continue?";
                     }
                 }
 
-                var id = tracker.Commit(Comments, isAmend, chkSignOff.IsChecked == true);
-                ShowStatusMessage("Commit successfully. Commit Hash: " + id);
+                service.NoRefresh = true;
+                int i = 1;
+                bool signoff = chkSignOff.IsChecked == true;
+
+                await Task.Run(() =>
+                {
+                    if (changed.Count() > 0 && listStaged.Items.Count == 0)
+                    {
+                        // auto stage all changes if nothing is staged
+                        foreach (var item in changed)
+                        {
+                            tracker.StageFile(item.FileName);
+                            ShowStatusMessage(string.Format("Staged ({0}/{1}): {2}", i++, count, item.FileName));
+                        }
+                    }
+
+                    var id = tracker.Commit(Comments, isAmend, signoff);
+                    ShowStatusMessage("Commit successfully. Commit Hash: " + id);
+                });
+
                 ClearUI();
                 
                 tracker.Refresh();
@@ -608,8 +841,107 @@ Are you sure you want to continue?";
             this.service = GitViewModel.Current;
         }
 
+        private async void TryRun(Action act)
+        {
+            string message = "";
+            Mouse.OverrideCursor = Cursors.Wait;
+            service.NoRefresh = true;
+            await Task.Run(() =>
+            {
+                try
+                {
+                    act();
+                }
+                catch (Exception ex)
+                {
+                    message = ex.Message;
+                    ShowStatusMessage(message);
+                }
+            });
+            if (message.Length > 0) MessageBox.Show(message, "Failed git apply", MessageBoxButton.OK, MessageBoxImage.Error);
+            service.NoRefresh = false;
+            HistoryViewCommands.RefreshGraph.Execute(null, this);
+            Mouse.OverrideCursor = null;
+        }
 
+        private void btnStageFile_Click(object sender, RoutedEventArgs e)
+        {
+            var fileName = ((GitFile)this.activeListView.SelectedItem).FileName;
+            TryRun(() =>
+            {
+                this.tracker.StageFile(fileName);
+            });
+        }
+
+        private void btnStageSelected_Click(object sender, RoutedEventArgs e)
+        {
+            TryRun(() =>
+            {
+                var selectionPosition = this.GetEditorSelectionPosition();
+                this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], true, false);
+            });
+        }
+
+        private void btnResetFile_Click(object sender, RoutedEventArgs e)
+        {
+            var file = ((GitFile)this.activeListView.SelectedItem);
+            var fileName = file.FileName;
+            TryRun(() =>
+            {
+                if (file.Status == GitFileStatus.NotControlled || file.Status == GitFileStatus.New)
+                {
+                    File.Delete(Path.Combine(this.tracker.WorkingDirectory, fileName));
+                }
+                else
+                {
+                    this.tracker.CheckOutFile(fileName);
+                }
+            });
+        }
+
+        private void btnResetSelected_Click(object sender, RoutedEventArgs e)
+        {
+            TryRun(() =>
+            {
+                var selectionPosition = this.GetEditorSelectionPosition();
+                this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], false, true);
+            });
+        }
+
+        private void btnUnStageFile_Click(object sender, RoutedEventArgs e)
+        {
+            var fileName = ((GitFile)this.activeListView.SelectedItem).FileName;
+            TryRun(() =>
+            {
+                this.tracker.UnStageFile(fileName);
+            });
+        }
+
+        private void btnUnStageSelected_Click(object sender, RoutedEventArgs e)
+        {
+            TryRun(() =>
+            {
+                var selectionPosition = this.GetEditorSelectionPosition();
+                this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], true, true);
+            });
+        }
+
+        private int[] GetEditorSelectionPosition()
+        {
+            return new int[] { this.DiffEditor.SelectionStart, this.DiffEditor.SelectionStart + this.DiffEditor.SelectionLength };
+        }
+
+        private void DiffEditor_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.tracker == null) return;
+
+            var selectionPosition = this.GetEditorSelectionPosition();
+            var hasChanges = tracker.HasChanges(diffLines, selectionPosition[0], selectionPosition[1]);
+            btnResetSelected.Visibility = btnStageSelected.Visibility = btnUnStageSelected.Visibility =
+                (hasChanges ? Visibility.Visible : Visibility.Collapsed);
+        }
     }
+
 
     public static class ExtHelper
     {
