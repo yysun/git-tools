@@ -39,9 +39,9 @@
     <Grid PreviewKeyDown="Grid_PreviewKeyDown">
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="#FFF2F2F2" Offset="0" />
+                <GradientStop Color="#FFDBDBDB" Offset="0" />
                 <GradientStop Color="#FFDBDBDB" Offset="1" />
-                <GradientStop Color="#FFD8D5D5" Offset="0.331" />
+                <GradientStop Color="#FFF2F2F2" Offset="0.331" />
             </LinearGradientBrush>
         </Grid.Background>
 

@@ -29,7 +29,7 @@ namespace GitUI
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
-			this.Style = (Style)Resources["GradientStyle"];
+			//this.Style = (Style)Resources["GradientStyle"];
 
             this.gitViewModel = GitViewModel.Current;
             this.gitConsole.GitExePath = GitBash.GitExePath;
