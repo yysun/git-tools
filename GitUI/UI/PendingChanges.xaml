@@ -170,7 +170,7 @@
 
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="100" />
+                        <RowDefinition Height="200" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -181,7 +181,7 @@
                    ToolTip="select file to commit, or right click to stage/unstage file" />
 
                     <Button Content="Stage All" Padding="10 0"
-                        VerticalAlignment="Center" Margin="0,0,4,0" Click="menuStageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
+                        VerticalAlignment="Center" Margin="0,0,10,0" Click="menuStageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
 
                     <ListView Grid.Row="1" Name="listUnstaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick"
                       SelectedValuePath="FileName" MouseUp="listView1_MouseUp" ButtonBase.Click="listView1_Click"
@@ -237,11 +237,11 @@
 
                     <Button Grid.Row="3" Content="Un-Stage All" Padding="10 0"
                         
-                        VerticalAlignment="Center" Margin="0,0,4,0" Click="menuUnstageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
+                        VerticalAlignment="Center" Margin="0,0,10,0" Click="menuUnstageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
 
                     <ListView Grid.Row="4" Name="listStaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick"
                       SelectedValuePath="FileName" MouseUp="listView1_MouseUp" ButtonBase.Click="listView1_Click"
-                      VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Margin="10,0">
+                      VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Margin="10,0,10,5">
 
                         <ListView.ContextMenu>
                             <ContextMenu>
