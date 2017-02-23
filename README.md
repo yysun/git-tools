@@ -21,6 +21,7 @@ For more information, please visit http://yysun.github.io/git-tools
 * Git Tools Toolbar
 * Git Changes Window
 * Git History Viewer
+* Stage/Unstage/Reset by lines
 
 ## How to Use
 
@@ -35,6 +36,12 @@ For more information, please visit http://yysun.github.io/git-tools
 * Open the solution and compile in Visual Studio 2017
 
 ## Change Logs
+
+### 1.7.0
+
+* Added advanced mode: displays unstaged changes and staged changes as two lists
+* Added advanced mode: allows stage/unstage/reset by selecting line
+* Improved Git Console auto complete
 
 ### 1.6.0
 
