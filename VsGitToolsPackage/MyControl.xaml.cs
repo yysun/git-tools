@@ -826,7 +826,7 @@ Note: if the file is included project, you need to delete the file from project 
                 var count = unstaged.Count();
 
                 var advancedMode = this.chkAdvMode.IsChecked == true;
-                var changed = this.activeListView.ItemsSource.Cast<GitFile>();
+                var changed = this.listUnstaged.ItemsSource.Cast<GitFile>();
 
                 ShowStatusMessage("Staging files ...");
 
@@ -877,8 +877,9 @@ Are you sure you want to continue?";
 
                 await Task.Run(() =>
                 {
-                    if (advancedMode)
+                    if (advancedMode && changed.Count()>0 && listStaged.Items.Count == 0)
                     {
+                        count = changed.Count();
                         // auto stage all changes if nothing is staged
                         foreach (var item in changed)
                         {

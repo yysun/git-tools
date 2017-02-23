@@ -769,10 +769,10 @@ Note: Undo file changes will restore the file(s) from the last commit.";
                 {
                     tracker.Refresh();
                     bool hasStaged = tracker == null ? false :
-                                     tracker.ChangedFiles.Any(f => f.X != ' ');
+                                     tracker.ChangedFiles.Any(f => f.X != ' ') || count > 0; 
+
                     if (!hasStaged)
                     {
-                        hasStaged = count > 0;
                         MessageBox.Show("No file has been selected/staged for commit.", "Commit",
                             MessageBoxButton.OK, MessageBoxImage.Exclamation);
                         return;
