@@ -9,8 +9,6 @@ Since Visual Studio 2013, Microsoft has built the Microsoft Git provider into Vi
 In order to be compatible with Microsoft Git, this extension is a modification of Git Source Control Provider. It removed the source control provider part and only contains the Git tools, 
 so that it can run side by side with Microsoft Git. Git Source Control Provider is still available as a separate extension.
 
-The source code of this extension is available from [GitHub](https://github.com/yysun/git-tools). Forks and pull requests are welcome.
-
 For more information, please visit http://yysun.github.io/git-tools
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=KBCLF3PZD6C98&lc=US&item_name=Git%20Source%20Control%20Provider&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
@@ -21,6 +19,7 @@ For more information, please visit http://yysun.github.io/git-tools
 * Git Tools Toolbar
 * Git Changes Window
 * Git History Viewer
+* Git Console with auto complete
 * Stage/Unstage/Reset by lines
 
 ## How to Use
@@ -34,10 +33,11 @@ For more information, please visit http://yysun.github.io/git-tools
 
 * Get source code: _git clone https://github.com/yysun/git-tools.git_
 * Open the solution and compile in Visual Studio 2017
+* Pull requests are welcome
 
 ## Change Logs
 
-### 1.7.0
+### 2.0.0
 
 * Added advanced mode: displays unstaged changes and staged changes as two lists
 * Added advanced mode: allows stage/unstage/reset by selecting line
