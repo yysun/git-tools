@@ -137,7 +137,8 @@ namespace GitUI.UI
             {
                 if (lstOptions.Visibility == Visibility.Visible)
                 {
-                    lstOptions.SelectedIndex -= 1;
+                    if (lstOptions.SelectedIndex > 0) lstOptions.SelectedIndex -= 1;
+                    lstOptions.ScrollIntoView(lstOptions.SelectedItem);
                 }
                 else
                 {
@@ -149,7 +150,8 @@ namespace GitUI.UI
             {
                 if (lstOptions.Visibility == Visibility.Visible)
                 {
-                    lstOptions.SelectedIndex += 1;
+                    if (lstOptions.SelectedIndex < lstOptions.Items.Count - 1) lstOptions.SelectedIndex += 1;
+                    lstOptions.ScrollIntoView(lstOptions.SelectedItem);
                 }
                 else
                 {

@@ -14,12 +14,9 @@ namespace GitScc
 
     public class GitIntellisenseHelper
     {
-        public static IEnumerable<string> GetOptions(GitRepository tracker, string command)
+        private static IEnumerable<string> GetGitData(GitRepository tracker, string option)
         {
-            if (tracker == null) return new string[] { };
-            var options = Commands.Where(i => Regex.IsMatch(command, i.Key)).Select(i => i.Value).FirstOrDefault();
-            if (options == null) return new string[] { };
-            switch (options[0])
+            switch (option)
             {
                 case "*branches*":
                     return tracker.RepositoryGraph.Refs
@@ -39,14 +36,35 @@ namespace GitScc
 
                 case "*commits*":
                     return tracker.RepositoryGraph.Commits
-                        .OrderByDescending(c=>c.AuthorDate)
+                        .OrderByDescending(c => c.AuthorDate)
                         .Select(r => r.ShortId);
+
+                default:
+                    return new string[] { };
             }
 
-            if (options[0].Contains("|")) 
-                return options[0].Split('|');
-            else
-                return options;
+        }
+        public static IEnumerable<string> GetOptions(GitRepository tracker, string command)
+        {
+            if (tracker == null) return new string[] { };
+            var options = Commands.Where(i => Regex.IsMatch(command, i.Key)).Select(i => i.Value).FirstOrDefault();
+            if (options == null) return new string[] { };
+
+            if (options.Length==1 && options[0].Contains("|")) options = options[0].Split('|');
+
+            var list = new List<string>();
+            foreach(var option in options)
+            {
+                if (option.StartsWith("*"))
+                {
+                    list.AddRange(GetGitData(tracker, option));
+                }
+                else
+                {
+                    list.Add(option);
+                }
+            }
+            return list;
         }
 
         static Dictionary<string, string[]> Commands = new Dictionary<string, string[]>{
@@ -75,10 +93,9 @@ namespace GitScc
             {"^git reset$", new string[] {"HEAD~|--soft|--mixed|--hard|--merge|--keep"}},
             {"^git reset HEAD$", new string[] {"*commits*"}},
 
-            {"^git config$", new string[] {"--global|--system|--local|--get|--add|--unset|--list|-l|--file"}},
-            {"^git config\\s?(?:--global|--system|--local)?$", new string[] {"--get|--add|--unset|--list|-l"}},
+            {"^git config$", new string[] {"--global|--system|--local|--get|--add|--unset|--list|-l|--file|*configs*"}},
+            {"^git config\\s?(?:--global|--system|--local)?$", new string[] {"--get|--add|--unset|--list|*configs*"}},
             {"^git config\\s?(?:--global|--system|--local)?\\s?(?:--get|--add|--unset)$", new string[] {"*configs*"}},
-            
         };
     }
 }
