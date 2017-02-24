@@ -22,9 +22,12 @@ namespace F1SYS.VsGitToolsPackage
     /// </summary>
     public partial class Settings : UserControl
     {
+        GitRepository tracker;
+
         public Settings()
         {
             InitializeComponent();
+            txtDonationLink.NavigateUri = new Uri("https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=KBCLF3PZD6C98&lc=US&item_name=Git%20Tools%20for%20Visual%20Studio&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted");
         }
         private void btnBrowse_Click(object sender, RoutedEventArgs e)
         {
@@ -47,22 +50,22 @@ namespace F1SYS.VsGitToolsPackage
             txtGitExePath.Text = GitBash.GitExePath;
             try
             {
-                var result = GitBash.Run("version", "");
+                var result = GitBash.Run("version");
                 txtMessage.Content = result.Output;
-                result = GitBash.Run("config --global user.name", "");
+                result = GitBash.Run("config --get user.name");
                 txtUserName.Text = result.Output;
-                result = GitBash.Run("config --global user.email", "");
+                result = GitBash.Run("config --get user.email");
                 txtUserEmail.Text = result.Output;
-                result = GitBash.Run("config --global credential.helper", "");
+                result = GitBash.Run("config --get credential.helper");
                 var msg = string.IsNullOrWhiteSpace(result.Output) ?
                     "Click here to install Windows Credential for Git" :
-                    "Git credential helper is installed";
+                    "You have installed git credential helper.";
                 txtGitCredentialHelper.Inlines.Clear();
                 txtGitCredentialHelper.Inlines.Add(msg);
-                result = GitBash.Run("config --global merge.tool", "");
+                result = GitBash.Run("config --get merge.tool");
                 msg = string.IsNullOrWhiteSpace(result.Output) ?
                    "Git merge tool is not configured." :
-                   "Git merge tool is " + result.Output;
+                   "You have configured git merge tool to be: " + result.Output;
                 txtGitMergeTool.Inlines.Clear();
                 txtGitMergeTool.Inlines.Add(msg);
             }
@@ -91,13 +94,19 @@ namespace F1SYS.VsGitToolsPackage
 
             try
             {
-                GitBash.Run("config --global user.name \"" + txtUserName.Text + "\"", "");
-                GitBash.Run("config --global user.email " + txtUserEmail.Text, "");
-
                 GitSccOptions.Current.GitBashPath = GitBash.GitExePath;
                 GitSccOptions.Current.SaveConfig();
-                //var sccService = BasicSccProvider.GetServiceEx<SccProviderService>();
-                //sccService.MarkDirty(false);
+
+                if(this.tracker !=null && this.tracker.IsGit)
+                {
+                    GitBash.Run("config user.name \"" + txtUserName.Text + "\"", tracker.WorkingDirectory);
+                    GitBash.Run("config user.email " + txtUserEmail.Text, tracker.WorkingDirectory);
+                }
+                else
+                {
+                    GitBash.Run("config --global user.name \"" + txtUserName.Text + "\"");
+                    GitBash.Run("config --global user.email " + txtUserEmail.Text);
+                }
             }
             catch (Exception ex)
             {
@@ -105,8 +114,9 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        internal void Show()
+        internal void Show(GitRepository tracker)
         {
+            this.tracker = tracker;
             this.Visibility = Visibility.Visible;
             txtGitExePath.Text = GitBash.GitExePath;
             btnOK.IsEnabled = false;
@@ -145,7 +155,5 @@ namespace F1SYS.VsGitToolsPackage
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
         }
-
-
     }
 }

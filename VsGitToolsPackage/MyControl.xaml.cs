@@ -802,7 +802,7 @@ Note: if the file is included project, you need to delete the file from project 
         }
         internal void OnSettings()
         {
-            Settings.Show();
+            Settings.Show(this.tracker);
         }
 
         internal async Task OnCommit()

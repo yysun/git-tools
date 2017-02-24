@@ -734,7 +734,7 @@ namespace GitScc
 
         public void SetConfig(string name, string value)
         {
-            GitBash.Run($"config --add {name} {value}", WorkingDirectory);
+            GitBash.Run($"config {name} {value}", WorkingDirectory);
         }
 
         public void RemveConfig(string name)
