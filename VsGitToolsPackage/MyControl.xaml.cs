@@ -922,14 +922,17 @@ Are you sure you want to continue?";
             if (this.gridAdvancedMode != null) this.gridAdvancedMode.Visibility = Visibility.Collapsed;
             if (this.pnlChangedFileTool != null) this.pnlChangedFileTool.Visibility = Visibility.Collapsed;
             if (this.pnlStagedFileTool != null) this.pnlStagedFileTool.Visibility = Visibility.Collapsed;
-            if (this.tracker != null) this.tracker.SetConfig(DISPLAY_MODE_NAME, "simple");
+            if (this.tracker != null && (this.tracker.GetConfig(DISPLAY_MODE_NAME) != "" || 
+                this.tracker.GetConfig(DISPLAY_MODE_NAME) != "simple"))
+                this.tracker.SetConfig(DISPLAY_MODE_NAME, "simple");
         }
 
         private void SetAdvancedMode()
         {
             if (this.listView1 != null) this.listView1.Visibility = Visibility.Collapsed;
             if (this.gridAdvancedMode != null) this.gridAdvancedMode.Visibility = Visibility.Visible;
-            if (this.tracker != null) this.tracker.SetConfig(DISPLAY_MODE_NAME, "advanced");
+            if (this.tracker != null && this.tracker.GetConfig(DISPLAY_MODE_NAME) != "advanced")
+                this.tracker.SetConfig(DISPLAY_MODE_NAME, "advanced");
         }
 
         private void chkAdvMode_Checked(object sender, RoutedEventArgs e)

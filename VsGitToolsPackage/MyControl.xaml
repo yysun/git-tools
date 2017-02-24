@@ -466,7 +466,7 @@
                         <ContentControl Grid.Row="1" x:Name="DiffEditor" MouseDoubleClick="DiffEditor_MouseDoubleClick" MouseUp="DiffEditor_MouseUp" />
                     </Grid>
                 </TabItem>
-                <TabItem Header="Git Console" Name="tabItem2" Margin="0,-3,0,3">
+                <TabItem Header="Git Console" Name="tabItem2">
                     <gitconsole:GitConsole x:Name="gitConsole1" />
                 </TabItem>
             </TabControl>
