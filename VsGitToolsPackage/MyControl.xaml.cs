@@ -27,7 +27,7 @@ namespace F1SYS.VsGitToolsPackage
     /// </summary>
     public partial class MyControl : UserControl
     {
-        const string DISPLAY_MODE_NAME = "vd-git-tools.mode";
+        const string DISPLAY_MODE_NAME = "vs-git-tools.mode";
 
         GitRepository tracker;
         //VsGitToolsService service;

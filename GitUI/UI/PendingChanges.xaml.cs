@@ -25,7 +25,7 @@ namespace GitUI.UI
     /// </summary>
     public partial class PendingChanges : UserControl
     {
-        const string DISPLAY_MODE_NAME = "vd-git-tools.mode";
+        const string DISPLAY_MODE_NAME = "vs-git-tools.mode";
         private ListView activeListView;
 
         GitFileStatusTracker tracker;
