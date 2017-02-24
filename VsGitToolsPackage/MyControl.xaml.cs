@@ -970,8 +970,10 @@ Are you sure you want to continue?";
 
         private void btnStageFile_Click(object sender, RoutedEventArgs e)
         {
-           var fileName = ((GitFile)this.activeListView.SelectedItem).FileName;
-           TryRun(() =>
+            var file = ((GitFile)this.activeListView.SelectedItem);
+            if (file == null) return;
+            var fileName = file.FileName;
+            TryRun(() =>
             {
                 //this.tracker.Apply(diffLines, 1, diffLines.Length, true, false);
                 this.tracker.StageFile(fileName);
@@ -990,6 +992,7 @@ Are you sure you want to continue?";
         private void btnResetFile_Click(object sender, RoutedEventArgs e)
         {
             var file = ((GitFile)this.activeListView.SelectedItem);
+            if (file == null) return;
             var fileName = file.FileName;
             TryRun(() =>
             {
@@ -1015,7 +1018,9 @@ Are you sure you want to continue?";
 
         private void btnUnStageFile_Click(object sender, RoutedEventArgs e)
         {
-            var fileName = ((GitFile)this.activeListView.SelectedItem).FileName;
+            var file = ((GitFile)this.activeListView.SelectedItem);
+            if (file == null) return;
+            var fileName = file.FileName;
             TryRun(() =>
             {
                 //this.tracker.Apply(diffLines, 1, diffLines.Length, true, true);

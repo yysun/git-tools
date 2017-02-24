@@ -148,8 +148,7 @@ namespace GitUI.UI
                 }
                 else
                 {
-                    this.DiffEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(
-                        ext);
+                    this.DiffEditor.SyntaxHighlighting = HighlightingManager.Instance.GetDefinitionByExtension(ext);
                 }
                 this.DiffEditor.ShowLineNumbers = true;
                 this.DiffEditor.Load(fileName);
@@ -167,7 +166,8 @@ namespace GitUI.UI
             }
             finally
             {
-                File.Delete(fileName);
+                // Cannot delete because the file real, not a copy anymore
+                // File.Delete(fileName);
             }
         }
 
@@ -522,7 +522,7 @@ Note: Undo file changes will restore the file(s) from the last commit.";
 
         private void menuStageAll_Click(object sender, RoutedEventArgs e)
         {
-            var unstaged = this.activeListView.ItemsSource.Cast<GitFile>()
+            var unstaged = this.listUnstaged.ItemsSource.Cast<GitFile>()
                .Where(item => !item.IsStaged);
             this.StageFiles(unstaged);
         }
@@ -552,7 +552,7 @@ Note: Undo file changes will restore the file(s) from the last commit.";
 
         private void menuUnstageAll_Click(object sender, RoutedEventArgs e)
         {
-            var staged = this.activeListView.ItemsSource.Cast<GitFile>()
+            var staged = this.listStaged.ItemsSource.Cast<GitFile>()
                .Where(item => item.IsStaged);
             this.UnStageFiles(staged);
         }
@@ -872,7 +872,9 @@ Are you sure you want to continue?";
 
         private void btnStageFile_Click(object sender, RoutedEventArgs e)
         {
-            var fileName = ((GitFile)this.activeListView.SelectedItem).FileName;
+            var file = ((GitFile)this.activeListView.SelectedItem);
+            if (file == null) return;
+            var fileName = file.FileName;
             TryRun(() =>
             {
                 this.tracker.StageFile(fileName);
@@ -881,9 +883,9 @@ Are you sure you want to continue?";
 
         private void btnStageSelected_Click(object sender, RoutedEventArgs e)
         {
+            var selectionPosition = this.GetEditorSelectionPosition();
             TryRun(() =>
             {
-                var selectionPosition = this.GetEditorSelectionPosition();
                 this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], true, false);
             });
         }
@@ -891,6 +893,7 @@ Are you sure you want to continue?";
         private void btnResetFile_Click(object sender, RoutedEventArgs e)
         {
             var file = ((GitFile)this.activeListView.SelectedItem);
+            if (file == null) return;
             var fileName = file.FileName;
             TryRun(() =>
             {
@@ -907,16 +910,18 @@ Are you sure you want to continue?";
 
         private void btnResetSelected_Click(object sender, RoutedEventArgs e)
         {
+            var selectionPosition = this.GetEditorSelectionPosition();
             TryRun(() =>
             {
-                var selectionPosition = this.GetEditorSelectionPosition();
                 this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], false, true);
             });
         }
 
         private void btnUnStageFile_Click(object sender, RoutedEventArgs e)
         {
-            var fileName = ((GitFile)this.activeListView.SelectedItem).FileName;
+            var file = ((GitFile)this.activeListView.SelectedItem);
+            if (file == null) return;
+            var fileName = file.FileName;
             TryRun(() =>
             {
                 this.tracker.UnStageFile(fileName);
@@ -925,9 +930,9 @@ Are you sure you want to continue?";
 
         private void btnUnStageSelected_Click(object sender, RoutedEventArgs e)
         {
+            var selectionPosition = this.GetEditorSelectionPosition();
             TryRun(() =>
             {
-                var selectionPosition = this.GetEditorSelectionPosition();
                 this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], true, true);
             });
         }
