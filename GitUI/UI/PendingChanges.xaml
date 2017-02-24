@@ -104,7 +104,7 @@
 			<Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="grid1">
 
 				<Grid.RowDefinitions>
-					<RowDefinition Height="80" />
+					<RowDefinition Height="150" />
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="*" />

@@ -748,6 +748,25 @@ namespace GitScc
             return result.Output.Trim();
         }
 
+        public string GetCommitTemplate()
+        {
+            var fileName = GetConfig("commit.template");
+            if (!string.IsNullOrWhiteSpace(fileName))
+            {
+
+                if (fileName.StartsWith("~"))
+                {
+                    fileName = fileName.Replace("~", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+                }
+                else
+                {
+                    if (!File.Exists(fileName)) fileName = Path.Combine(WorkingDirectory, fileName);
+                }
+
+                if (File.Exists(fileName)) return File.ReadAllText(fileName);
+            }
+            return "";
+        }
     }
 
     public class GitFileStatusTracker: GitRepository

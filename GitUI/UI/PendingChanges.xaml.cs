@@ -283,6 +283,8 @@ namespace GitUI.UI
 
             Action act = () =>
             {
+                if (string.IsNullOrEmpty(Comments)) Comments = tracker.GetCommitTemplate();
+
                 lblMessage.Content = "Commit to: " + tracker.CurrentBranch;
                 //service.NoRefresh = true;
                 ShowStatusMessage("Getting changed files ...");
@@ -755,8 +757,12 @@ Note: Undo file changes will restore the file(s) from the last commit.";
 
                 if (string.IsNullOrWhiteSpace(Comments))
                 {
-                    MessageBox.Show("Please enter comments for the commit.", "Commit",
+                    Comments = tracker.GetCommitTemplate();
+                    if (string.IsNullOrWhiteSpace(Comments))
+                    {
+                        MessageBox.Show("Please enter comments for the commit.", "Commit",
                         MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    }
                     return;
                 }
 
@@ -812,7 +818,7 @@ Are you sure you want to continue?";
                 });
 
                 ClearUI();
-                
+                Comments = tracker.GetCommitTemplate();
                 tracker.Refresh();
                 if (tracker.ChangedFiles.Count() == 0)
                 {

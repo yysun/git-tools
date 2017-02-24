@@ -400,6 +400,7 @@ namespace F1SYS.VsGitToolsPackage
                 return;
             }
 
+            if (string.IsNullOrEmpty(Comments)) Comments = tracker.GetCommitTemplate();
             this.chkAdvMode.IsChecked = this.tracker.GetConfig(DISPLAY_MODE_NAME) == "advanced";
 
             var selectedFile = GetSelectedFileName();
@@ -815,8 +816,12 @@ Note: if the file is included project, you need to delete the file from project 
 
                 if (string.IsNullOrWhiteSpace(Comments))
                 {
-                    MessageBox.Show("Please enter comments for the commit.", "Commit",
+                    Comments = tracker.GetCommitTemplate();
+                    if (string.IsNullOrWhiteSpace(Comments))
+                    {
+                        MessageBox.Show("Please enter comments for the commit.", "Commit",
                         MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    }
                     return;
                 }
 
@@ -899,6 +904,7 @@ Are you sure you want to continue?";
                     ShowStatusMessage("Commit successfully. Commit Hash: " + id);
                 });
                 ClearUI();
+                Comments = tracker.GetCommitTemplate();
                 this.toolWindow.Service.NoRefresh = false;
                 await this.toolWindow.Service.RefreshToolWindows();
             }
