@@ -53,19 +53,19 @@ namespace F1SYS.VsGitToolsPackage
                 var result = GitBash.Run("version");
                 txtMessage.Content = result.Output;
                 result = GitBash.Run("config --get user.name");
-                txtUserName.Text = result.Output;
+                txtUserName.Text = result.Output.Trim();
                 result = GitBash.Run("config --get user.email");
-                txtUserEmail.Text = result.Output;
+                txtUserEmail.Text = result.Output.Trim();
                 result = GitBash.Run("config --get credential.helper");
-                var msg = string.IsNullOrWhiteSpace(result.Output) ?
+                var msg = string.IsNullOrWhiteSpace(result.Output.Trim()) ?
                     "Click here to install Windows Credential for Git" :
                     "You have installed git credential helper.";
                 txtGitCredentialHelper.Inlines.Clear();
                 txtGitCredentialHelper.Inlines.Add(msg);
                 result = GitBash.Run("config --get merge.tool");
-                msg = string.IsNullOrWhiteSpace(result.Output) ?
+                msg = string.IsNullOrWhiteSpace(result.Output.Trim()) ?
                    "Git merge tool is not configured." :
-                   "You have configured git merge tool to be: " + result.Output;
+                   "You have configured git merge tool to be: " + result.Output.Trim();
                 txtGitMergeTool.Inlines.Clear();
                 txtGitMergeTool.Inlines.Add(msg);
             }
@@ -107,6 +107,7 @@ namespace F1SYS.VsGitToolsPackage
                     GitBash.Run("config --global user.name \"" + txtUserName.Text + "\"");
                     GitBash.Run("config --global user.email " + txtUserEmail.Text);
                 }
+                Hide();
             }
             catch (Exception ex)
             {
