@@ -934,7 +934,9 @@ Are you sure you want to continue?";
 
         private int[] GetEditorSelectionPosition()
         {
-            return new int[] { this.DiffEditor.SelectionStart, this.DiffEditor.SelectionStart + this.DiffEditor.SelectionLength };
+            return new int[] {
+                this.DiffEditor.Document.GetLineByOffset(this.DiffEditor.SelectionStart).LineNumber,
+                this.DiffEditor.Document.GetLineByOffset(this.DiffEditor.SelectionStart + this.DiffEditor.SelectionLength).LineNumber };
         }
 
         private void DiffEditor_Click(object sender, RoutedEventArgs e)
