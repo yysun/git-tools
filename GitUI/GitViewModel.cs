@@ -41,12 +41,17 @@ namespace GitUI
 
 		public GitFileStatusTracker Tracker { get { return tracker; } }
 		public string WorkingDirectory { get { return workingDirectory; } }
-		public bool ShowSimplifiedView
+
+
+        private bool _ShowSimplifiedView;
+
+        public bool ShowSimplifiedView
 		{
-            get { return tracker.RepositoryGraph.IsSimplified; }
+            get { return _ShowSimplifiedView; }
 			set
 			{
-                tracker.RepositoryGraph.IsSimplified = value;
+                _ShowSimplifiedView = value;
+                if (tracker != null && tracker.RepositoryGraph != null) tracker.RepositoryGraph.IsSimplified = value;
                 GraphChanged(this, null); 
 			}
 		}
@@ -98,7 +103,8 @@ namespace GitUI
 				fileSystemWatcher.EnableRaisingEvents = true;
 			}
 
-            GraphChanged(this, null);
+            this.ShowSimplifiedView = this._ShowSimplifiedView;
+            //GraphChanged(this, null);
 		}
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -165,7 +171,11 @@ namespace GitUI
 
             await Task.Run(() =>
             {
+
                 this.tracker.Refresh();
+
+                if (tracker != null && tracker.RepositoryGraph != null) 
+                    tracker.RepositoryGraph.IsSimplified = this._ShowSimplifiedView;
 
                 // cache branch and changed files
                 if (this.tracker != null && this.tracker.IsGit)
