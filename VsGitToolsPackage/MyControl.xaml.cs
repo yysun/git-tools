@@ -35,7 +35,8 @@ namespace F1SYS.VsGitToolsPackage
         private ListView activeListView;
         private MyToolWindow toolWindow;
         private IVsTextView textView;
-        private string[] diffLines;
+
+        private string[] diffLines = new string[] { };
 
         public MyControl(MyToolWindow toolWindow)
         {
@@ -71,6 +72,12 @@ namespace F1SYS.VsGitToolsPackage
             this.toolWindow.ClearEditor();
             this.DiffEditor.Content = null;
             fileInEditor = null;
+            pnlChangedFileTool.Visibility = activeListView == listUnstaged && 
+                listUnstaged.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            pnlStagedFileTool.Visibility = activeListView == listStaged && 
+                listStaged.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            btnResetSelected.Visibility = btnStageSelected.Visibility 
+                = btnUnStageSelected.Visibility = Visibility.Collapsed;
         }
 
         string fileInEditor;
@@ -557,13 +564,6 @@ Note: Changes that have not committed will be lost.";
             await this.toolWindow.Service.RefreshToolWindows();
         }
 
-        private void menuStageAll_Click(object sender, RoutedEventArgs e)
-        {
-            var unstaged = this.activeListView.ItemsSource.Cast<GitFile>()
-               .Where(item => !item.IsStaged);
-            this.StageFiles(unstaged);
-        }
-
         private void menuStage_Click(object sender, RoutedEventArgs e)
         {
             var unstaged = this.activeListView.SelectedItems.Cast<GitFile>()
@@ -588,17 +588,10 @@ Note: Changes that have not committed will be lost.";
             await this.toolWindow.Service.RefreshToolWindows();
         }
 
-        private void menuUnstageAll_Click(object sender, RoutedEventArgs e)
-        {
-            var staged = this.activeListView.ItemsSource.Cast<GitFile>()
-               .Where(item => item.IsStaged);
-            this.UnStageFiles(staged);
-        }
-
         private void menuUnstage_Click(object sender, RoutedEventArgs e)
         {
             var staged = this.activeListView.SelectedItems.Cast<GitFile>()
-               .Where(item => item.IsStaged);
+               .Where(item => item.IsStaged || item.X != ' ');
             this.UnStageFiles(staged);
         }
 
@@ -707,10 +700,13 @@ Note: if the file is included project, you need to delete the file from project 
 
         private void DiffEditor_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (this.tracker == null) return;
-            var selectionPosition = this.GetEditorSelectionPosition();
-            var hasChanges = tracker.HasChanges(diffLines, selectionPosition[0], selectionPosition[1]);
-            btnResetSelected.Visibility = btnStageSelected.Visibility = btnUnStageSelected.Visibility = 
+            var hasChanges = false;
+            if (this.tracker != null)
+            {
+                var selectionPosition = this.GetEditorSelectionPosition();
+                hasChanges = tracker.HasChanges(diffLines, selectionPosition[0], selectionPosition[1]);
+            }
+            btnResetSelected.Visibility = btnStageSelected.Visibility = btnUnStageSelected.Visibility =
                 (hasChanges ? Visibility.Visible : Visibility.Collapsed);
         }
 
@@ -811,7 +807,6 @@ Note: if the file is included project, you need to delete the file from project 
 
             try
             {
-
                 var isAmend = chkAmend.IsChecked == true;
 
                 if (string.IsNullOrWhiteSpace(Comments))
@@ -970,72 +965,77 @@ Are you sure you want to continue?";
 
         private void btnStageFile_Click(object sender, RoutedEventArgs e)
         {
-            var file = ((GitFile)this.activeListView.SelectedItem);
-            if (file == null) return;
-            var fileName = file.FileName;
-            TryRun(() =>
-            {
-                //this.tracker.Apply(diffLines, 1, diffLines.Length, true, false);
-                this.tracker.StageFile(fileName);
-            });
+            menuStage_Click(this, null);
         }
 
         private void btnStageSelected_Click(object sender, RoutedEventArgs e)
         {
+            var selectionPosition = this.GetEditorSelectionPosition();
             TryRun(() =>
             {
-                var selectionPosition = this.GetEditorSelectionPosition();
                 this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], true, false);
             });
         }
 
         private void btnResetFile_Click(object sender, RoutedEventArgs e)
         {
-            var file = ((GitFile)this.activeListView.SelectedItem);
-            if (file == null) return;
-            var fileName = file.FileName;
-            TryRun(() =>
-            {
-                if (file.Status == GitFileStatus.NotControlled || file.Status == GitFileStatus.New)
-                {
-                    File.Delete(Path.Combine(this.tracker.WorkingDirectory, fileName));
-                }
-                else
-                {
-                    this.tracker.CheckOutFile(fileName);
-                }
-            });
+            menuUndo_Click(this, null);
         }
 
         private void btnResetSelected_Click(object sender, RoutedEventArgs e)
         {
+            var selectionPosition = this.GetEditorSelectionPosition();
             TryRun(() =>
             {
-                var selectionPosition = this.GetEditorSelectionPosition();
                 this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], false, true);
             });
         }
 
         private void btnUnStageFile_Click(object sender, RoutedEventArgs e)
         {
-            var file = ((GitFile)this.activeListView.SelectedItem);
-            if (file == null) return;
-            var fileName = file.FileName;
-            TryRun(() =>
-            {
-                //this.tracker.Apply(diffLines, 1, diffLines.Length, true, true);
-                this.tracker.UnStageFile(fileName);
-            });
+            menuUnstage_Click(this, null);
+        }
+
+        private void btnDeleteFile_Click(object sender, RoutedEventArgs e)
+        {
+            menuDeleteFile_Click(this, null);
         }
 
         private void btnUnStageSelected_Click(object sender, RoutedEventArgs e)
         {
+            var selectionPosition = this.GetEditorSelectionPosition();
             TryRun(() =>
             {
-                var selectionPosition = this.GetEditorSelectionPosition();
                 this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], true, true);
             });
         }
+
+        private void btnStageAll_Click(object sender, RoutedEventArgs e)
+        {
+            var unstaged = this.listUnstaged.ItemsSource.Cast<GitFile>()
+               .Where(item => !item.IsStaged);
+            this.StageFiles(unstaged);
+        }
+
+        private void btnUnstageAll_Click(object sender, RoutedEventArgs e)
+        {
+            var staged = this.listStaged.ItemsSource.Cast<GitFile>()
+               .Where(item => item.IsStaged);
+            this.UnStageFiles(staged);
+        }
+
+        private void listUnstaged_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            foreach (MenuItem item in listUnstaged.ContextMenu.Items)
+                item.IsEnabled = listUnstaged.SelectedItems.Count > 0;
+        }
+
+        private void listStaged_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            foreach (MenuItem item in listStaged.ContextMenu.Items)
+                item.IsEnabled = listStaged.SelectedItems.Count > 0;
+        }
+
     }
 
     public static class ExtHelper

@@ -31,11 +31,12 @@ namespace GitUI.UI
         GitFileStatusTracker tracker;
         GitViewModel service;
 
-        private string[] diffLines;
+        private string[] diffLines = new string[] { };
 
         public PendingChanges()
         {
             InitializeComponent();
+            this.DiffEditor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
         }
 
         #region Events
@@ -128,6 +129,12 @@ namespace GitUI.UI
         private void ClearEditor()
         {
             this.DiffEditor.Text = "";
+            pnlChangedFileTool.Visibility = activeListView == listUnstaged && 
+                listUnstaged.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            pnlStagedFileTool.Visibility = activeListView == listStaged && 
+                listStaged.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            btnResetSelected.Visibility = btnStageSelected.Visibility
+                = btnUnStageSelected.Visibility = Visibility.Collapsed;
         }
 
         private void ShowFile(string fileName)
@@ -482,25 +489,40 @@ namespace GitUI.UI
             });
         }
 
-        private void menuUndo_Click(object sender, RoutedEventArgs e)
+        private async void menuUndo_Click(object sender, RoutedEventArgs e)
         {
             const string deleteMsg = @"
 
 Note: Undo file changes will restore the file(s) from the last commit.";
 
-            var filesToUndo = new List<string>();
+            var filesToUndo = this.activeListView.SelectedItems.Cast<GitFile>();
+            if (filesToUndo.Count() <= 0) return;
 
-            GetSelectedFiles(fileName => filesToUndo.Add(fileName));
-
-            string title = (filesToUndo.Count == 1) ? "Undo File Changes" : "Undo Files Changes for " + filesToUndo.Count + " Files?";
-            string message = (filesToUndo.Count == 1) ?
-                "Are you sure you want to undo changes to file: " + Path.GetFileName(filesToUndo.First()) + deleteMsg :
-                String.Format("Are you sure you want to undo changes to {0} files", filesToUndo.Count) + deleteMsg;
+            string title = (filesToUndo.Count() == 1) ? "Undo File Changes" : "Undo Files Changes for " + filesToUndo.Count() + " Files?";
+            string message = (filesToUndo.Count() == 1) ?
+                "Are you sure you want to undo changes to file: " + Path.GetFileName(filesToUndo.First().FileName) + deleteMsg :
+                String.Format("Are you sure you want to undo changes to {0} files", filesToUndo.Count()) + deleteMsg;
 
             if (MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                foreach (var fileName in filesToUndo)
-                    tracker.CheckOutFile(fileName);
+                service.NoRefresh = true;
+                await Task.Run(() =>
+                {
+                    foreach (var file in filesToUndo)
+                    {
+                        if (file.Status == GitFileStatus.NotControlled || file.Status == GitFileStatus.New)
+                        {
+                            File.Delete(Path.Combine(this.tracker.WorkingDirectory, file.FileName));
+                        }
+                        else
+                        {
+                            this.tracker.CheckOutFile(file.FileName);
+                        }
+                    }
+                });
+                service.NoRefresh = false;
+                service.NoRefresh = false;
+                HistoryViewCommands.RefreshGraph.Execute(null, this);
             }
         }
 
@@ -518,13 +540,6 @@ Note: Undo file changes will restore the file(s) from the last commit.";
             });
             service.NoRefresh = false;
             HistoryViewCommands.RefreshGraph.Execute(null, this);
-        }
-
-        private void menuStageAll_Click(object sender, RoutedEventArgs e)
-        {
-            var unstaged = this.listUnstaged.ItemsSource.Cast<GitFile>()
-               .Where(item => !item.IsStaged);
-            this.StageFiles(unstaged);
         }
 
         private void menuStage_Click(object sender, RoutedEventArgs e)
@@ -550,17 +565,10 @@ Note: Undo file changes will restore the file(s) from the last commit.";
             HistoryViewCommands.RefreshGraph.Execute(null, this);
         }
 
-        private void menuUnstageAll_Click(object sender, RoutedEventArgs e)
-        {
-            var staged = this.listStaged.ItemsSource.Cast<GitFile>()
-               .Where(item => item.IsStaged);
-            this.UnStageFiles(staged);
-        }
-
         private void menuUnstage_Click(object sender, RoutedEventArgs e)
         {
             var staged = this.activeListView.SelectedItems.Cast<GitFile>()
-               .Where(item => item.IsStaged);
+               .Where(item => item.IsStaged || item.X != ' ');
             this.UnStageFiles(staged);
         }
 
@@ -872,13 +880,7 @@ Are you sure you want to continue?";
 
         private void btnStageFile_Click(object sender, RoutedEventArgs e)
         {
-            var file = ((GitFile)this.activeListView.SelectedItem);
-            if (file == null) return;
-            var fileName = file.FileName;
-            TryRun(() =>
-            {
-                this.tracker.StageFile(fileName);
-            });
+            menuStage_Click(this, null);
         }
 
         private void btnStageSelected_Click(object sender, RoutedEventArgs e)
@@ -892,20 +894,7 @@ Are you sure you want to continue?";
 
         private void btnResetFile_Click(object sender, RoutedEventArgs e)
         {
-            var file = ((GitFile)this.activeListView.SelectedItem);
-            if (file == null) return;
-            var fileName = file.FileName;
-            TryRun(() =>
-            {
-                if (file.Status == GitFileStatus.NotControlled || file.Status == GitFileStatus.New)
-                {
-                    File.Delete(Path.Combine(this.tracker.WorkingDirectory, fileName));
-                }
-                else
-                {
-                    this.tracker.CheckOutFile(fileName);
-                }
-            });
+            menuUndo_Click(this, null);
         }
 
         private void btnResetSelected_Click(object sender, RoutedEventArgs e)
@@ -919,13 +908,12 @@ Are you sure you want to continue?";
 
         private void btnUnStageFile_Click(object sender, RoutedEventArgs e)
         {
-            var file = ((GitFile)this.activeListView.SelectedItem);
-            if (file == null) return;
-            var fileName = file.FileName;
-            TryRun(() =>
-            {
-                this.tracker.UnStageFile(fileName);
-            });
+            menuUnstage_Click(this, null);
+        }
+
+        private void btnDeleteFile_Click(object sender, RoutedEventArgs e)
+        {
+            menuDeleteFile_Click(this, null);
         }
 
         private void btnUnStageSelected_Click(object sender, RoutedEventArgs e)
@@ -935,6 +923,20 @@ Are you sure you want to continue?";
             {
                 this.tracker.Apply(diffLines, selectionPosition[0], selectionPosition[1], true, true);
             });
+        }
+
+        private void btnStageAll_Click(object sender, RoutedEventArgs e)
+        {
+            var unstaged = this.listUnstaged.ItemsSource.Cast<GitFile>()
+               .Where(item => !item.IsStaged);
+            this.StageFiles(unstaged);
+        }
+
+        private void btnUnstageAll_Click(object sender, RoutedEventArgs e)
+        {
+            var staged = this.listStaged.ItemsSource.Cast<GitFile>()
+               .Where(item => item.IsStaged);
+            this.UnStageFiles(staged);
         }
 
         private int[] GetEditorSelectionPosition()
@@ -950,6 +952,31 @@ Are you sure you want to continue?";
 
             var selectionPosition = this.GetEditorSelectionPosition();
             var hasChanges = tracker.HasChanges(diffLines, selectionPosition[0], selectionPosition[1]);
+            btnResetSelected.Visibility = btnStageSelected.Visibility = btnUnStageSelected.Visibility =
+                (hasChanges ? Visibility.Visible : Visibility.Collapsed);
+        }
+
+        private void listUnstaged_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            foreach (MenuItem item in listUnstaged.ContextMenu.Items)
+                item.IsEnabled = listUnstaged.SelectedItems.Count > 0;
+        }
+
+        private void listStaged_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            foreach (MenuItem item in listStaged.ContextMenu.Items)
+                item.IsEnabled = listStaged.SelectedItems.Count > 0;
+        }
+
+
+        private void Caret_PositionChanged(object sender, EventArgs e)
+        {
+            var hasChanges = false;
+            if (this.tracker != null)
+            {
+                var selectionPosition = this.GetEditorSelectionPosition();
+                hasChanges = tracker.HasChanges(diffLines, selectionPosition[0], selectionPosition[1]);
+            }
             btnResetSelected.Visibility = btnStageSelected.Visibility = btnUnStageSelected.Visibility =
                 (hasChanges ? Visibility.Visible : Visibility.Collapsed);
         }

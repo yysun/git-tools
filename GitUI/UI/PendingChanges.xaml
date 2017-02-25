@@ -90,6 +90,9 @@
                     <Button Content="Reset Selected" Padding="10 0"
                                     Name="btnResetSelected" 
                                     VerticalAlignment="Center" Margin="0,0,4,0" Click="btnResetSelected_Click"/>
+                    <Button Content="Delete File" Padding="10 0"
+                                    Name="btnDeleteFile" 
+                                    VerticalAlignment="Center" Margin="0,0,4,0" Click="btnDeleteFile_Click"/>
                 </StackPanel>
                 <StackPanel Name="pnlStagedFileTool" Margin="0,0,0,8" Orientation="Horizontal" Visibility="Collapsed">
                     <Button Content="Un-Stage File" Padding="10 0"
@@ -181,17 +184,18 @@
                    ToolTip="select file to commit, or right click to stage/unstage file" />
 
                     <Button Content="Stage All" Padding="10 0"
-                        VerticalAlignment="Center" Margin="0,0,10,0" Click="menuStageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
+                        VerticalAlignment="Center" Margin="0,0,10,0" Click="btnStageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
 
                     <ListView Grid.Row="1" Name="listUnstaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick"
                       SelectedValuePath="FileName" MouseUp="listView1_MouseUp" ButtonBase.Click="listView1_Click"
-                      VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Margin="10,0">
+                      VerticalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Margin="10,0" ContextMenuOpening="listUnstaged_ContextMenuOpening">
 
                         <ListView.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Stage File" Click="menuStage_Click" />
                                 <!--<MenuItem Header="Stage All" Click="menuStageAll_Click" />-->
-                                <MenuItem Header="Reset File Changes" Click="menuUndo_Click"/>
+                                <MenuItem Header="Reset File" Click="menuUndo_Click"/>
+                                <MenuItem Header="Delete File" Click="menuDeleteFile_Click" />
                             </ContextMenu>
                         </ListView.ContextMenu>
 
@@ -236,12 +240,11 @@
                   ToolTip="select file to commit, or right click to stage/unstage file" VerticalContentAlignment="Stretch" />
 
                     <Button Grid.Row="3" Content="Un-Stage All" Padding="10 0"
-                        
-                        VerticalAlignment="Center" Margin="0,0,10,0" Click="menuUnstageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
+                        VerticalAlignment="Center" Margin="0,0,10,0" Click="btnUnstageAll_Click" HorizontalContentAlignment="Right" HorizontalAlignment="Right"/>
 
                     <ListView Grid.Row="4" Name="listStaged" SelectionChanged="listView1_SelectionChanged" MouseDoubleClick="listView1_MouseDoubleClick"
                       SelectedValuePath="FileName" MouseUp="listView1_MouseUp" ButtonBase.Click="listView1_Click"
-                      VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Margin="10,0,10,5">
+                      VerticalContentAlignment="Center" ScrollViewer.HorizontalScrollBarVisibility="Hidden" Margin="10,0,10,5" ContextMenuOpening="listStaged_ContextMenuOpening">
 
                         <ListView.ContextMenu>
                             <ContextMenu>
