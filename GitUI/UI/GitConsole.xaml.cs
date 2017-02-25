@@ -142,7 +142,7 @@ namespace GitUI.UI
                 }
                 else
                 {
-                    GetCommand(commandIdx);
+                    GetCommand(--commandIdx);
                 }
                 e.Handled = true;
             }
@@ -254,7 +254,7 @@ namespace GitUI.UI
                (commandHistory.Count == 0 || commandHistory.Last() != command))
             {
                 commandHistory.Add(command);
-                commandIdx = commandHistory.Count - 1;
+                commandIdx = commandHistory.Count;
             }
 
             if (!ProcessInternalCommand(command))
