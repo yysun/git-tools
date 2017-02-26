@@ -762,29 +762,10 @@ Note: if the file is included project, you need to delete the file from project 
         private void OpenFile(string fileName)
         {
             fileName = System.IO.Path.Combine(this.tracker.WorkingDirectory, fileName);
-
             if (string.IsNullOrWhiteSpace(fileName)) return;
-
             fileName = fileName.Replace("/", "\\");
             var dte = toolWindow.dte;
-            bool opened = false;
-            Array projects = (Array)dte.ActiveSolutionProjects;
-            foreach (dynamic project in projects)
-            {
-                foreach (dynamic item in project.ProjectItems)
-                {
-                    if (string.Compare(item.FileNames[0], fileName, true) == 0)
-                    {
-                        dynamic wnd = item.Open(EnvDTE.Constants.vsViewKindPrimary);
-                        wnd.Activate();
-                        opened = true;
-                        break;
-                    }
-                }
-                if (opened) break;
-            }
-
-            if (!opened) dte.ItemOperations.OpenFile(fileName);
+            dte.ItemOperations.OpenFile(fileName);
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
