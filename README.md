@@ -15,19 +15,40 @@ For more information, please visit http://yysun.github.io/git-tools
 
 # Features
 
-* Git Tools Menu
-* Git Tools Toolbar
-* Git Changes Window
-* Git History Viewer
-* Git Console with auto complete
-* Stage/Unstage/Reset by lines
+## Git Tools Menu
+![main-menu](https://cloud.githubusercontent.com/assets/170547/23336421/281f2002-fb9e-11e6-9cec-77362e6a553c.png)
+
+![main-menu-gitext](https://cloud.githubusercontent.com/assets/170547/23336427/59259ea6-fb9e-11e6-97c8-f7d1fd321325.png)
+
+![main-menu-gittor](https://cloud.githubusercontent.com/assets/170547/23336429/69e726ba-fb9e-11e6-8790-f460c019f9a5.png)
+
+# Git Tools Toolbar
+![tool-bar](https://cloud.githubusercontent.com/assets/170547/23336451/fafd078c-fb9e-11e6-8000-90f6fd606034.png)
+
+# Git Changes Window - Simple Mode - Manage Stage/Index Automatically
+![simplified-mode](https://cloud.githubusercontent.com/assets/170547/23336456/1c6b784a-fb9f-11e6-8136-81dc09205b6f.png)
+
+# Git Changes Window - Advanced Mode - Stage/Unstage/Reset by Files and Lines
+![advanced-mode-1](https://cloud.githubusercontent.com/assets/170547/23336458/23f1fd96-fb9f-11e6-9968-276ea3eca394.png)
+
+# Git History Viewer - All commits
+![git-history-viewer-simplified-view-off](https://cloud.githubusercontent.com/assets/170547/23336493/f1b14098-fb9f-11e6-9319-a8f1d02ee2e0.png)
+
+# Git History Viewer - Key commits
+![git-history-viewer-simplified-view](https://cloud.githubusercontent.com/assets/170547/23336491/eeb85796-fb9f-11e6-861b-97878de280ba.png)
+
+# Git Console with auto complete
+![git-console](https://cloud.githubusercontent.com/assets/170547/23336540/2b58ee08-fba1-11e6-8591-55aceb319124.png)
+
 
 ## How to Use
 
-* Install [Git for Windows](http://code.google.com/p/msysgit), [Git Extensions](http://code.google.com/p/gitextensions) or [TortoiseGit](http://code.google.com/p/tortoisegit).
+* Install [Git for Windows](http://code.google.com/p/msysgit), [Git Extensions](http://code.google.com/p/gitextensions) (optional) or [TortoiseGit](http://code.google.com/p/tortoisegit) (optional).
 * Run Visual Studio. 
 * Go to Tools | Extensions and Updates..., search online gallery for Git Tools and install. 
 * Select Top Menu 'Git Tools' or add 'Git Tools'toolbar to the main window.
+
+![install](https://cloud.githubusercontent.com/assets/170547/23336552/6e7382b6-fba1-11e6-80ed-f0cefa01ee27.png)
 
 ## Compile Source Code
 
@@ -40,8 +61,9 @@ For more information, please visit http://yysun.github.io/git-tools
 ### 2.0.0
 
 * Added advanced mode: displays unstaged changes and staged changes as two lists
-* Added advanced mode: allows stage/unstage/reset by selecting line
+* Added advanced mode: allows stage/unstage/reset by selecting line(s)
 * Improved Git Console auto complete
+* Support git commit.template settings
 
 ### 1.6.0
 
