@@ -4,7 +4,7 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
 			 mc:Ignorable="d" 
-			 d:DesignHeight="120" d:DesignWidth="200">
+			 d:DesignHeight="120" d:DesignWidth="200" MouseMove="UserControl_MouseMove" GiveFeedback="UserControl_GiveFeedback" DragEnter="UserControl_DragEnter" DragLeave="UserControl_DragLeave" DragOver="UserControl_DragOver" Drop="UserControl_Drop" AllowDrop="True">
 	<UserControl.Resources>
 		<ControlTemplate x:Key="ButtonControlTemplate1" TargetType="{x:Type Button}">
 			<Grid Width="12" Height="12">

@@ -195,5 +195,69 @@ namespace GitScc.UI
             Clipboard.SetText(this.txtId.Text);
         }
 
+        #region drag and drop
+        private void UserControl_MouseMove(object sender, MouseEventArgs e)
+        {
+            CommitBox commitBox = sender as CommitBox;
+            if (commitBox != null && e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragDrop.DoDragDrop(commitBox, commitBox.txtId.Text, DragDropEffects.Copy);
+            }
+        }
+
+        private void UserControl_DragEnter(object sender, DragEventArgs e)
+        {
+            CommitBox commitBox = sender as CommitBox;
+            if (commitBox != null)
+            {
+                // If the DataObject contains string data, extract it.
+                if (e.Data.GetDataPresent(DataFormats.StringFormat))
+                {
+                    string dataString = (string)e.Data.GetData(DataFormats.StringFormat);
+                    // TODO
+                }
+            }
+        }
+
+        private void UserControl_DragLeave(object sender, DragEventArgs e)
+        {
+            CommitBox commitBox = sender as CommitBox;
+            if (commitBox != null)
+            {
+                // TODO
+            }
+        }
+
+        private void UserControl_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.None;
+
+            if (e.Data.GetDataPresent(DataFormats.StringFormat))
+            {
+                string dataString = (string)e.Data.GetData(DataFormats.StringFormat);
+                e.Effects = DragDropEffects.Copy | DragDropEffects.Move;
+                // TODO
+            }
+        }
+
+        private void UserControl_Drop(object sender, DragEventArgs e)
+        {
+            CommitBox commitBox = sender as CommitBox;
+            if (commitBox != null)
+            {
+                if (e.Data.GetDataPresent(DataFormats.StringFormat))
+                {
+                    string dataString = (string)e.Data.GetData(DataFormats.StringFormat);
+                    MessageBox.Show($"merge: {dataString} ==> {this.txtId.Text}");
+                }
+            }
+        }
+
+        private void UserControl_GiveFeedback(object sender, GiveFeedbackEventArgs e)
+        {
+
+        }
+
+        #endregion
     }
 }
