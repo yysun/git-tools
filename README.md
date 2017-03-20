@@ -2,10 +2,10 @@
 
 ## Introduction
 
-This extension provides a git changes tool window, a graphical git history viewer and menus to launch Git Bash, Git Extenstions and TortoiseGit. It is the successor of Git Source Control Provider.
+This extension provides a git changes tool window, a graphical git history viewer and menus to launch Git Bash, Git Extensions and TortoiseGit. It is the successor of Git Source Control Provider.
 
-[Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c) has been providing Git tools to supports Visual Studio 2008-2015. 
-Since Visual Studio 2013, Microsoft has built the Microsoft Git provider into Visual Studio. Visual Studio can have only one active source control provider at a time. 
+[Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c) has been providing Git tools to Visual Studio since Visual Studio 2008. 
+Started in Visual Studio 2013, Microsoft has built the Microsoft Git provider into Visual Studio. Visual Studio can have only one active source control provider at a time. 
 In order to be compatible with Microsoft Git, this extension is a modification of Git Source Control Provider. It removed the source control provider part and only contains the Git tools, 
 so that it can run side by side with Microsoft Git. Git Source Control Provider is still available as a separate extension.
 
