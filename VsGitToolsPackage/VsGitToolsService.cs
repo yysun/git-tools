@@ -18,7 +18,7 @@ namespace F1SYS.VsGitToolsPackage
 {
     [Guid("8E86F257-5F3C-4E21-B08D-926029AAEECC")]
     public class VsGitToolsService : IDisposable,
-        IVsSolutionEvents, 
+        IVsSolutionEvents,
         IVsUpdateSolutionEvents2
         //IVsFileChangeEvents
     {
@@ -34,11 +34,11 @@ namespace F1SYS.VsGitToolsPackage
 
         private GitRepository previousRepository;
 
-        public GitRepository Repository         
+        public GitRepository Repository
         {
             get
             {
-                var repo = trackers.Count == 1 ? 
+                var repo = trackers.Count == 1 ?
                     trackers[0]:
                     GetTracker(GetSelectFileName());
 
@@ -48,7 +48,7 @@ namespace F1SYS.VsGitToolsPackage
                     WatchFileChanges(repo.WorkingDirectory);
                     // NeedRefresh = true;
                 }
-                
+
                 previousRepository = repo;
                 return repo;
             }
@@ -150,7 +150,7 @@ namespace F1SYS.VsGitToolsPackage
         private IList<string> GetNodeFiles(IVsSccProject2 pscp2, uint itemid)
         {
             // NOTE: the function returns only a list of files, containing both regular files and special files
-            // If you want to hide the special files (similar with solution explorer), you may need to return 
+            // If you want to hide the special files (similar with solution explorer), you may need to return
             // the special files in a hastable (key=master_file, values=special_file_list)
 
             // Initialize output parameters
@@ -274,7 +274,7 @@ namespace F1SYS.VsGitToolsPackage
                         ErrorHandler.ThrowOnFailure(multiItemSelect.GetSelectionInfo(out numberOfSelectedItems, out isSingleHierarchyInt));
                         bool isSingleHierarchy = (isSingleHierarchyInt != 0);
 
-                        // Now loop all selected items and add them to the list 
+                        // Now loop all selected items and add them to the list
                         Debug.Assert(numberOfSelectedItems > 0, "Bad number of selected itemd");
                         if (numberOfSelectedItems > 0)
                         {
@@ -355,7 +355,7 @@ namespace F1SYS.VsGitToolsPackage
 
             if (string.IsNullOrEmpty(projectDirecotry) ||
                  trackers.Any(t=> t.IsGit && string.Compare(
-                     t.WorkingDirectory, 
+                     t.WorkingDirectory,
                      tracker.WorkingDirectory, true) == 0)) return;
 
             trackers.Add(tracker);
@@ -403,7 +403,7 @@ namespace F1SYS.VsGitToolsPackage
                 trackers.Clear();
                 Debug.WriteLine("VS Git Tools - OpenRepository raised excpetion: ", ex.ToString());
             }
-   
+
         }
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -442,7 +442,7 @@ namespace F1SYS.VsGitToolsPackage
             this.package = package;
 
             // Subscribe to solution events
-            IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution; 
+            IVsSolution sol = package.GetServiceEx<SVsSolution>() as IVsSolution;
             sol.AdviseSolutionEvents(this, out _vsSolutionEventsCookie);
 
             var sbm = package.GetServiceEx<SVsSolutionBuildManager>() as IVsSolutionBuildManager2;
@@ -629,7 +629,7 @@ namespace F1SYS.VsGitToolsPackage
                 noRefresh = value;
             }
         }
-        
+
         private void Refresh()
         {
             if (NeedRefresh && !NoRefresh)
@@ -641,10 +641,10 @@ namespace F1SYS.VsGitToolsPackage
             }
         }
 
-        private void timer_Tick(object sender, EventArgs e)
+        private async void timer_Tick(object sender, EventArgs e)
         {
             timer.Stop();
-            RefreshToolWindows();
+            await RefreshToolWindows();
         }
 
         internal async Task RefreshToolWindows(bool force = false)
@@ -654,7 +654,7 @@ namespace F1SYS.VsGitToolsPackage
 
             Debug.WriteLine("==== Refresh !!! ");
 
-            toolWindow.dte.StatusBar.Text = "Analyzing git reporsitory ...";
+            toolWindow.dte.StatusBar.Text = "Analyzing git repository ...";
             await Task.Run(() =>
             {
                 CloseRepository();
@@ -669,7 +669,7 @@ namespace F1SYS.VsGitToolsPackage
                 }
 
                 toolWindow.Refresh(force);
-                
+
             });
 
             toolWindow.dte.StatusBar.Text = "";
