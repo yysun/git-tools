@@ -601,7 +601,7 @@ namespace GitUI.UI
         }
 
 
-        private void lstOptions_Click(object sender, RoutedEventArgs e)
+        private void lstOptions_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             InsertText(lstOptions.SelectedValue as string);
         }
@@ -702,6 +702,7 @@ namespace GitUI.UI
         private void HideOptions()
         {
             lstOptions.Visibility = Visibility.Collapsed;
+            this.richTextBox1.Focus();
         }
 
         internal MainWindow mainWindow;
@@ -709,6 +710,5 @@ namespace GitUI.UI
         {
             mainWindow.ShowStatusMessage(msg);
         }
-
     }
 }

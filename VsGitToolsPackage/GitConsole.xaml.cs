@@ -606,8 +606,7 @@ namespace GitScc.UI
             }
         }
 
-
-        private void lstOptions_Click(object sender, RoutedEventArgs e)
+        private void lstOptions_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             InsertText(lstOptions.SelectedValue as string);
         }
@@ -711,6 +710,7 @@ namespace GitScc.UI
         private void HideOptions()
         {
             lstOptions.Visibility = Visibility.Collapsed;
+            this.richTextBox1.Focus();
         }
 
         private MyToolWindow toolWindow;

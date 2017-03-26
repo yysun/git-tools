@@ -14,7 +14,7 @@
 		        	 Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}">
             <FlowDocument></FlowDocument>
         </RichTextBox>
-        <ListBox Height="200" HorizontalAlignment="Left" Name="lstOptions" VerticalAlignment="Top" Width="240" Visibility="Collapsed" ButtonBase.Click="lstOptions_Click"
+        <ListBox Height="200" HorizontalAlignment="Left" Name="lstOptions" VerticalAlignment="Top" Width="240" Visibility="Collapsed" PreviewMouseDown="lstOptions_PreviewMouseDown"
                  Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}"
 			     Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}" />
     </Grid>
