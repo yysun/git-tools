@@ -169,7 +169,9 @@ namespace GitScc.DataServices
                         if (n == m)
                             lanes[lane] = parentId;
                         else
-                            lanes.Add(parentId);
+                        {
+                            lanes.Insert(lane + 1, parentId);
+                        }
                     }
                     else if (parentLane > lane)
                     {
