@@ -155,8 +155,18 @@ namespace GitScc.DataServices
 
                 if (lane < 0)
                 {
-                    lanes.Add(id);
-                    lane = lanes.Count - 1;
+                    var parent = parents.LastOrDefault();
+                    var parentLane = parent == null ? -1 : lanes.IndexOf(parent.Id);
+                    if (parentLane >= 0)
+                    {
+                        lanes.Insert(parentLane + 1, id);
+                        lane = parentLane + 1;
+                    }
+                    else
+                    {
+                        lanes.Add(id);
+                        lane = lanes.Count - 1;
+                    }
                 }
 
                 int m = parents.Count() - 1;
