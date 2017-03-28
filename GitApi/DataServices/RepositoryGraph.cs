@@ -133,7 +133,6 @@ namespace GitScc.DataServices
             links = new List<GraphLink>();
             var lanes = new List<string>();
 
-            var buf = new List<string>();
             int i = 0;
 
             foreach (var commit in commits)
@@ -155,37 +154,20 @@ namespace GitScc.DataServices
 
                 if (lane < 0)
                 {
-                    var parent = parents.LastOrDefault();
-                    var parentLane = parent == null ? -1 : lanes.IndexOf(parent.Id);
-                    if (parentLane >= 0)
-                    {
-                        lanes.Insert(parentLane + 1, id);
-                        lane = parentLane + 1;
-                    }
-                    else
-                    {
-                        lanes.Add(id);
-                        lane = lanes.Count - 1;
-                    }
+                    lanes.Add(id);
+                    lane = lanes.Count - 1;
                 }
 
                 int m = parents.Count() - 1;
                 for (int n = m; n >= 0; n--)
                 {
                     var parentId = parents[n].Id;
-                    var parentLane = lanes.IndexOf(parentId);
-                    if (parentLane < 0)
+                    if (lanes.IndexOf(parentId) < 0)
                     {
                         if (n == m)
                             lanes[lane] = parentId;
                         else
-                        {
-                            lanes.Insert(lane + 1, parentId);
-                        }
-                    }
-                    else if (parentLane > lane)
-                    {
-                        lanes[lane] = parentId;
+                            lanes.Add(parentId);
                     }
                 }
                 children.ForEach(child => lanes.Remove(child.Id));
@@ -250,8 +232,6 @@ namespace GitScc.DataServices
                             parent.ChildIds[parent.ChildIds.IndexOf(commit.Id)] = cid;
                             child.ParentIds[child.ParentIds.IndexOf(commit.Id)] = pid;
                         }
-                        //commit.ChildIds.Clear();
-                        //commit.ParentIds.Clear();
                     }
                 }
             }
