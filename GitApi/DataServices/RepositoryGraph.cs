@@ -162,15 +162,19 @@ namespace GitScc.DataServices
                 for (int n = m; n >= 0; n--)
                 {
                     var parentId = parents[n].Id;
-                    if (lanes.IndexOf(parentId) < 0)
-                    {
-                        if (n == m)
-                            lanes[lane] = parentId;
-                        else
-                            lanes.Add(parentId);
-                    }
+                    if (n == m || lanes.IndexOf(parentId) >= 0)
+                        lanes[lane] = parentId;
+                    else
+                        lanes.Add(parentId);
                 }
-                children.ForEach(child => lanes.Remove(child.Id));
+
+                var idx = lanes.Count - 1;
+                while(idx > 0)
+                {
+                    if (lanes[idx] == id) lanes.RemoveAt(idx);
+                    else break;
+                    idx = lanes.Count - 1;
+                }
 
                 var node = new GraphNode
                 {
