@@ -14,7 +14,7 @@ For more information, please visit http://yysun.github.io/git-tools
 
 ## How to Use
 
-* Install [Git for Windows](http://code.google.com/p/msysgit), [Git Extensions](http://code.google.com/p/gitextensions) (optional) or [TortoiseGit](http://code.google.com/p/tortoisegit) (optional).
+* Install [Git for Windows](http://code.google.com/p/msysgit), [Git Extensions](https://gitextensions.github.io) (optional) or [TortoiseGit](http://code.google.com/p/tortoisegit) (optional).
 * Run Visual Studio.
 * Go to Tools | Extensions and Updates..., search online gallery for Git Tools and install.
 * Select Top Menu 'Git Tools' or add 'Git Tools' toolbar to the main window.
