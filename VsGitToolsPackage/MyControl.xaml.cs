@@ -271,6 +271,8 @@ namespace F1SYS.VsGitToolsPackage
                 menuIgnore.IsEnabled = false;
                 menuCompare.IsEnabled = false;
             }
+
+            //todo: evtl. hide menuCompareVS if both use the vs-diff tool...
             menuCompareVS.IsEnabled = menuCompare.IsEnabled;
         }
 
