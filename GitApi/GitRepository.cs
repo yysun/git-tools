@@ -171,6 +171,8 @@ namespace GitScc
             var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
             try
             {
+
+
                 GitBash.RunCmd(string.Format("diff HEAD -- \"{0}\" > \"{1}\"", fileName, tmpFileName), WorkingDirectory);
             }
             catch (Exception ex)
@@ -189,8 +191,8 @@ namespace GitScc
             {
                 return false;
             }
-
-            GitBash.RunCmd(string.Format("difftool --no-prompt {0}", fileList), WorkingDirectory);
+            var cmd = string.Format("difftool --no-prompt {0}", fileList);
+            var t = GitBash.RunAsync(cmd, WorkingDirectory);
             return true;
         }
 
