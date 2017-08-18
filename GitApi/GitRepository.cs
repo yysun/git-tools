@@ -180,9 +180,17 @@ namespace GitScc
             return tmpFileName;
         }
 
-        public bool DiffTool(string fileName)
+        public bool DiffTool(params string[] fileNames)
         {
-            GitBash.RunCmd(string.Format("difftool --no-prompt \"{0}\"", fileName), WorkingDirectory);
+            var quotedFileNames = from f in fileNames
+                                 select string.Format("\"{0}\"", f);
+            var fileList = string.Join(" ", quotedFileNames);
+            if (fileList == "")
+            {
+                return false;
+            }
+
+            GitBash.RunCmd(string.Format("difftool --no-prompt {0}", fileList), WorkingDirectory);
             return true;
         }
 
