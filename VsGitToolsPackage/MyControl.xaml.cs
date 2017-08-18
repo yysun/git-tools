@@ -271,6 +271,7 @@ namespace F1SYS.VsGitToolsPackage
                 menuIgnore.IsEnabled = false;
                 menuCompare.IsEnabled = false;
             }
+            menuCompareVS.IsEnabled = menuCompare.IsEnabled;
         }
 
         private T FindAncestorOfType<T>(DependencyObject dependencyObject)
@@ -501,10 +502,21 @@ namespace F1SYS.VsGitToolsPackage
                 GitFileStatus status = this.tracker.GetFileStatus(fileName);
                 if (status == GitFileStatus.Modified || status == GitFileStatus.Staged)
                 {
-                    //the usage of vs-diff tool can be easily configured in gitconfig (e.g. by using team-explorer window)
-                    //we use default diff git diff tool
-                    fileName = Path.Combine(this.tracker.WorkingDirectory, fileName);
-                    this.tracker.DiffTool(fileName);
+                    if (sender == menuCompareVS)
+                    {
+                        string tempFile = Path.GetFileName(fileName);
+                        tempFile = Path.Combine(Path.GetTempPath(), tempFile);
+                        this.tracker.SaveFileFromLastCommit(fileName, tempFile);
+
+                        fileName = Path.Combine(this.tracker.WorkingDirectory, fileName);
+                        toolWindow.DiffService.OpenComparisonWindow(tempFile, fileName);
+                    } else
+                    {
+                        //the usage of vs-diff tool can be easily configured in gitconfig (e.g. by using team-explorer window)
+                        //we use default diff git diff tool
+                        fileName = Path.Combine(this.tracker.WorkingDirectory, fileName);
+                        this.tracker.DiffTool(fileName);
+                    }
                 }
             });
         }
