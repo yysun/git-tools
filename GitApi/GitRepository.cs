@@ -10,9 +10,9 @@ using System.Windows.Threading;
 
 namespace GitScc
 {
-	public class GitRepository
-	{
-		private string workingDirectory;
+    public class GitRepository
+    {
+        private string workingDirectory;
         private bool isGit;
         private string branch;
         private IEnumerable<GitFile> changedFiles;
@@ -20,23 +20,22 @@ namespace GitScc
         private IDictionary<string, string> configs;
         private IEnumerable<GitFile> ignored;
 
-
-		public string WorkingDirectory { get { return workingDirectory; } }
+        public string WorkingDirectory { get { return workingDirectory; } }
         public bool IsGit { get { return isGit; } }
 
         public GitRepository(string directory)
-		{
+        {
             this.workingDirectory = directory;
             Refresh();
             this.isGit = false;
-            var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory); 
+            var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory);
             if (!result.HasError && !result.Output.StartsWith("fatal:"))
             {
                 this.workingDirectory = result.Output.Trim();
                 result = GitBash.Run("rev-parse --is-inside-work-tree", WorkingDirectory);
                 isGit = string.Compare("true", result.Output.Trim(), true) == 0;
             }
-		}
+        }
 
         public void Refresh()
         {
@@ -48,7 +47,7 @@ namespace GitScc
             this.ignored = null;
         }
 
-		#region Git commands
+        #region Git commands
 
         private string GitRun(string cmd)
         {
@@ -59,25 +58,25 @@ namespace GitScc
             return result.Output;
         }
 
-		internal string AddTag(string name, string id)
-		{
-			return GitRun(string.Format("tag \"{0}\" {1}", name, id));
-		}
+        internal string AddTag(string name, string id)
+        {
+            return GitRun(string.Format("tag \"{0}\" {1}", name, id));
+        }
 
-		internal string GetTagId(string name)
-		{
-			return GitRun("show-ref refs/tags/" + name);
-		}
+        internal string GetTagId(string name)
+        {
+            return GitRun("show-ref refs/tags/" + name);
+        }
 
-		internal string DeleteTag(string name)
-		{
-			return GitRun("tag -d " + name);
-		}
+        internal string DeleteTag(string name)
+        {
+            return GitRun("tag -d " + name);
+        }
 
-		internal string AddBranch(string name, string id)
-		{
-			return GitRun(string.Format("branch \"{0}\" {1}", name, id));
-		}
+        internal string AddBranch(string name, string id)
+        {
+            return GitRun(string.Format("branch \"{0}\" {1}", name, id));
+        }
 
         internal string GetBranchId(string name)
         {
@@ -90,10 +89,10 @@ namespace GitScc
             return id;
         }
 
-		internal string DeleteBranch(string name)
-		{
-			return GitRun("branch -d " + name);
-		}
+        internal string DeleteBranch(string name)
+        {
+            return GitRun("branch -d " + name);
+        }
 
         public void CheckOutBranch(string branch, bool createNew = false)
         {
@@ -101,23 +100,23 @@ namespace GitScc
             GitRun(string.Format("checkout {0} {1}", (createNew ? "-b" : ""), branch));
         }
 
-		internal string Archive(string id, string fileName)
-		{
-			return GitRun(string.Format("archive {0} --format=zip --output \"{1}\"", id, fileName));
-		}
+        internal string Archive(string id, string fileName)
+        {
+            return GitRun(string.Format("archive {0} --format=zip --output \"{1}\"", id, fileName));
+        }
 
-		internal void Patch(string id1, string fileName)
-		{
-			GitRun(string.Format("format-patch {0} -1 --stdout > \"{1}\"", id1, fileName));
-		}
+        internal void Patch(string id1, string fileName)
+        {
+            GitRun(string.Format("format-patch {0} -1 --stdout > \"{1}\"", id1, fileName));
+        }
 
-		internal void Patch(string id1, string id2, string fileName)
-		{
-			GitRun(string.Format("format-patch {0}..{1} -o \"{2}\"", id1, id2, fileName));
-		}
+        internal void Patch(string id1, string id2, string fileName)
+        {
+            GitRun(string.Format("format-patch {0}..{1} -o \"{2}\"", id1, id2, fileName));
+        }
 
-		#endregion    
-	
+        #endregion
+
         public static void Init(string folderName)
         {
             GitBash.Run("init", folderName);
@@ -171,8 +170,6 @@ namespace GitScc
             var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
             try
             {
-
-
                 GitBash.RunCmd(string.Format("diff HEAD -- \"{0}\" > \"{1}\"", fileName, tmpFileName), WorkingDirectory);
             }
             catch (Exception ex)
@@ -185,7 +182,7 @@ namespace GitScc
         public bool DiffTool(params string[] fileNames)
         {
             var quotedFileNames = from f in fileNames
-                                 select string.Format("\"{0}\"", f);
+                                  select string.Format("\"{0}\"", f);
             var fileList = string.Join(" ", quotedFileNames);
             if (fileList == "")
             {
@@ -304,7 +301,7 @@ namespace GitScc
                 char x = status[0];
                 char y = status.Length > 1 ? status[1] : ' ';
 
-                var gitFile = new GitFile { FileName = fileName.Trim(), X = x, Y = y  };
+                var gitFile = new GitFile { FileName = fileName.Trim(), X = x, Y = y };
 
                 switch (x)
                 {
@@ -526,7 +523,7 @@ namespace GitScc
 
         public bool IsIgnored(string fullPath)
         {
-            foreach(var item in this.Ignored)
+            foreach (var item in this.Ignored)
             {
                 var name = Path.GetFullPath(Path.Combine(WorkingDirectory, item.FileName));
                 if (Directory.Exists(name) && fullPath.StartsWith(name)) return true;
@@ -717,7 +714,7 @@ namespace GitScc
         {
             var difftool = new DiffTool();
             var hunks = difftool.GetHunks(diffLines, startLine, endLine, reverse);
-            if (hunks.Count() <=0) throw new Exception("No change selected");
+            if (hunks.Count() <= 0) throw new Exception("No change selected");
 
             var tmpFileName = Path.ChangeExtension(Path.GetTempFileName(), ".diff");
             using (var file = new StreamWriter(tmpFileName, false, Encoding.UTF8))
@@ -735,7 +732,7 @@ namespace GitScc
                 {
                     var heading = $"@@ -{hunk.OldBlock[0]},{hunk.OldBlock[1]} +{hunk.NewBlock[0]},{hunk.NewBlock[1]} @@{hunk.Heading}";
                     file.Write(FixEOL(heading));
-                    foreach(var line in hunk.Lines)
+                    foreach (var line in hunk.Lines)
                     {
                         file.Write(FixEOL(line));
                     }
@@ -785,7 +782,7 @@ namespace GitScc
         }
     }
 
-    public class GitFileStatusTracker: GitRepository
+    public class GitFileStatusTracker : GitRepository
     {
         public GitFileStatusTracker(string directory) : base(directory) { }
     }
