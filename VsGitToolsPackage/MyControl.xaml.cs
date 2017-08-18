@@ -501,11 +501,10 @@ namespace F1SYS.VsGitToolsPackage
                 GitFileStatus status = this.tracker.GetFileStatus(fileName);
                 if (status == GitFileStatus.Modified || status == GitFileStatus.Staged)
                 {
-                    string tempFile = Path.GetFileName(fileName);
-                    tempFile = Path.Combine(Path.GetTempPath(), tempFile);
-                    this.tracker.SaveFileFromLastCommit(fileName, tempFile);
+                    //the usage of vs-diff tool can be easily configured in gitconfig (e.g. by using team-explorer window)
+                    //we use default diff git diff tool
                     fileName = Path.Combine(this.tracker.WorkingDirectory, fileName);
-                    toolWindow.DiffService.OpenComparisonWindow(tempFile, fileName);
+                    this.tracker.DiffTool(fileName);
                 }
             });
         }
