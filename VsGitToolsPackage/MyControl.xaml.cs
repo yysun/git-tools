@@ -512,8 +512,6 @@ namespace F1SYS.VsGitToolsPackage
                         toolWindow.DiffService.OpenComparisonWindow(tempFile, fileName);
                     } else
                     {
-                        //the usage of vs-diff tool can be easily configured in gitconfig (e.g. by using team-explorer window)
-                        //we use default diff git diff tool
                         fileName = Path.Combine(this.tracker.WorkingDirectory, fileName);
                         this.tracker.DiffTool(fileName);
                     }
