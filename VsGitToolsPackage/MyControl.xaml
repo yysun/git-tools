@@ -446,7 +446,7 @@
                                     Name="btnStageSelected" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
                                     Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
                                     VerticalAlignment="Center" Margin="0,0,4,0" Click="btnStageSelected_Click"/>
-                            <Button Content="Rest File" Padding="10 0"
+                            <Button Content="Reset File" Padding="10 0"
                                     Name="btnResetFile" Foreground="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowTextKey}}" 
                                     Background="{DynamicResource {x:Static vsfx:VsBrushes.ToolWindowBackgroundKey}}"
                                     VerticalAlignment="Center" Margin="0,0,4,0" Click="btnResetFile_Click"/>
