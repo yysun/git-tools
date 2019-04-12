@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+  
+  <!-- Adds a reference to the KnownMonikers in the ImageCatalog for use in the <button> elements -->
+  <Include href="KnownImageIds.vsct"/>
+
+  <Commands package="guidPackage">
+
+    <Menus>
+      <Menu guid="guidMyCommandPackageCmdSet" id="TopLevelMenu" priority="0x700" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+        <Strings>
+          <ButtonText>Git Tools</ButtonText>
+          <CommandName>Git Tools</CommandName>
+        </Strings>
+      </Menu>
+    </Menus>
+    
+    <Groups>
+      <Group guid="guidMyCommandPackageCmdSet" id="MyMenuGroup" priority="0x0600">
+        <Parent guid="guidMyCommandPackageCmdSet" id="TopLevelMenu"/>
+      </Group>
+    </Groups>
+          
+    <Buttons>
+      <Button guid="guidMyCommandPackageCmdSet" id="MyCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidMyCommandPackageCmdSet" id="MyMenuGroup" />
+        <Icon guid="ImageCatalogGuid" id="ButtonClick" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Git Changes</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <KeyBindings>
+    <KeyBinding guid="guidMyCommandPackageCmdSet" id="MyCommandId" editor="guidVSStd97" key1="K" mod1="Control" key2="0" mod2="Control" />
+  </KeyBindings>
+
+  <Symbols>
+    <GuidSymbol name="guidPackage" value="{9C86573C-CB62-45D0-9C1A-DAD967BBBDC4}" />
+    <GuidSymbol name="guidMyCommandPackageCmdSet" value="{31337E4B-26EB-4201-B411-80950E42165B}">
+      <IDSymbol name="MyMenuGroup" value="0x1020" />
+      <IDSymbol name="MyCommandId" value="0x0100" />
+      <IDSymbol name="TopLevelMenu" value="0x1021"/>    
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>
