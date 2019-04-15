@@ -15,7 +15,7 @@ namespace VSIXProject2019
 
     static class PkgCmdIDList
     {
-        public const uint cmdidGitToolsWindow = 0x101;
+        public const int cmdidGitToolsWindow = 0x101;
 
         public const int icmdSccCommandGitBash = 0x102;
         public const int icmdSccCommandGitExtension = 0x103;
