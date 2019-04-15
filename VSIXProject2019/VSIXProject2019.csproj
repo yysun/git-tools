@@ -60,6 +60,27 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Package.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\Preview.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\UndoCheckout.png" />
+    <Resource Include="Resources\Switch.png" />
+    <Resource Include="Resources\Settings.png" />
+    <Resource Include="Resources\Refresh.png" />
+    <Resource Include="Resources\PendingCheckins.png" />
+    <Resource Include="Resources\Loading.png" />
+    <Resource Include="Resources\Compare.png" />
+    <Content Include="Resources\Dragon.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\git_32.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Resource Include="Resources\History.png" />
+    <None Include="Resources\Images.png" />
     <Content Include="Resources\LICENSE.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
