@@ -119,7 +119,7 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>IconAndText</CommandFlag>
         <Strings>
-          <ButtonText>About</ButtonText>
+          <ButtonText>Github</ButtonText>
         </Strings>
       </Button>
 
