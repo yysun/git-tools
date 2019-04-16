@@ -221,11 +221,15 @@
     </CommandPlacement>
 
     <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="imnuGitExtMenu" priority="0x0108">
-      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbar" />
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="imnuGitTorMenu" priority="0x0109">
-      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbar" />
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandAbout" priority="0x0120">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="cmdidGitToolsWindow" priority="0x0">
@@ -240,10 +244,10 @@
       <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
     </CommandPlacement>
 
-    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="imnuGitExtMenu" priority="0x0010">
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="imnuGitExtMenu" priority="0x0108">
       <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
     </CommandPlacement>
-    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="imnuGitTorMenu" priority="0x0011">
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="imnuGitTorMenu" priority="0x0109">
       <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
     </CommandPlacement>
 
