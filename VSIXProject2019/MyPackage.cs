@@ -85,6 +85,9 @@ namespace VSIXProject2019
             menu = new OleMenuCommand(new EventHandler(OnAbout), cmd);
             commandService.AddCommand(menu);
 
+            cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesSettings);
+            menu = new OleMenuCommand(new EventHandler(OnSettings), cmd);
+            commandService.AddCommand(menu);
             #endregion
 
         }
@@ -147,6 +150,11 @@ namespace VSIXProject2019
                     create: true,
                     cancellationToken: package.DisposalToken);
             });
+        }
+
+        private void OnSettings(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private static void OnAbout(object sender, EventArgs e)
