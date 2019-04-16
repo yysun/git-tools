@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -21,10 +22,13 @@ namespace VSIXProject2019
     [ProvideToolWindow(typeof(GitChangesWindow))]
     public sealed class MyPackage : AsyncPackage
     {
+        static EnvDTE80.DTE2 dte;
+
         // This method is run automatically the first time the command is being executed
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            dte = await GetServiceAsync(typeof(EnvDTE.DTE)) as EnvDTE80.DTE2;
             //await MyCommand.InitializeAsync(this);
 
             #region commands
@@ -92,6 +96,18 @@ namespace VSIXProject2019
 
         }
 
+        private static string CurrentGitWorkingDirectory
+        {
+            get
+            {
+                EnvDTE.Properties properties = dte.get_Properties("Environment", "ProjectsAndSolution");
+                EnvDTE.Property p = properties.Item("ProjectsLocation");
+                return p.Value as string;
+            }
+        }
+
+
+
         #region open tool window
         public override IVsAsyncToolWindowFactory GetAsyncToolWindowFactory(Guid toolWindowType)
         {
@@ -117,6 +133,25 @@ namespace VSIXProject2019
         #endregion
 
         #region command event handlers
+        private static void RunDetatched(string cmd, string arguments)
+        {
+            using (Process process = new Process())
+            {
+                process.StartInfo.UseShellExecute = true;
+                process.StartInfo.ErrorDialog = false;
+                process.StartInfo.RedirectStandardOutput = false;
+                process.StartInfo.RedirectStandardInput = false;
+
+                process.StartInfo.CreateNoWindow = false;
+                process.StartInfo.FileName = cmd;
+                process.StartInfo.Arguments = arguments;
+                process.StartInfo.WorkingDirectory = CurrentGitWorkingDirectory;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
+                process.StartInfo.LoadUserProfile = true;
+
+                process.Start();
+            }
+        }
 
         private static void OnStatus(object sender, EventArgs e)
         {
@@ -159,17 +194,38 @@ namespace VSIXProject2019
 
         private static void OnAbout(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            Process.Start("https://github.com/yysun/git-tools");
+        }
+
+        private static void OnGitBashCommand(object sender, EventArgs e)
+        {
+            var gitExePath = GitSccOptions.Current.GitBashPath;
+            var gitBashPath = gitExePath.Replace("git.exe", "sh.exe");
+            RunDetatched("cmd.exe", string.Format("/c \"{0}\" --login -i", gitBashPath));
         }
 
         private static void OnGitTorCommandExec(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            var menuCommand = sender as MenuCommand;
+            if (null != menuCommand)
+            {
+                int idx = menuCommand.CommandID.ID - PkgCmdIDList.icmdGitTorCommand1;
+                var cmd = GitToolCommands.GitTorCommands[idx];
+                var targetPath = CurrentGitWorkingDirectory;
+                var tortoiseGitPath = GitSccOptions.Current.TortoiseGitPath;
+                RunDetatched(tortoiseGitPath, cmd.Command + " /path:\"" + targetPath + "\"");
+            }
         }
 
         private static void OnGitExtCommandExec(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            var menuCommand = sender as MenuCommand;
+            if (null != menuCommand)
+            {
+                int idx = menuCommand.CommandID.ID - PkgCmdIDList.icmdGitExtCommand1;
+                var gitExtensionPath = GitSccOptions.Current.GitExtensionPath;
+                RunDetatched(gitExtensionPath, GitToolCommands.GitExtCommands[idx].Command);
+            }
         }
 
         private static void OnTortoiseGitCommand(object sender, EventArgs e)
@@ -198,11 +254,6 @@ namespace VSIXProject2019
         }
 
         private static void OnRefreshCommand(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void OnGitBashCommand(object sender, EventArgs e)
         {
             throw new NotImplementedException();
         }
