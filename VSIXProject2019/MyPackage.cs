@@ -58,56 +58,47 @@ namespace VSIXProject2019
 
 
             CommandID cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandGitBash);
-            OleMenuCommand menu = new OleMenuCommand(new EventHandler(OnGitBashCommand), cmd);
+            OleMenuCommand menu = new OleMenuCommand(OnGitBashCommand, cmd);
             commandService.AddCommand(menu);
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesRefresh);
-            menu = new OleMenuCommand(new EventHandler(OnRefreshCommand), cmd);
+            menu = new OleMenuCommand(OnRefreshCommand, cmd);
             commandService.AddCommand(menu);
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandInit);
-            menu = new OleMenuCommand(new EventHandler(OnInitCommand), cmd);
+            menu = new OleMenuCommand(OnInitCommand, cmd);
             commandService.AddCommand(menu);
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandEditIgnore);
-            menu = new OleMenuCommand(new EventHandler(OnEditIgnore), cmd);
+            menu = new OleMenuCommand(OnEditIgnore, cmd);
             commandService.AddCommand(menu);
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesCommit);
-            menu = new OleMenuCommand(new EventHandler(OnCommitCommand), cmd);
+            menu = new OleMenuCommand(OnCommitCommand, cmd);
             commandService.AddCommand(menu);
-
-            cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandGitExtension);
-            menu = new OleMenuCommand(new EventHandler(OnGitExtensionCommand), cmd);
-            commandService.AddCommand(menu);
-
-            cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandGitTortoise);
-            menu = new OleMenuCommand(new EventHandler(OnTortoiseGitCommand), cmd);
-            commandService.AddCommand(menu);
-
 
             for (int i = 0; i < GitToolCommands.GitExtCommands.Count; i++)
             {
                 cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdGitExtCommand1 + i);
-                var mc = new OleMenuCommand(new EventHandler(OnGitExtCommandExec), cmd);
-                mc.BeforeQueryStatus += new EventHandler(OnStatus);
+                var mc = new OleMenuCommand(OnGitExtCommandExec, cmd);
+                mc.BeforeQueryStatus += OnStatus;
                 commandService.AddCommand(mc);
             }
 
             for (int i = 0; i < GitToolCommands.GitTorCommands.Count; i++)
             {
                 cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdGitTorCommand1 + i);
-                var mc = new OleMenuCommand(new EventHandler(OnGitTorCommandExec), cmd);
-                mc.BeforeQueryStatus += new EventHandler(OnStatus);
+                var mc = new OleMenuCommand(OnGitTorCommandExec, cmd);
+                mc.BeforeQueryStatus += OnStatus;
                 commandService.AddCommand(mc);
             }
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandAbout);
-            menu = new OleMenuCommand(new EventHandler(OnAbout), cmd);
+            menu = new OleMenuCommand(OnAbout, cmd);
             commandService.AddCommand(menu);
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesSettings);
-            menu = new OleMenuCommand(new EventHandler(OnSettings), cmd);
+            menu = new OleMenuCommand(OnSettings, cmd);
             commandService.AddCommand(menu);
             #endregion
 
@@ -130,6 +121,7 @@ namespace VSIXProject2019
                 CurrentGitWorkingDirectory = Path.GetDirectoryName(solutionFileName);
                 tracker = new GitTracker(CurrentGitWorkingDirectory);
                 tracker.Changed += (tracker) => Tracker_Changed(tracker);
+                Tracker_Changed(tracker);
             }
         }
 
@@ -243,19 +235,19 @@ namespace VSIXProject2019
             Process.Start("https://github.com/yysun/git-tools");
         }
 
-        private static void OnAbout(object sender, EventArgs e)
+        private void OnAbout(object sender, EventArgs e)
         {
             Process.Start("https://github.com/yysun/git-tools");
         }
 
-        private static void OnGitBashCommand(object sender, EventArgs e)
+        private void OnGitBashCommand(object sender, EventArgs e)
         {
             var gitExePath = GitSccOptions.Current.GitBashPath;
             var gitBashPath = gitExePath.Replace("git.exe", "sh.exe");
             RunDetatched("cmd.exe", string.Format("/c \"{0}\" --login -i", gitBashPath));
         }
 
-        private static void OnGitTorCommandExec(object sender, EventArgs e)
+        private void OnGitTorCommandExec(object sender, EventArgs e)
         {
             var menuCommand = sender as MenuCommand;
             if (null != menuCommand)
@@ -268,7 +260,7 @@ namespace VSIXProject2019
             }
         }
 
-        private static void OnGitExtCommandExec(object sender, EventArgs e)
+        private void OnGitExtCommandExec(object sender, EventArgs e)
         {
             var menuCommand = sender as MenuCommand;
             if (null != menuCommand)
@@ -279,34 +271,25 @@ namespace VSIXProject2019
             }
         }
 
-        private static void OnTortoiseGitCommand(object sender, EventArgs e)
+
+        private void OnCommitCommand(object sender, EventArgs e)
         {
             throw new NotImplementedException();
         }
 
-        private static void OnCommitCommand(object sender, EventArgs e)
+        private void OnEditIgnore(object sender, EventArgs e)
         {
             throw new NotImplementedException();
         }
 
-        private static void OnEditIgnore(object sender, EventArgs e)
+        private void OnInitCommand(object sender, EventArgs e)
         {
             throw new NotImplementedException();
         }
 
-        private static void OnInitCommand(object sender, EventArgs e)
+        private void OnRefreshCommand(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
-        }
-
-        private static void OnGitExtensionCommand(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private static void OnRefreshCommand(object sender, EventArgs e)
-        {
-            throw new NotImplementedException();
+            Tracker_Changed(tracker);
         }
         #endregion
     }
