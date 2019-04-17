@@ -3,6 +3,8 @@
     using System;
     using System.ComponentModel.Design;
     using System.Runtime.InteropServices;
+    using Microsoft;
+    using Microsoft.VisualStudio.ProjectSystem;
     using Microsoft.VisualStudio.Shell;
 
     /// <summary>
@@ -35,10 +37,6 @@
             this.Content = new GitChangesWindowControl(state.DTE);
         }
 
-        public void Refresh(GitTracker tracker)
-        {
-            ((GitChangesWindowControl)this.Content).Refresh(tracker);
-        }
     }
 
     public class GitChangesWindowState

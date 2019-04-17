@@ -129,7 +129,7 @@ namespace VSIXProject2019
             {
                 CurrentGitWorkingDirectory = Path.GetDirectoryName(solutionFileName);
                 tracker = new GitTracker(CurrentGitWorkingDirectory);
-                tracker.Changed += Tracker_Changed;
+                tracker.Changed += (tracker) => Tracker_Changed(tracker);
             }
         }
 
@@ -140,15 +140,23 @@ namespace VSIXProject2019
             Tracker_Changed(tracker);
         }
 
-        private T FindToolWindowPane<T>() where T : ToolWindowPane
+        private GitChangesWindowControl FindMyControl()
         {
-            return (T)this.FindToolWindow(typeof(T), 0, true);
+            var window = FindToolWindow(typeof(GitChangesWindow), 0, true) as GitChangesWindow;
+            return window?.Content as GitChangesWindowControl;
         }
 
-        private void Tracker_Changed(GitTracker tracker)
+        private async Task Tracker_Changed(GitTracker tracker)
         {
-            var window = FindToolWindowPane<GitChangesWindow>();
-            window?.Refresh(tracker);
+            try
+            {
+                await JoinableTaskFactory.SwitchToMainThreadAsync();
+                FindMyControl()?.Refresh(tracker);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Git Tools Refresh Exception:" + ex.ToString());
+            }
         }
 
         #region open tool window
