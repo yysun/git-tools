@@ -9,12 +9,20 @@
     /// </summary>
     public partial class GitChangesWindowControl : UserControl
     {
+        EnvDTE80.DTE2 DTE { get; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="GitChangesWindowControl"/> class.
         /// </summary>
-        public GitChangesWindowControl()
+        public GitChangesWindowControl(EnvDTE80.DTE2 DTE)
         {
             this.InitializeComponent();
+            this.DTE = DTE;
+        }
+
+        public void Refresh(GitTracker tracker)
+        {
+
         }
 
         /// <summary>
