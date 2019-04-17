@@ -757,8 +757,9 @@ namespace GitScc
 
         public string GetConfig(string name)
         {
-            var result = GitBash.Run($"config --get {name}", WorkingDirectory);
-            return result.Output.Trim();
+            //var result = GitBash.Run($"config --get {name}", WorkingDirectory);
+            //return result.Output.Trim();
+            return Configs[name];
         }
 
         public string GetCommitTemplate()
