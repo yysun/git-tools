@@ -60,6 +60,7 @@
       <DependentUpon>GitChangesWindowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GitToolCommands.cs" />
+    <Compile Include="GitTracker.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="MyPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
