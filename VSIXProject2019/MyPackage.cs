@@ -137,6 +137,7 @@ namespace VSIXProject2019
         {
             CurrentGitWorkingDirectory = "";
             tracker = null;
+            Tracker_Changed(tracker);
         }
 
         private T FindToolWindowPane<T>() where T : ToolWindowPane
@@ -147,9 +148,8 @@ namespace VSIXProject2019
         private void Tracker_Changed(GitTracker tracker)
         {
             var window = FindToolWindowPane<GitChangesWindow>();
-            window.Refresh(tracker);
+            window?.Refresh(tracker);
         }
-
 
         #region open tool window
         public override IVsAsyncToolWindowFactory GetAsyncToolWindowFactory(Guid toolWindowType)
