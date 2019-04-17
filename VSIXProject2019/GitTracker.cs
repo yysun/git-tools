@@ -8,7 +8,7 @@ namespace VSIXProject2019
 {
     public delegate void ChangedEventHandler(GitTracker tracker);
 
-    public class GitTracker
+    public class GitTracker: IDisposable
     {
         public string Directory { get; }
         public GitRepository Repository { get; }
@@ -19,21 +19,27 @@ namespace VSIXProject2019
         {
             this.Directory = directory;
             this.Repository = new GitRepository(directory);
-            WatchFileChanges(directory);
+            WatchFileChanges();
         }
 
-        //public bool NoRefresh { get; set; }
+        public void Dispose()
+        {
+            Debug.WriteLine("GT ==== Dispose ");
+            if (timer != null ) timer.Stop();
+            UnWatchFileChanges();
+        }
 
         Timer timer;
         FileSystemWatcher fileSystemWatcher;
-        private void WatchFileChanges(string folder)
+        private void WatchFileChanges()
         {
-            Debug.WriteLine("GT ==== Monitoring: " + folder);
             UnWatchFileChanges();
 
             if (!GitSccOptions.Current.DisableAutoRefresh)
             {
-                fileSystemWatcher = new FileSystemWatcher(folder);
+                Debug.WriteLine("GT ==== Monitoring: " + Directory);
+
+                fileSystemWatcher = new FileSystemWatcher(Directory);
                 fileSystemWatcher.IncludeSubdirectories = true;
                 fileSystemWatcher.Deleted += new FileSystemEventHandler(fileSystemWatcher_Changed);
                 fileSystemWatcher.Changed += new FileSystemEventHandler(fileSystemWatcher_Changed);
@@ -45,6 +51,8 @@ namespace VSIXProject2019
         {
             if (fileSystemWatcher != null)
             {
+                Debug.WriteLine("GT ==== Strop Monitoring: " + Directory);
+
                 fileSystemWatcher.Deleted -= new FileSystemEventHandler(fileSystemWatcher_Changed);
                 fileSystemWatcher.Changed -= new FileSystemEventHandler(fileSystemWatcher_Changed);
                 fileSystemWatcher.EnableRaisingEvents = false;
@@ -56,7 +64,10 @@ namespace VSIXProject2019
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
             var name = Path.GetFullPath(e.FullPath);
-            if (e.ChangeType == WatcherChangeTypes.Changed)
+            if (
+                e.ChangeType == WatcherChangeTypes.Changed &&
+                !name.EndsWith(".git") && !name.EndsWith(".lock") &&
+                !Repository.IsIgnored(name))
             {
                 Debug.WriteLine("GT ==== File system changed [" + e.ChangeType.ToString() + "]" + e.FullPath);
                 if (timer != null)
@@ -75,7 +86,8 @@ namespace VSIXProject2019
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             timer.Stop();
-            Debug.WriteLine("GT ==== Timer_Elapsed");
+            Debug.WriteLine("GT ==== Timer_Elapsed - Fire Changed Event");
+            Repository.Refresh();
             Changed(this);
         }
 
