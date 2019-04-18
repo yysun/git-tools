@@ -14,6 +14,8 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using System.IO;
+    using Microsoft.VisualStudio.TextManager.Interop;
+    using System.Text.RegularExpressions;
 
     /// <summary>
     /// Interaction logic for GitChangesWindowControl.
@@ -27,18 +29,19 @@
         private ListView activeListView;
         private string[] diffLines = new string[] { };
 
-        //private MyToolWindow toolWindow;
-        //private IVsTextView textView;
+        private GitChangesWindow toolWindow;
+        private IVsTextView textView;
 
         EnvDTE80.DTE2 DTE { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GitChangesWindowControl"/> class.
         /// </summary>
-        public GitChangesWindowControl(EnvDTE80.DTE2 DTE)
+        public GitChangesWindowControl(GitChangesWindow toolWindow)
         {
             this.InitializeComponent();
-            this.DTE = DTE;
+            this.toolWindow = toolWindow;
+            this.DTE = toolWindow.DTE;
             this.gitConsole1.ShowStatusMessage = this.ShowStatusMessage;
         }
 
@@ -72,7 +75,7 @@
 
         private void ClearEditor()
         {
-            //this.toolWindow.ClearEditor();
+            this.toolWindow.ClearEditor();
             this.DiffEditor.Content = null;
             fileInEditor = null;
             pnlChangedFileTool.Visibility = activeListView == listUnstaged &&
@@ -87,30 +90,25 @@
 
         private void ShowFile(string fileName)
         {
-            //try
-            //{
-            //    var tuple = this.toolWindow.SetDisplayedFile(fileName);
-            //    if (tuple != null)
-            //    {
-            //        this.DiffEditor.Content = tuple.Item1;
-            //        this.textView = tuple.Item2;
-            //    }
-            //    pnlChangedFileTool.Visibility = Visibility.Collapsed;
-            //    pnlStagedFileTool.Visibility = Visibility.Collapsed;
-            //    if (this.activeListView == this.listUnstaged)
-            //    {
-            //        pnlChangedFileTool.Visibility = Visibility.Visible;
-            //    }
-            //    else if (this.activeListView == this.listStaged)
-            //    {
-            //        pnlStagedFileTool.Visibility = Visibility.Visible;
-            //    }
-            //}
-            //finally
-            //{
-            //    //File.Delete(fileName);
-            //    fileInEditor = fileName;
-            //}
+            try
+            {
+                this.textView = this.toolWindow.SetDisplayedFile(fileName);
+                pnlChangedFileTool.Visibility = Visibility.Collapsed;
+                pnlStagedFileTool.Visibility = Visibility.Collapsed;
+                if (this.activeListView == this.listUnstaged)
+                {
+                    pnlChangedFileTool.Visibility = Visibility.Visible;
+                }
+                else if (this.activeListView == this.listStaged)
+                {
+                    pnlStagedFileTool.Visibility = Visibility.Visible;
+                }
+            }
+            finally
+            {
+                //File.Delete(fileName);
+                fileInEditor = fileName;
+            }
         }
 
         internal void ReloadEditor()
@@ -156,61 +154,61 @@
 
         private void ShowSelectedFile()
         {
-            //var fileName = GetSelectedFileName();
+            var fileName = GetSelectedFileName();
 
-            //this.ClearEditor();
+            this.ClearEditor();
 
-            //if (fileName == null)
-            //{
-            //    diffLines = new string[0];
-            //    return;
-            //}
+            if (fileName == null)
+            {
+                diffLines = new string[0];
+                return;
+            }
 
-            //try
-            //{
-            //    if (this.tabControl1.SelectedIndex != 0) this.tabControl1.SelectedIndex = 0;
+            try
+            {
+                if (this.tabControl1.SelectedIndex != 0) this.tabControl1.SelectedIndex = 0;
 
-            //    string tmpFileName = "";
+                string tmpFileName = "";
 
-            //    var status = tracker.GetFileStatus(fileName);
-            //    if (status == GitFileStatus.NotControlled || status == GitFileStatus.New)
-            //    {
-            //        tmpFileName = Path.Combine(tracker.WorkingDirectory, fileName);
-            //    }
-            //    else
-            //    {
-            //        if (this.activeListView == listView1)
-            //        {
-            //            tmpFileName = tracker.DiffFile(fileName);
-            //        }
-            //        else
-            //        {
-            //            var diffAgainstIndex = this.activeListView == this.listStaged;
-            //            tmpFileName = tracker.DiffFileAdv(fileName, diffAgainstIndex);
-            //        }
-            //    }
-            //    if (!string.IsNullOrWhiteSpace(tmpFileName) && File.Exists(tmpFileName))
-            //    {
-            //        if (tracker.IsBinaryFile(tmpFileName))
-            //        {
-            //            this.DiffEditor.Content = $"File \"{fileName}\" is binary that cannot be displayed. Double click to to view.";
-            //        }
-            //        //if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
-            //        //{
-            //        //    this.DiffEditor.Content = "File is too big to display: " + fileName;
-            //        //}
-            //        else
-            //        {
-            //            diffLines = File.ReadAllLines(tmpFileName);
-            //            this.ShowFile(tmpFileName);
-            //        }
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = ex.Message;
-            //    ShowStatusMessage(message);
-            //}
+                var status = repository.GetFileStatus(fileName);
+                if (status == GitFileStatus.NotControlled || status == GitFileStatus.New)
+                {
+                    tmpFileName = Path.Combine(repository.WorkingDirectory, fileName);
+                }
+                else
+                {
+                    if (this.activeListView == listView1)
+                    {
+                        tmpFileName = repository.DiffFile(fileName);
+                    }
+                    else
+                    {
+                        var diffAgainstIndex = this.activeListView == this.listStaged;
+                        tmpFileName = repository.DiffFileAdv(fileName, diffAgainstIndex);
+                    }
+                }
+                if (!string.IsNullOrWhiteSpace(tmpFileName) && File.Exists(tmpFileName))
+                {
+                    if (repository.IsBinaryFile(tmpFileName))
+                    {
+                        this.DiffEditor.Content = $"File \"{fileName}\" is binary that cannot be displayed. Double click to to view.";
+                    }
+                    //if (new FileInfo(tmpFileName).Length > 2 * 1024 * 1024)
+                    //{
+                    //    this.DiffEditor.Content = "File is too big to display: " + fileName;
+                    //}
+                    else
+                    {
+                        diffLines = File.ReadAllLines(tmpFileName);
+                        this.ShowFile(tmpFileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+                ShowStatusMessage(message);
+            }
         }
 
         private void listView1_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -502,27 +500,29 @@
 
         private void menuCompare_Click(object sender, RoutedEventArgs e)
         {
-            //GetSelectedFileName(fileName =>
-            //{
-            //    GitFileStatus status = this.tracker.GetFileStatus(fileName);
-            //    if (status == GitFileStatus.Modified || status == GitFileStatus.Staged)
-            //    {
-            //        if (sender == menuCompareVS)
-            //        {
-            //            string tempFile = Path.GetFileName(fileName);
-            //            tempFile = Path.Combine(Path.GetTempPath(), tempFile);
-            //            this.tracker.SaveFileFromLastCommit(fileName, tempFile);
+            GetSelectedFileName(fileName =>
+            {
+                Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
 
-            //            fileName = Path.Combine(this.tracker.WorkingDirectory, fileName);
-            //            toolWindow.DiffService.OpenComparisonWindow(tempFile, fileName);
-            //        }
-            //        else
-            //        {
-            //            fileName = Path.Combine(this.tracker.WorkingDirectory, fileName);
-            //            this.tracker.DiffTool(fileName);
-            //        }
-            //    }
-            //});
+                GitFileStatus status = this.repository.GetFileStatus(fileName);
+                if (status == GitFileStatus.Modified || status == GitFileStatus.Staged)
+                {
+                    if (sender == menuCompareVS)
+                    {
+                        string tempFile = Path.GetFileName(fileName);
+                        tempFile = Path.Combine(Path.GetTempPath(), tempFile);
+                        this.repository.SaveFileFromLastCommit(fileName, tempFile);
+
+                        fileName = Path.Combine(this.repository.WorkingDirectory, fileName);
+                        toolWindow.DiffService.OpenComparisonWindow(tempFile, fileName);
+                    }
+                    else
+                    {
+                        fileName = Path.Combine(this.repository.WorkingDirectory, fileName);
+                        this.repository.DiffTool(fileName);
+                    }
+                }
+            });
         }
 
         private async void menuUndo_Click(object sender, RoutedEventArgs e)
@@ -660,15 +660,6 @@ Note: if the file is included project, you need to delete the file from project 
 
         #endregion
 
-        //private void chkNewBranch_Checked(object sender, RoutedEventArgs e)
-        //{
-        //    txtNewBranch.Focus();
-        //}
-
-        //private void txtNewBranch_TextChanged(object sender, TextChangedEventArgs e)
-        //{
-        //    chkNewBranch.IsChecked = txtNewBranch.Text.Length > 0;
-        //}
 
         private void chkAmend_Checked(object sender, RoutedEventArgs e)
         {
@@ -682,29 +673,26 @@ Note: if the file is included project, you need to delete the file from project 
         {
             if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control)
             {
-                //toolWindow.OnCommitCommand();
-                throw new NotImplementedException();
+                OnCommit();
             }
         }
 
         private int[] GetEditorSelectionPosition()
         {
-            throw new NotImplementedException();
-
-            //int sl = 0, sc = 0, el = 0, ec = 0;
-            //try
-            //{
-            //    if (0 != textView.GetSelection(out sl, out sc, out el, out ec))
-            //    {
-            //        textView.GetCaretPos(out sl, out sc);
-            //        el = sl;
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    ShowStatusMessage(ex.Message);
-            //}
-            //return new int[2] { sl + 1, el + 1 };
+            int sl = 0, sc = 0, el = 0, ec = 0;
+            try
+            {
+                if (0 != textView.GetSelection(out sl, out sc, out el, out ec))
+                {
+                    textView.GetCaretPos(out sl, out sc);
+                    el = sl;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowStatusMessage(ex.Message);
+            }
+            return new int[2] { sl + 1, el + 1 };
         }
 
         private void DiffEditor_MouseUp(object sender, MouseButtonEventArgs e)
@@ -722,52 +710,49 @@ Note: if the file is included project, you need to delete the file from project 
 
         private void DiffEditor_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            throw new NotImplementedException();
+            int start = 1, column = 1; bool diff = false;
+            try
+            {
+                if (this.textView != null && diffLines != null && diffLines.Length > 0)
+                {
+                    int line;
+                    textView.GetCaretPos(out line, out column);
 
-            //int start = 1, column = 1; bool diff = false;
-            //try
-            //{
-            //    if (this.textView != null && diffLines != null && diffLines.Length > 0)
-            //    {
-            //        int line;
-            //        textView.GetCaretPos(out line, out column);
+                    string text = diffLines[line];
+                    while (line >= 0)
+                    {
+                        var match = Regex.Match(text, "^@@(.+)@@");
+                        if (match.Success)
+                        {
+                            var s = match.Groups[1].Value;
+                            s = s.Substring(s.IndexOf('+') + 1);
+                            s = s.Substring(0, s.IndexOf(','));
+                            start += Convert.ToInt32(s) - 2;
+                            diff = true;
+                            break;
+                        }
+                        else if (text.StartsWith("-"))
+                        {
+                            start--;
+                        }
 
-            //        string text = diffLines[line];
-            //        while (line >= 0)
-            //        {
-            //            var match = Regex.Match(text, "^@@(.+)@@");
-            //            if (match.Success)
-            //            {
-            //                var s = match.Groups[1].Value;
-            //                s = s.Substring(s.IndexOf('+') + 1);
-            //                s = s.Substring(0, s.IndexOf(','));
-            //                start += Convert.ToInt32(s) - 2;
-            //                diff = true;
-            //                break;
-            //            }
-            //            else if (text.StartsWith("-"))
-            //            {
-            //                start--;
-            //            }
-
-            //            start++;
-            //            --line;
-            //            text = line >= 0 ? diffLines[line] : "";
-            //        }
-            //    }
-            //    if (!diff) start--;
-            //}
-            //catch (Exception ex)
-            //{
-            //    ShowStatusMessage(ex.Message);
-            //}
-            //GetSelectedFileName((fileName) =>
-            //{
-            //    OpenFile(fileName);
-            //    var dte = toolWindow.dte;
-            //    var selection = dte.ActiveDocument.Selection as EnvDTE.TextSelection;
-            //    selection.MoveToLineAndOffset(start, column);
-            //});
+                        start++;
+                        --line;
+                        text = line >= 0 ? diffLines[line] : "";
+                    }
+                }
+                if (!diff) start--;
+            }
+            catch (Exception ex)
+            {
+                ShowStatusMessage(ex.Message);
+            }
+            GetSelectedFileName((fileName) =>
+            {
+                OpenFile(fileName);
+                var selection = DTE.ActiveDocument.Selection as EnvDTE.TextSelection;
+                selection.MoveToLineAndOffset(start, column);
+            });
         }
 
         private void OpenFile(string fileName)
@@ -795,6 +780,7 @@ Note: if the file is included project, you need to delete the file from project 
         internal async Task OnCommit()
         {
             if (tracker == null) return;
+            if (!hasFileSaved()) return;
 
             try
             {
@@ -1020,6 +1006,10 @@ Are you sure you want to continue?";
                 item.IsEnabled = listStaged.SelectedItems.Count > 0;
         }
 
+        internal bool hasFileSaved()
+        {
+            return DTE.ItemOperations.PromptToSave != EnvDTE.vsPromptResult.vsPromptResultCancelled;
+        }
     }
 
     public static class ExtHelper
