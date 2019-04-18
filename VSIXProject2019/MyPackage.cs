@@ -59,6 +59,10 @@ namespace VSIXProject2019
 
             CommandID cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandGitBash);
             OleMenuCommand menu = new OleMenuCommand(OnGitBashCommand, cmd);
+            menu.BeforeQueryStatus += (s, e) => {
+                var command = s as OleMenuCommand;
+                command.Enabled = File.Exists(GitSccOptions.Current.GitBashPath);
+            };
             commandService.AddCommand(menu);
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesRefresh);
@@ -67,21 +71,28 @@ namespace VSIXProject2019
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandInit);
             menu = new OleMenuCommand(OnInitCommand, cmd);
+            menu.BeforeQueryStatus += (s, e) => { ((OleMenuCommand)s).Visible = tracker!= null && !IsSolutionGitControlled;  };
             commandService.AddCommand(menu);
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandEditIgnore);
             menu = new OleMenuCommand(OnEditIgnore, cmd);
+            menu.BeforeQueryStatus += (s, e) => { ((OleMenuCommand)s).Visible = IsSolutionGitControlled; };
             commandService.AddCommand(menu);
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdPendingChangesCommit);
             menu = new OleMenuCommand(OnCommitCommand, cmd);
+            menu.BeforeQueryStatus += (s, e) => { ((OleMenuCommand)s).Visible = IsSolutionGitControlled; };
             commandService.AddCommand(menu);
 
             for (int i = 0; i < GitToolCommands.GitExtCommands.Count; i++)
             {
                 cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdGitExtCommand1 + i);
                 var mc = new OleMenuCommand(OnGitExtCommandExec, cmd);
-                mc.BeforeQueryStatus += OnStatus;
+                mc.BeforeQueryStatus += (s, e) => {
+                    var command = s as OleMenuCommand;
+                    command.Text = GitToolCommands.GitExtCommands[command.CommandID.ID - PkgCmdIDList.icmdGitExtCommand1].Name;
+                    command.Enabled = File.Exists(GitSccOptions.Current.GitExtensionPath);
+                };
                 commandService.AddCommand(mc);
             }
 
@@ -89,7 +100,11 @@ namespace VSIXProject2019
             {
                 cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdGitTorCommand1 + i);
                 var mc = new OleMenuCommand(OnGitTorCommandExec, cmd);
-                mc.BeforeQueryStatus += OnStatus;
+                mc.BeforeQueryStatus += (s, e) => {
+                    var command = s as OleMenuCommand;
+                    command.Text = GitToolCommands.GitExtCommands[command.CommandID.ID - PkgCmdIDList.icmdGitTorCommand1].Name;
+                    command.Enabled = File.Exists(GitSccOptions.Current.TortoiseGitPath);
+                };
                 commandService.AddCommand(mc);
             }
 
@@ -116,6 +131,9 @@ namespace VSIXProject2019
         private void OpenRepository()
         {
             var solutionFileName = dte.Solution?.FullName;
+
+            Debug.WriteLine("GT === Open repository: " + solutionFileName);
+
             if (!string.IsNullOrEmpty(solutionFileName))
             {
                 CurrentGitWorkingDirectory = Path.GetDirectoryName(solutionFileName);
@@ -196,29 +214,16 @@ namespace VSIXProject2019
             }
         }
 
-        private static void OnStatus(object sender, EventArgs e)
+        private bool IsSolutionGitControlled 
         {
-            var command = sender as OleMenuCommand;
-            if (command != null)
+            get
             {
-                var cmdId = command.CommandID.ID;
-                if (cmdId >= PkgCmdIDList.icmdGitExtCommand1 &&
-                    cmdId < PkgCmdIDList.icmdGitExtCommand1 + GitToolCommands.GitExtCommands.Count)
-                {
-                    int idx = cmdId - PkgCmdIDList.icmdGitExtCommand1;
-                    command.Text = GitToolCommands.GitExtCommands[idx].Name;
-                }
-                else if (cmdId >= PkgCmdIDList.icmdGitTorCommand1 &&
-                    cmdId < PkgCmdIDList.icmdGitTorCommand1 + GitToolCommands.GitTorCommands.Count)
-                {
-                    int idx = cmdId - PkgCmdIDList.icmdGitTorCommand1;
-                    command.Text = GitToolCommands.GitTorCommands[idx].Name;
-                }
+                var isGit = tracker?.Repository?.IsGit;
+                return isGit == true;
             }
         }
 
-
-        private static void OpenToolWindow(AsyncPackage package)
+        private void OpenToolWindow(AsyncPackage package)
         {
             package.JoinableTaskFactory.RunAsync(async () =>
             {
