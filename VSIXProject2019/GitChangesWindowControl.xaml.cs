@@ -39,6 +39,7 @@
         {
             this.InitializeComponent();
             this.DTE = DTE;
+            this.gitConsole1.ShowStatusMessage = this.ShowStatusMessage;
         }
 
         public void Refresh(GitTracker tracker)
@@ -48,78 +49,78 @@
             Refresh(repository);
         }
 
-            #region Events
+        #region Events
 
-            private void checkBoxSelected_Click(object sender, RoutedEventArgs e)
+        private void checkBoxSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var checkBox = sender as CheckBox;
+            foreach (var item in this.listView1.SelectedItems)
             {
-                var checkBox = sender as CheckBox;
-                foreach (var item in this.listView1.SelectedItems)
-                {
-                    ((GitFile)item).IsSelected = checkBox.IsChecked == true;
-                }
+                ((GitFile)item).IsSelected = checkBox.IsChecked == true;
             }
+        }
 
-            private void checkBoxAllStaged_Click(object sender, RoutedEventArgs e)
+        private void checkBoxAllStaged_Click(object sender, RoutedEventArgs e)
+        {
+            var checkBox = sender as CheckBox;
+            foreach (var item in this.listView1.Items)
             {
-                var checkBox = sender as CheckBox;
-                foreach (var item in this.listView1.Items)
-                {
-                    ((GitFile)item).IsSelected = checkBox.IsChecked == true;
-                }
+                ((GitFile)item).IsSelected = checkBox.IsChecked == true;
             }
+        }
 
 
-            private void ClearEditor()
-            {
-                //this.toolWindow.ClearEditor();
-                this.DiffEditor.Content = null;
-                fileInEditor = null;
-                pnlChangedFileTool.Visibility = activeListView == listUnstaged &&
-                    listUnstaged.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-                pnlStagedFileTool.Visibility = activeListView == listStaged &&
-                    listStaged.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-                btnResetSelected.Visibility = btnStageSelected.Visibility
-                    = btnUnStageSelected.Visibility = Visibility.Collapsed;
-            }
+        private void ClearEditor()
+        {
+            //this.toolWindow.ClearEditor();
+            this.DiffEditor.Content = null;
+            fileInEditor = null;
+            pnlChangedFileTool.Visibility = activeListView == listUnstaged &&
+                listUnstaged.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            pnlStagedFileTool.Visibility = activeListView == listStaged &&
+                listStaged.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            btnResetSelected.Visibility = btnStageSelected.Visibility
+                = btnUnStageSelected.Visibility = Visibility.Collapsed;
+        }
 
-            string fileInEditor;
+        string fileInEditor;
 
-            private void ShowFile(string fileName)
-            {
-                //try
-                //{
-                //    var tuple = this.toolWindow.SetDisplayedFile(fileName);
-                //    if (tuple != null)
-                //    {
-                //        this.DiffEditor.Content = tuple.Item1;
-                //        this.textView = tuple.Item2;
-                //    }
-                //    pnlChangedFileTool.Visibility = Visibility.Collapsed;
-                //    pnlStagedFileTool.Visibility = Visibility.Collapsed;
-                //    if (this.activeListView == this.listUnstaged)
-                //    {
-                //        pnlChangedFileTool.Visibility = Visibility.Visible;
-                //    }
-                //    else if (this.activeListView == this.listStaged)
-                //    {
-                //        pnlStagedFileTool.Visibility = Visibility.Visible;
-                //    }
-                //}
-                //finally
-                //{
-                //    //File.Delete(fileName);
-                //    fileInEditor = fileName;
-                //}
-            }
+        private void ShowFile(string fileName)
+        {
+            //try
+            //{
+            //    var tuple = this.toolWindow.SetDisplayedFile(fileName);
+            //    if (tuple != null)
+            //    {
+            //        this.DiffEditor.Content = tuple.Item1;
+            //        this.textView = tuple.Item2;
+            //    }
+            //    pnlChangedFileTool.Visibility = Visibility.Collapsed;
+            //    pnlStagedFileTool.Visibility = Visibility.Collapsed;
+            //    if (this.activeListView == this.listUnstaged)
+            //    {
+            //        pnlChangedFileTool.Visibility = Visibility.Visible;
+            //    }
+            //    else if (this.activeListView == this.listStaged)
+            //    {
+            //        pnlStagedFileTool.Visibility = Visibility.Visible;
+            //    }
+            //}
+            //finally
+            //{
+            //    //File.Delete(fileName);
+            //    fileInEditor = fileName;
+            //}
+        }
 
-            internal void ReloadEditor()
-            {
-                if (fileInEditor != null) ShowFile(fileInEditor);
-            }
+        internal void ReloadEditor()
+        {
+            if (fileInEditor != null) ShowFile(fileInEditor);
+        }
 
         #endregion
 
-            #region listView1
+        #region listView1
         private GridViewColumnHeader _currentSortedColumn;
         private ListSortDirection _lastSortDirection;
 
@@ -402,7 +403,7 @@
         internal void Refresh(GitRepository repository)
         {
             //this.tracker = tracker;
-            ////this.gitConsole1.Refresh(tracker, toolWindow);
+            this.gitConsole1.Refresh(repository);
 
             if (this.activeListView == null) this.activeListView = this.listView1;
 
