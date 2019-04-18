@@ -788,8 +788,7 @@ Note: if the file is included project, you need to delete the file from project 
         }
         internal void OnSettings()
         {
-            throw new NotImplementedException();
-            //Settings.Show(this.tracker);
+            Settings.Show(this.tracker?.Repository);
         }
 
         internal async Task OnCommit()
