@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
+using System.Resources;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -236,11 +237,6 @@ namespace VSIXProject2019
             });
         }
 
-        private void OnSettings(object sender, EventArgs e)
-        {
-            Process.Start("https://github.com/yysun/git-tools");
-        }
-
         private void OnAbout(object sender, EventArgs e)
         {
             Process.Start("https://github.com/yysun/git-tools");
@@ -280,17 +276,32 @@ namespace VSIXProject2019
 
         private void OnCommitCommand(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            FindMyControl()?.OnCommit();
         }
 
-        private void OnEditIgnore(object sender, EventArgs e)
+        private void OnSettings(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            FindMyControl()?.OnSettings();
         }
 
         private void OnInitCommand(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrWhiteSpace(CurrentGitWorkingDirectory)) return;
+            GitRepository.Init(CurrentGitWorkingDirectory);
+            var ignoreFileName = Path.Combine(CurrentGitWorkingDirectory, ".gitignore");
+            if (!File.Exists(ignoreFileName))
+            {
+                File.WriteAllText(ignoreFileName, VSPackage.IgnoreFileContent);
+            }
+            OpenRepository();
+        }
+
+        private void OnEditIgnore(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(CurrentGitWorkingDirectory)) return;
+            var fn = Path.Combine(CurrentGitWorkingDirectory, ".gitignore");
+            if (!File.Exists(fn)) File.WriteAllText(fn, "# git ignore file");
+            dte.ItemOperations.OpenFile(fn);
         }
 
         private void OnRefreshCommand(object sender, EventArgs e)
