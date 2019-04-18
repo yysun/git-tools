@@ -19,14 +19,14 @@
         </Strings>
       </Menu>
 
-      <Menu guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbar" priority="0x0000" type="Toolbar">
+      <!--<Menu guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbar" priority="0x0000" type="Toolbar">
         <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbar" />
         <CommandFlag>DefaultDocked</CommandFlag>
         <Strings>
           <CommandName>Git Tools</CommandName>
           <ButtonText>Git Tools Toolbar</ButtonText>
         </Strings>
-      </Menu>
+      </Menu>-->
 
       <Menu guid="guidVsGitToolsPackageCmdSet" id="imnuGitExtMenu" priority="0x0200" type="MenuController">
         <Parent guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenuGroup" />
@@ -229,7 +229,7 @@
     </CommandPlacement>
 
     <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandAbout" priority="0x0120">
-      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" />
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
     </CommandPlacement>
 
     <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="cmdidGitToolsWindow" priority="0x0">
