@@ -59,6 +59,12 @@
     <Compile Include="GitChangesWindowControl.xaml.cs">
       <DependentUpon>GitChangesWindowControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GitConsole.xaml.cs">
+      <DependentUpon>GitConsole.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GitSettings.xaml.cs">
+      <DependentUpon>GitSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GitToolCommands.cs" />
     <Compile Include="GitTracker.cs" />
     <Compile Include="Guids.cs" />
@@ -136,6 +142,14 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="GitChangesWindowControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GitConsole.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GitSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
