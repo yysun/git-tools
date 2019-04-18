@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
@@ -132,15 +132,16 @@ namespace VSIXProject2019
         {
             var solutionFileName = dte.Solution?.FullName;
 
-            Debug.WriteLine("GT === Open repository: " + solutionFileName);
-
             if (!string.IsNullOrEmpty(solutionFileName))
             {
-                CurrentGitWorkingDirectory = Path.GetDirectoryName(solutionFileName);
+                CurrentGitWorkingDirectory = File.Exists(solutionFileName) ? Path.GetDirectoryName(solutionFileName) : solutionFileName;
                 tracker = new GitTracker(CurrentGitWorkingDirectory);
+                if (tracker.Repository.IsGit) CurrentGitWorkingDirectory = tracker.Repository.WorkingDirectory;
                 tracker.Changed += (tracker) => Tracker_Changed(tracker);
                 Tracker_Changed(tracker);
             }
+
+            Debug.WriteLine("GT === Open repository: " + CurrentGitWorkingDirectory);
         }
 
         private void CloseRepository()
