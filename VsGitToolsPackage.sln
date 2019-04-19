@@ -11,13 +11,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		UnitTests.testsettings = UnitTests.testsettings
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VsGitToolsPackage", "VsGitToolsPackage\VsGitToolsPackage.csproj", "{B867C32C-3C78-47E3-95DE-9A43B7AF1FA7}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C756204F-28E1-473A-8160-E697E3303F1B} = {C756204F-28E1-473A-8160-E697E3303F1B}
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VsGitToolsPackage.Tests", "VsGitToolsPackage.Tests\VsGitToolsPackage.Tests.csproj", "{0E10AFF0-4405-46C1-8FE6-802B17290576}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitApi", "GitApi\GitApi.csproj", "{161E81E2-25E5-4134-8D2D-595419B1265B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GitUI", "GitUI\GitUI.csproj", "{C756204F-28E1-473A-8160-E697E3303F1B}"
@@ -32,18 +25,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B867C32C-3C78-47E3-95DE-9A43B7AF1FA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B867C32C-3C78-47E3-95DE-9A43B7AF1FA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B867C32C-3C78-47E3-95DE-9A43B7AF1FA7}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B867C32C-3C78-47E3-95DE-9A43B7AF1FA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B867C32C-3C78-47E3-95DE-9A43B7AF1FA7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B867C32C-3C78-47E3-95DE-9A43B7AF1FA7}.Release|x86.ActiveCfg = Release|Any CPU
-		{0E10AFF0-4405-46C1-8FE6-802B17290576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E10AFF0-4405-46C1-8FE6-802B17290576}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E10AFF0-4405-46C1-8FE6-802B17290576}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{0E10AFF0-4405-46C1-8FE6-802B17290576}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E10AFF0-4405-46C1-8FE6-802B17290576}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0E10AFF0-4405-46C1-8FE6-802B17290576}.Release|x86.ActiveCfg = Release|Any CPU
 		{161E81E2-25E5-4134-8D2D-595419B1265B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{161E81E2-25E5-4134-8D2D-595419B1265B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{161E81E2-25E5-4134-8D2D-595419B1265B}.Debug|x86.ActiveCfg = Debug|Any CPU
