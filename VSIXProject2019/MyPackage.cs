@@ -11,10 +11,15 @@ using EnvDTE80;
 using GitScc;
 using Microsoft;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.ComponentModelHost;
+using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Events;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.TextManager.Interop;
+using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using Process = System.Diagnostics.Process;
 using SolutionEvents = Microsoft.VisualStudio.Shell.Events.SolutionEvents;
 using Task = System.Threading.Tasks.Task;
@@ -188,11 +193,19 @@ namespace VSIXProject2019
         {
             // Perform as much work as possible in this method which is being run on a background thread.
             // The object returned from this method is passed into the constructor of the GitChangesWindow
+            await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             var dte = await GetServiceAsync(typeof(DTE)) as DTE2;
-
+            var oleServiceProvider = await GetServiceAsync(typeof(IServiceProvider)) as IServiceProvider;
+            IVsInvisibleEditorManager invisibleEditorManager = await GetServiceAsync(typeof(SVsInvisibleEditorManager)) as IVsInvisibleEditorManager;
+            var componentModel = GetGlobalService(typeof(SComponentModel)) as IComponentModel;
+            var editorAdapter = componentModel.GetService<IVsEditorAdaptersFactoryService>();
             return new GitChangesWindowState
             {
-                DTE = dte
+                DTE = dte,
+                ComponentModel = componentModel,
+                OleServiceProvider = oleServiceProvider,
+                InvisibleEditorManager = invisibleEditorManager,
+                EditorAdapter = editorAdapter
             };
         }
         #endregion
@@ -218,7 +231,7 @@ namespace VSIXProject2019
             }
         }
 
-        private bool IsSolutionGitControlled 
+        private bool IsSolutionGitControlled
         {
             get
             {

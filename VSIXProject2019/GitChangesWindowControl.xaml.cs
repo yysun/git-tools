@@ -76,7 +76,6 @@
         private void ClearEditor()
         {
             this.toolWindow.ClearEditor();
-            this.DiffEditor.Content = null;
             fileInEditor = null;
             pnlChangedFileTool.Visibility = activeListView == listUnstaged &&
                 listUnstaged.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -765,8 +764,6 @@ Note: if the file is included project, you need to delete the file from project 
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            this.DiffEditor.Content = "";
-
             GridViewColumnCollection columns = ((GridView)listView1.View).Columns;
             _currentSortedColumn = (GridViewColumnHeader)columns[columns.Count - 1].Header;
             _lastSortDirection = ListSortDirection.Ascending;
