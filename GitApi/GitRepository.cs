@@ -26,15 +26,6 @@ namespace GitScc
         public GitRepository(string directory)
         {
             this.workingDirectory = directory;
-            Refresh();
-            this.isGit = false;
-            var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory);
-            if (!result.HasError && !result.Output.StartsWith("fatal:"))
-            {
-                this.workingDirectory = result.Output.Trim();
-                result = GitBash.Run("rev-parse --is-inside-work-tree", WorkingDirectory);
-                isGit = string.Compare("true", result.Output.Trim(), true) == 0;
-            }
         }
 
         public void Refresh()
@@ -45,6 +36,14 @@ namespace GitScc
             this.remotes = null;
             this.configs = null;
             this.ignored = null;
+            this.isGit = false;
+            var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory);
+            if (!result.HasError && !result.Output.StartsWith("fatal:"))
+            {
+                this.workingDirectory = result.Output.Trim();
+                result = GitBash.Run("rev-parse --is-inside-work-tree", WorkingDirectory);
+                isGit = string.Compare("true", result.Output.Trim(), true) == 0;
+            }
         }
 
         #region Git commands
@@ -759,7 +758,7 @@ namespace GitScc
         {
             //var result = GitBash.Run($"config --get {name}", WorkingDirectory);
             //return result.Output.Trim();
-            return Configs[name];
+            return Configs.ContainsKey(name) ? Configs[name] : null;
         }
 
         public string GetCommitTemplate()

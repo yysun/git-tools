@@ -40,14 +40,15 @@ namespace VSIXProject2019
             GitBash.UseUTF8FileNames = !GitSccOptions.Current.NotUseUTF8FileNames;
 
             bool isSolutionLoaded = await IsSolutionLoadedAsync();
-            if (isSolutionLoaded) OpenRepository();
             SolutionEvents.OnAfterOpenSolution += (o, e) => OpenRepository();
             SolutionEvents.OnAfterCloseSolution += (o, e) => CloseRepository();
             SolutionEvents.OnAfterOpenFolder += (o, e) => OpenRepository();
             SolutionEvents.OnAfterCloseFolder += (o, e) => CloseRepository();
+
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             dte = await GetServiceAsync(typeof(DTE)) as DTE2;
             Assumes.Present(dte);
+            if (isSolutionLoaded) OpenRepository();
 
             #region commands
             var commandService = await GetServiceAsync((typeof(IMenuCommandService))) as OleMenuCommandService;
@@ -164,6 +165,7 @@ namespace VSIXProject2019
             {
                 await JoinableTaskFactory.SwitchToMainThreadAsync();
                 FindMyControl()?.Refresh(tracker);
+                ((Commands2)dte.Commands).UpdateCommandUI(true);
             }
             catch (Exception ex)
             {
@@ -291,9 +293,8 @@ namespace VSIXProject2019
             var ignoreFileName = Path.Combine(CurrentGitWorkingDirectory, ".gitignore");
             if (!File.Exists(ignoreFileName))
             {
-                File.WriteAllText(ignoreFileName, VSPackage.IgnoreFileContent);
+                //File.WriteAllText(ignoreFileName, Resources.IgnoreFileContent);
             }
-            OpenRepository();
         }
 
         private void OnEditIgnore(object sender, EventArgs e)
