@@ -6,6 +6,10 @@
 
 This extension provides a few more git tools to Visual Studio, including git changes window, graphical git history viewer and menus to launch Git Bash, Git Extensions and TortoiseGit. It is the successor of [Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c)
 
+
+> Git Tools is a GNU2-licensed open source project. Please consider [supporting the project on Patreon](https://www.patreon.com/gittools). 👍❤️🙏
+
+
 [Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c) has been providing Git tools to Visual Studio since Visual Studio 2008. Started in Visual Studio 2013, Microsoft has built the Microsoft Git provider into Visual Studio, but Visual Studio remains allowing only one active source control provider at a time. In order to be compatible with Microsoft Git, this extension is a modification of the Git Source Control Provider. It removed the file status glyphs in solution explorer, so that it can run side by side with Microsoft Git.
 
 ![main-menu](https://cloud.githubusercontent.com/assets/170547/23336421/281f2002-fb9e-11e6-9cec-77362e6a553c.png)
