@@ -154,6 +154,7 @@ namespace VSIXProject2019
         private void CloseRepository()
         {
             CurrentGitWorkingDirectory = "";
+            tracker.Dispose();
             tracker = null;
             Tracker_Changed(tracker);
         }
