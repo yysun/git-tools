@@ -15,7 +15,6 @@
 namespace DiffClassifier
 {
     using System.ComponentModel.Composition;
-    using System.Composition;
     using System.Windows.Media;
     using Microsoft.VisualStudio.Text.Classification;
     using Microsoft.VisualStudio.Utilities;

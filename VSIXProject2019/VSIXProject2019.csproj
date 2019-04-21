@@ -55,6 +55,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DiffClassifier\DiffClassificationDefinitions.cs" />
+    <Compile Include="DiffClassifier\DiffClassifier.cs" />
+    <Compile Include="DiffClassifier\DiffClassifierProvider.cs" />
     <Compile Include="GitChangesWindow.cs" />
     <Compile Include="GitChangesWindowControl.xaml.cs">
       <DependentUpon>GitChangesWindowControl.xaml</DependentUpon>
@@ -137,6 +140,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
