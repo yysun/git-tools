@@ -45,6 +45,8 @@
         private IServiceProvider OleServiceProvider;
         private IVsInvisibleEditorManager InvisibleEditorManager;
         private IVsEditorAdaptersFactoryService EditorAdapter;
+        private IVsInvisibleEditor invisibleEditor;
+        private IVsCodeWindow codeWindow;
         private IVsTextView textView;
 
         public const string WindowGuidString = "e0487501-8bf2-4e94-8b35-ceb6f0010c44"; // Replace with new GUID in your own code
@@ -96,11 +98,25 @@
             }
         }
 
+        /// <summary>
+        /// Cleans up an existing editor if we are about to put a new one in place, used to close down the old editor bits as well as
+        /// nulling out any cached objects that we have that came from the now dead editor.
         /// </summary>
         internal void ClearEditor()
         {
             filePath = "";
-            DiffEditor.Content = null;
+            if (this.codeWindow != null)
+            {
+                this.codeWindow.Close();
+                this.codeWindow = null;
+            }
+
+            if (this.textView != null)
+            {
+                this.textView.CloseView();
+                this.textView = null;
+            }
+            this.invisibleEditor = null;
         }
         #endregion
 
@@ -110,14 +126,12 @@
             //IVsInvisibleEditors are in-memory represenations of typical Visual Studio editors.
             //Language services, highlighting and error squiggles are hooked up to these editors
             //for us once we convert them to WpfTextViews. 
-            IVsInvisibleEditor invisibleEditor;
             ErrorHandler.ThrowOnFailure(this.InvisibleEditorManager.RegisterInvisibleEditor(
                 filePath
                 , pProject: null
                 , dwFlags: (uint)_EDITORREGFLAGS.RIEF_ENABLECACHING
                 , pFactory: null
                 , ppEditor: out invisibleEditor));
-            //RegisterDocument(filePath);
 
             var docDataPointer = IntPtr.Zero;
             Guid guidIVsTextLines = typeof(IVsTextLines).GUID;
@@ -129,7 +143,6 @@
 
             IVsTextLines docData = (IVsTextLines)Marshal.GetObjectForIUnknown(docDataPointer);
 
-            IVsCodeWindow codeWindow;
             //Create a code window adapter
             codeWindow = EditorAdapter.CreateVsCodeWindowAdapter(OleServiceProvider);
 
@@ -146,14 +159,10 @@
             ErrorHandler.ThrowOnFailure(codeWindow.GetPrimaryView(out textView));
 
             var textViewHost = EditorAdapter.GetWpfTextViewHost(textView);
-            //textViewHost.TextView.Options.SetOptionValue(GitTextViewOptions.DiffMarginId, false);
             textViewHost.TextView.Options.SetOptionValue(DefaultTextViewHostOptions.ChangeTrackingId, false);
             textViewHost.TextView.Options.SetOptionValue(DefaultTextViewHostOptions.GlyphMarginId, false);
             textViewHost.TextView.Options.SetOptionValue(DefaultTextViewHostOptions.LineNumberMarginId, false);
             textViewHost.TextView.Options.SetOptionValue(DefaultTextViewHostOptions.OutliningMarginId, false);
-            textViewHost.TextView.Options.SetOptionValue(DefaultTextViewOptions.ViewProhibitUserInputId, true);
-
-            //DiffEditor.Content = "";
             DiffEditor.Content = textViewHost.HostControl;
 
             return textView;
