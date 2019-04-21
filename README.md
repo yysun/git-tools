@@ -1,22 +1,33 @@
-# Git Tools
-
-## Extension for Visual Studio 2019 is under development (in the VS2019 branch)
+# Git Tools and Git Tools 2019
 
 ## Introduction
 
-This extension provides a few more git tools to Visual Studio, including git changes window, graphical git history viewer and menus to launch Git Bash, Git Extensions and TortoiseGit. It is the successor of [Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c)
+[Git Tools](https://marketplace.visualstudio.com/items?itemName=yysun.GitTools) is a Visual Studio extension that integration a few more git tools to Visual Studio 2013/2015/2017, including git changes window, graphical git history viewer and menus to launch Git Bash, Git Extensions and TortoiseGit.
+
+ [Git Tools 2019](https://marketplace.visualstudio.com/items?itemName=yysun.git-tools-2019) supports the new Visual Studio 2019 extension architecture. It is compiled from the VS2019 branch.
 
 
-> Git Tools is a GNU2-licensed open source project. Please consider [supporting the project on Patreon](https://www.patreon.com/gittools). 👍❤️🙏
+> Git Tools is a open source project. Please [donate](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=KBCLF3PZD6C98&lc=US&item_name=Git%20Tools%20for%20Visual%20Studio&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted) or [support the project on Patreon](https://www.patreon.com/gittools). 👍❤️🙏
 
 
-[Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c) has been providing Git tools to Visual Studio since Visual Studio 2008. Started in Visual Studio 2013, Microsoft has built the Microsoft Git provider into Visual Studio, but Visual Studio remains allowing only one active source control provider at a time. In order to be compatible with Microsoft Git, this extension is a modification of the Git Source Control Provider. It removed the file status glyphs in solution explorer, so that it can run side by side with Microsoft Git.
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=KBCLF3PZD6C98&lc=US&item_name=Git%20Tools%20for%20Visual%20Studio&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
+
+## History
+
+Git Tools and Git Tools 2019 are  the successor of [Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c).
+
+
+[Git Source Control Provider](https://marketplace.visualstudio.com/items?itemName=yysun.GitSourceControlProvider) was the Visual Studio extention for Visual Studio 2008/2010. It integrates Git tools to Visual Studio as a source control provider since Visual Studio 2008 ([Github Project](https://github.com/yysun/Git-Source-Control-Provider)) ([InfoQ News](https://www.infoq.com/news/2010/06/Git-Visual-Studio)).
+
+Started in Visual Studio 2013, Microsoft has built the Microsoft Git provider into Visual Studio, but Visual Studio remains allowing only one active source control provider at a time. [Git Tools](https://marketplace.visualstudio.com/items?itemName=yysun.GitTools) is modified from the Git Source Control Provider to become a standalone extension. Ii ts compatible with Microsoft Git and can run side by side with Microsoft Git.
+
+Visual Studio 2019 has a new asynchronous extension architecture. [Git Tools 2019](https://marketplace.visualstudio.com/items?itemName=yysun.git-tools-2019) is modifed from Git Tools to adopt the new architecture. It is compiled from the VS2019 branch.
 
 ![main-menu](https://cloud.githubusercontent.com/assets/170547/23336421/281f2002-fb9e-11e6-9cec-77362e6a553c.png)
 
+
 For more information, please visit http://yysun.github.io/git-tools
 
-[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=KBCLF3PZD6C98&lc=US&item_name=Git%20Tools%20for%20Visual%20Studio&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted)
 
 ## How to Use
 
