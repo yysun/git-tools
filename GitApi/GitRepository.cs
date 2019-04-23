@@ -522,9 +522,12 @@ namespace GitScc
 
         public bool IsIgnored(string fullPath)
         {
+            if (System.IO.Directory.Exists(fullPath)) fullPath += "\\";
+            fullPath = fullPath.ToLower();
+
             foreach (var item in this.Ignored)
             {
-                var name = Path.GetFullPath(Path.Combine(WorkingDirectory, item.FileName));
+                var name = Path.GetFullPath(Path.Combine(WorkingDirectory, item.FileName)).ToLower();
                 if (Directory.Exists(name) && fullPath.StartsWith(name)) return true;
                 if (string.Compare(fullPath, name, true) == 0) return true;
             }

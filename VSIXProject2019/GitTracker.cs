@@ -63,12 +63,9 @@ namespace VSIXProject2019
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            var name = Path.GetFullPath(e.FullPath);
-            if (System.IO.Directory.Exists(name)) name += "\\";
-
             if (!(e.Name.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
                 && !e.Name.EndsWith(".lock") 
-                && !this.Repository.IsIgnored(name))
+                && !this.Repository.IsIgnored(e.FullPath))
             {
                 Debug.WriteLine("GT ==== File system changed [" + e.ChangeType.ToString() + "]" + e.FullPath);
                 if (timer != null)
