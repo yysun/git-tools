@@ -203,7 +203,7 @@ namespace VSIXProject2019
             return new GitChangesWindowState
             {
                 DTE = dte,
-                ComponentModel = componentModel,
+                AsyncPackage = this,
                 OleServiceProvider = oleServiceProvider,
                 InvisibleEditorManager = invisibleEditorManager,
                 EditorAdapter = editorAdapter

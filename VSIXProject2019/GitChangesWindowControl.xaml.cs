@@ -42,7 +42,8 @@
             this.InitializeComponent();
             this.toolWindow = toolWindow;
             this.DTE = toolWindow.DTE;
-            this.gitConsole1.ShowStatusMessage = this.ShowStatusMessage;
+            this.gitConsole1.ShowStatusMessage = msg => ShowStatusMessage(msg);
+            this.gitConsole1.JoinableTaskFactory = toolWindow.AsyncPackage.JoinableTaskFactory;
         }
 
         public void Refresh(GitTracker tracker)
@@ -399,7 +400,8 @@
 
         internal void Refresh(GitRepository repository)
         {
-            //this.tracker = tracker;
+            ShowStatusMessage("Refresh Git Changes");
+
             this.gitConsole1.Refresh(repository);
 
             if (this.activeListView == null) this.activeListView = this.listView1;
@@ -450,6 +452,8 @@
                 this.label4.Visibility = Visibility.Visible;
             else
                 this.label4.Visibility = Visibility.Collapsed;
+
+            ShowStatusMessage("");
         }
 
         internal void ClearUI()
@@ -487,9 +491,9 @@
         }
 
 
-        private void ShowStatusMessage(string msg)
+        private async Task ShowStatusMessage(string msg)
         {
-            //await ThreadingHelper.SwitchToMainThreadAsync();
+            await toolWindow.AsyncPackage.JoinableTaskFactory.SwitchToMainThreadAsync();
             Action action = () => { Dispatcher.VerifyAccess(); DTE.StatusBar.Text = msg; };
             Dispatcher.Invoke(action);
         }

@@ -1,4 +1,5 @@
 ﻿using GitScc;
+using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -436,31 +437,34 @@ namespace VSIXProject2019
 
         #region Write output/error and prompt
 
-        void WritePrompt()
+        async void WritePrompt()
         {
             Action act = () =>
             {
                 WritePromptText();
             };
-            this.Dispatcher.BeginInvoke(act, DispatcherPriority.Normal);
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            Dispatcher.BeginInvoke(act, DispatcherPriority.Normal);
         }
 
-        void WriteError(string data)
+        async void WriteError(string data)
         {
             Action act = () =>
             {
                 WriteText(data, BRUSH_ERROR);
             };
-            this.Dispatcher.BeginInvoke(act, DispatcherPriority.Normal);
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            Dispatcher.BeginInvoke(act, DispatcherPriority.Normal);
         }
 
-        void WriteOutput(string data)
+        async void WriteOutput(string data)
         {
             Action act = () =>
             {
                 WriteText(data, BRUSH_OUTPUT);
             };
-            this.Dispatcher.BeginInvoke(act, DispatcherPriority.Normal);
+            await JoinableTaskFactory.SwitchToMainThreadAsync();
+            Dispatcher.BeginInvoke(act, DispatcherPriority.Normal);
         }
 
         void ChangePrompt(string command, Brush brush)
@@ -708,6 +712,7 @@ namespace VSIXProject2019
         }
 
         public Action<string> ShowStatusMessage { get; set; }
+        public JoinableTaskFactory JoinableTaskFactory { get; set; }
 
     }
 }

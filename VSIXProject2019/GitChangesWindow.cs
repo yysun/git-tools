@@ -38,10 +38,9 @@
         // on releases prior to d16.0.
         const _codewindowbehaviorflags CWB_DISABLEDIFF = (_codewindowbehaviorflags)0x04;
 
-
         public EnvDTE80.DTE2 DTE;
 
-        private IComponentModel ComponentModel;
+        internal AsyncPackage AsyncPackage;
         private IServiceProvider OleServiceProvider;
         private IVsInvisibleEditorManager InvisibleEditorManager;
         private IVsEditorAdaptersFactoryService EditorAdapter;
@@ -63,7 +62,7 @@
             this.Caption = "Git Changes";
             this.ToolBar = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.imnuGitChangesToolWindowToolbarMenu);
             this.DTE = state.DTE;
-            this.ComponentModel = state.ComponentModel;
+            this.AsyncPackage = state.AsyncPackage;
             this.OleServiceProvider = state.OleServiceProvider;
             this.InvisibleEditorManager = state.InvisibleEditorManager;
             this.EditorAdapter = state.EditorAdapter;
@@ -173,9 +172,9 @@
     public class GitChangesWindowState
     {
         public EnvDTE80.DTE2 DTE { get; set; }
-        public IComponentModel ComponentModel { get; set; }
+        public AsyncPackage AsyncPackage { get; set; }
         public IServiceProvider OleServiceProvider { get; set; }
         public IVsInvisibleEditorManager InvisibleEditorManager { get; set; }
         public IVsEditorAdaptersFactoryService EditorAdapter { get; set; }
-}
+    }
 }
