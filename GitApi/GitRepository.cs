@@ -13,7 +13,7 @@ namespace GitScc
     public class GitRepository
     {
         private string workingDirectory;
-        private bool isGit;
+        private bool? isGit;
         private string branch;
         private IEnumerable<GitFile> changedFiles;
         private IEnumerable<string> remotes;
@@ -21,7 +21,6 @@ namespace GitScc
         private IEnumerable<GitFile> ignored;
 
         public string WorkingDirectory { get { return workingDirectory; } }
-        public bool IsGit { get { return isGit; } }
 
         public GitRepository(string directory)
         {
@@ -36,13 +35,24 @@ namespace GitScc
             this.remotes = null;
             this.configs = null;
             this.ignored = null;
-            this.isGit = false;
-            var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory);
-            if (!result.HasError && !result.Output.StartsWith("fatal:"))
+            this.isGit = null;
+        }
+
+        public bool IsGit
+        {
+            get
             {
-                this.workingDirectory = result.Output.Trim();
-                result = GitBash.Run("rev-parse --is-inside-work-tree", WorkingDirectory);
-                isGit = string.Compare("true", result.Output.Trim(), true) == 0;
+                if (isGit == null)
+                {
+                    var result = GitBash.Run("rev-parse --show-toplevel", WorkingDirectory);
+                    if (!result.HasError && !result.Output.StartsWith("fatal:"))
+                    {
+                        this.workingDirectory = result.Output.Trim();
+                        result = GitBash.Run("rev-parse --is-inside-work-tree", WorkingDirectory);
+                        isGit = string.Compare("true", result.Output.Trim(), true) == 0;
+                    }
+                }
+                return isGit == true;
             }
         }
 
@@ -649,7 +659,7 @@ namespace GitScc
 
         public void SaveFileFromLastCommit(string fileName, string tempFile)
         {
-            if (!this.isGit) return;
+            if (!this.IsGit) return;
             var head = GetBranchId("HEAD");
             if (head != null)
             {
