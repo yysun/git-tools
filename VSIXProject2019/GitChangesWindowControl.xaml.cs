@@ -50,7 +50,7 @@
         {
             this.tracker = tracker;
             this.repository = tracker?.Repository;
-            Refresh(repository);
+            Refresh();
         }
 
         #region Events
@@ -398,7 +398,7 @@
 
         #region Git functions
 
-        internal void Refresh(GitRepository repository)
+        private void Refresh()
         {
             ShowStatusMessage("Refresh Git Changes");
 
