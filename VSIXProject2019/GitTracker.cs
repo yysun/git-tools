@@ -10,6 +10,8 @@ namespace VSIXProject2019
 
     public class GitTracker: IDisposable
     {
+        public static bool NoRefresh;
+
         public string Directory { get; }
         public GitRepository Repository { get; }
 
@@ -63,7 +65,8 @@ namespace VSIXProject2019
 
         private void fileSystemWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (!(e.Name.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
+            if (!NoRefresh
+                && !(e.Name.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
                 && !e.Name.EndsWith(".lock") 
                 && !this.Repository.IsIgnored(e.FullPath))
             {

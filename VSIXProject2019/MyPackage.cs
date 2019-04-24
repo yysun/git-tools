@@ -36,7 +36,7 @@ namespace VSIXProject2019
     {
         static DTE2 dte;
         static string CurrentGitWorkingDirectory;
-        static GitTracker tracker;
+        internal GitTracker tracker;
 
         // This method is run automatically the first time the command is being executed
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)

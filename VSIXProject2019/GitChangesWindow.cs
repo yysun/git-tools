@@ -6,6 +6,7 @@
     using System.Runtime.InteropServices;
     using System.Windows.Controls;
     using System.Windows.Forms;
+    using EnvDTE80;
     using Microsoft;
     using Microsoft.VisualStudio;
     using Microsoft.VisualStudio.ComponentModelHost;
@@ -31,7 +32,7 @@
     /// </para>
     /// </remarks>
     [Guid(WindowGuidString)]
-    public class GitChangesWindow : ToolWindowPane //,IOleCommandTarget, IVsWindowFrameNotify3
+    public class GitChangesWindow : ToolWindowPane, IVsWindowFrameNotify3
     {
         // This will actually be defined as _codewindowbehaviorflags2.CWB_DISABLEDIFF once the latest version of
         // Microsoft.VisualStudio.TextManager.Interop.16.0.DesignTime is published. Setting the flag will have no effect
@@ -40,7 +41,7 @@
 
         public EnvDTE80.DTE2 DTE;
 
-        internal AsyncPackage AsyncPackage;
+        internal MyPackage AsyncPackage;
         private IServiceProvider OleServiceProvider;
         private IVsInvisibleEditorManager InvisibleEditorManager;
         private IVsEditorAdaptersFactoryService EditorAdapter;
@@ -166,13 +167,54 @@
 
             return textView;
         }
+
+        #region IVsWindowFrameNotify3
+        public int OnShow(int fShow)
+        {
+            if (fShow == 1)
+            {
+                if (GitTracker.NoRefresh)
+                {
+                    AsyncPackage.tracker?.Repository?.Refresh();
+                }
+                GitTracker.NoRefresh = false;
+                ((GitChangesWindowControl)Content).Refresh(AsyncPackage.tracker);
+                ((Commands2)DTE.Commands).UpdateCommandUI(true);
+            }
+            else if(fShow == 0)
+            {
+                GitTracker.NoRefresh = true;
+            }
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
+
+        public int OnMove(int x, int y, int w, int h)
+        {
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
+
+        public int OnSize(int x, int y, int w, int h)
+        {
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
+
+        public int OnDockableChange(int fDockable, int x, int y, int w, int h)
+        {
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
+
+        public int OnClose(ref uint pgrfSaveOptions)
+        {
+            return Microsoft.VisualStudio.VSConstants.S_OK;
+        }
+        #endregion
     }
 
 
     public class GitChangesWindowState
     {
         public EnvDTE80.DTE2 DTE { get; set; }
-        public AsyncPackage AsyncPackage { get; set; }
+        public MyPackage AsyncPackage { get; set; }
         public IServiceProvider OleServiceProvider { get; set; }
         public IVsInvisibleEditorManager InvisibleEditorManager { get; set; }
         public IVsEditorAdaptersFactoryService EditorAdapter { get; set; }
