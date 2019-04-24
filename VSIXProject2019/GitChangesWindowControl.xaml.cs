@@ -92,7 +92,10 @@
         {
             try
             {
-                this.textView = this.toolWindow.SetDisplayedFile(fileName);
+                if (fileInEditor != fileName)
+                {
+                    this.textView = this.toolWindow.SetDisplayedFile(fileName);
+                }
                 pnlChangedFileTool.Visibility = Visibility.Collapsed;
                 pnlStagedFileTool.Visibility = Visibility.Collapsed;
                 if (this.activeListView == this.listUnstaged)
@@ -110,12 +113,6 @@
                 fileInEditor = fileName;
             }
         }
-
-        internal void ReloadEditor()
-        {
-            if (fileInEditor != null) ShowFile(fileInEditor);
-        }
-
         #endregion
 
         #region listView1
@@ -155,11 +152,9 @@
         private void ShowSelectedFile()
         {
             var fileName = GetSelectedFileName();
-
-            this.ClearEditor();
-
             if (fileName == null)
             {
+                this.ClearEditor();
                 diffLines = new string[0];
                 return;
             }
