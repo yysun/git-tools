@@ -10,7 +10,7 @@ namespace VSIXProject2019
 
     public class GitTracker: IDisposable
     {
-        public static bool NoRefresh;
+        public static bool NoRefresh = true;
 
         public string Directory { get; }
         public GitRepository Repository { get; }

@@ -168,6 +168,7 @@ namespace VSIXProject2019
         {
             try
             {
+                if (GitTracker.NoRefresh) return;
                 await JoinableTaskFactory.SwitchToMainThreadAsync();
                 FindMyControl()?.Refresh(tracker);
                 ((Commands2)dte.Commands).UpdateCommandUI(true);
