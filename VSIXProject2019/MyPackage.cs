@@ -28,7 +28,7 @@ namespace VSIXProject2019
 {
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("Git Tools 2019", "This extension provides a git changes window, and menus to launch Git Bash, Git Extenstions and TortoiseGit.", "3.0.5")]
+    [InstalledProductRegistration("Git Tools 2019", "This extension provides a git changes window, and menus to launch Git Bash, Git Extenstions and TortoiseGit.", "3.0.6")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid("9C86573C-CB62-45D0-9C1A-DAD967BBBDC4")] // must match GUID in the .vsct file
     [ProvideToolWindow(typeof(GitChangesWindow))]
@@ -62,7 +62,6 @@ namespace VSIXProject2019
             CommandID toolwndCommandID = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.cmdidGitToolsWindow);
             var menuToolWin = new OleMenuCommand((s, e) => OpenToolWindow(this), toolwndCommandID);
             commandService.AddCommand(menuToolWin);
-
 
             CommandID cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandGitBash);
             OleMenuCommand menu = new OleMenuCommand(OnGitBashCommand, cmd);
