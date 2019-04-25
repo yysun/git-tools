@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="GitTools2019.369a6a45-ea16-42d2-ba84-10faed6dd1e7" Version="3.0.6" Language="en-US" Publisher="yysun" />
+        <Identity Id="GitTools2019.369a6a45-ea16-42d2-ba84-10faed6dd1e7" Version="3.0.7" Language="en-US" Publisher="yysun" />
         <DisplayName>Git Tools 2019</DisplayName>
         <Description xml:space="preserve">This extension provides a git changes window, and menus to launch Git Bash, Git Extenstions and TortoiseGit.</Description>
         <MoreInfo>https://github.com/yysun/git-tools</MoreInfo>
