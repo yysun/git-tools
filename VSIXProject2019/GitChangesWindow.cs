@@ -47,7 +47,7 @@
         private IVsEditorAdaptersFactoryService EditorAdapter;
         private IVsInvisibleEditor invisibleEditor;
         private IVsCodeWindow codeWindow;
-        private IVsTextView textView;
+        internal IVsTextView textView;
 
         public const string WindowGuidString = "e0487501-8bf2-4e94-8b35-ceb6f0010c44"; // Replace with new GUID in your own code
         public const string Title = "Git Changes Window";

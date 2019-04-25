@@ -30,7 +30,13 @@
         private string[] diffLines = new string[] { };
 
         private GitChangesWindow toolWindow;
-        private IVsTextView textView;
+        private IVsTextView textView
+        {
+            get
+            {
+                return toolWindow?.textView;
+            }
+        }
 
         EnvDTE80.DTE2 DTE { get; }
 
@@ -44,6 +50,7 @@
             this.DTE = toolWindow.DTE;
             this.gitConsole1.ShowStatusMessage = msg => ShowStatusMessage(msg);
             this.gitConsole1.JoinableTaskFactory = toolWindow.AsyncPackage.JoinableTaskFactory;
+            Refresh(toolWindow.AsyncPackage.tracker);
         }
 
         public void Refresh(GitTracker tracker)
@@ -77,6 +84,7 @@
         private void ClearEditor()
         {
             this.toolWindow.ClearEditor();
+            this.DiffEditor.Content = null;
             fileInEditor = null;
             pnlChangedFileTool.Visibility = activeListView == listUnstaged &&
                 listUnstaged.SelectedItems.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -94,7 +102,7 @@
             {
                 if (fileInEditor != fileName)
                 {
-                    this.textView = this.toolWindow.SetDisplayedFile(fileName);
+                    this.toolWindow.SetDisplayedFile(fileName);
                 }
                 pnlChangedFileTool.Visibility = Visibility.Collapsed;
                 pnlStagedFileTool.Visibility = Visibility.Collapsed;
@@ -677,6 +685,7 @@ Note: if the file is included project, you need to delete the file from project 
 
         private int[] GetEditorSelectionPosition()
         {
+            if (textView == null) return new int[2] { 0, 0 };
             int sl = 0, sc = 0, el = 0, ec = 0;
             try
             {
@@ -708,6 +717,7 @@ Note: if the file is included project, you need to delete the file from project 
 
         private void DiffEditor_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if (textView == null) return;
             int start = 1, column = 1; bool diff = false;
             try
             {
