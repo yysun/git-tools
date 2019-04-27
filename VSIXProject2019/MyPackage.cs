@@ -143,8 +143,8 @@ namespace VSIXProject2019
                 CurrentGitWorkingDirectory = File.Exists(solutionFileName) ? Path.GetDirectoryName(solutionFileName) : solutionFileName;
                 tracker = new GitTracker(CurrentGitWorkingDirectory);
                 if (tracker.Repository.IsGit) CurrentGitWorkingDirectory = tracker.Repository.WorkingDirectory;
-                tracker.Changed += (tracker) => Tracker_Changed(tracker);
-                Tracker_Changed(tracker);
+                tracker.Changed += (tracker) => _ = RefreshAsync(tracker);
+                _ = RefreshAsync(tracker);
             }
 
             Debug.WriteLine("GT === Open repository: " + CurrentGitWorkingDirectory);
@@ -155,7 +155,7 @@ namespace VSIXProject2019
             CurrentGitWorkingDirectory = "";
             tracker.Dispose();
             tracker = null;
-            Tracker_Changed(tracker);
+            _ = RefreshAsync(tracker);
         }
 
         private GitChangesWindowControl FindMyControl()
@@ -164,19 +164,19 @@ namespace VSIXProject2019
             return window?.Content as GitChangesWindowControl;
         }
 
-        private async Task Tracker_Changed(GitTracker tracker)
+        private async Task RefreshAsync(GitTracker tracker)
         {
             try
             {
-                if (GitTracker.NoRefresh) return;
                 await JoinableTaskFactory.SwitchToMainThreadAsync();
-                FindMyControl()?.Refresh(tracker);
+                if (!GitTracker.NoRefresh) FindMyControl()?.Refresh(tracker);
                 ((Commands2)dte.Commands).UpdateCommandUI(true);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Git Tools Refresh Exception:" + ex.ToString());
             }
+
         }
 
         #region open tool window
@@ -321,7 +321,7 @@ namespace VSIXProject2019
 
         private void OnRefreshCommand(object sender, EventArgs e)
         {
-            Tracker_Changed(tracker);
+            _ = RefreshAsync(tracker);
         }
         #endregion
 
