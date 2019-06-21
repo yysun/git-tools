@@ -208,7 +208,7 @@
 
   <CommandPlacements>
 
-    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandInit" priority="0x0001">
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesRefresh" priority="0x0001">
       <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" />
     </CommandPlacement>
 
