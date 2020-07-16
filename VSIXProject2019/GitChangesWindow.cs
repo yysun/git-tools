@@ -1,23 +1,17 @@
 ﻿namespace VSIXProject2019
 {
+    using EnvDTE80;
+    using Microsoft.VisualStudio;
+    using Microsoft.VisualStudio.Editor;
+    using Microsoft.VisualStudio.Shell;
+    using Microsoft.VisualStudio.Shell.Interop;
+    using Microsoft.VisualStudio.Text.Editor;
+    using Microsoft.VisualStudio.TextManager.Interop;
     using System;
     using System.ComponentModel.Design;
     using System.Diagnostics;
     using System.Runtime.InteropServices;
     using System.Windows.Controls;
-    using System.Windows.Forms;
-    using EnvDTE80;
-    using Microsoft;
-    using Microsoft.VisualStudio;
-    using Microsoft.VisualStudio.ComponentModelHost;
-    using Microsoft.VisualStudio.Editor;
-    using Microsoft.VisualStudio.OLE.Interop;
-    using Microsoft.VisualStudio.ProjectSystem;
-    using Microsoft.VisualStudio.Shell;
-    using Microsoft.VisualStudio.Shell.Interop;
-    using Microsoft.VisualStudio.Text;
-    using Microsoft.VisualStudio.Text.Editor;
-    using Microsoft.VisualStudio.TextManager.Interop;
     using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
     /// <summary>
