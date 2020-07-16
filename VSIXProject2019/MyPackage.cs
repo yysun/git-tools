@@ -164,7 +164,7 @@ namespace VSIXProject2019
             try
             {
                 await JoinableTaskFactory.SwitchToMainThreadAsync();
-                if (!GitTracker.NoRefresh) FindMyControl()?.Refresh(tracker);
+                FindMyControl()?.Refresh(tracker);
                 ((Commands2)dte.Commands).UpdateCommandUI(true);
             }
             catch (Exception ex)
@@ -245,6 +245,11 @@ namespace VSIXProject2019
                     0,
                     create: true,
                     cancellationToken: package.DisposalToken);
+
+                if ((null == window) || (null == window.Frame))
+                {
+                    throw new NotSupportedException("Cannot create tool window");
+                }
             });
         }
 
