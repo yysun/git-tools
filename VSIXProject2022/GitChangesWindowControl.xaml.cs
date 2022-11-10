@@ -1,4 +1,4 @@
-﻿namespace VSIXProject2019
+﻿namespace VSIXProject2022
 {
     using GitScc;
     using System;

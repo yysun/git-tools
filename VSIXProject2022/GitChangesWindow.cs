@@ -1,4 +1,4 @@
-﻿namespace VSIXProject2019
+﻿namespace VSIXProject2022
 {
     using EnvDTE80;
     using Microsoft.VisualStudio;
@@ -69,7 +69,7 @@
         {
             get
             {
-                return (IVsDifferenceService) this.GetService(typeof(SVsDifferenceService));
+                return (IVsDifferenceService)this.GetService(typeof(SVsDifferenceService));
             }
         }
 
@@ -175,7 +175,7 @@
                 ((GitChangesWindowControl)Content).Refresh(AsyncPackage.tracker);
                 ((Commands2)DTE.Commands).UpdateCommandUI(true);
             }
-            else if(fShow == 0)
+            else if (fShow == 0)
             {
                 GitTracker.NoRefresh = true;
             }
