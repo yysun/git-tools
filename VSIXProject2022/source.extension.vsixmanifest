@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="VSIXProject2022.31470746-52dd-4faf-9f70-2752bc3807b4" Version="5.0.0" Language="en-US" Publisher="yysun" />
+        <Identity Id="GitTools2022.31470746-52dd-4faf-9f70-2752bc3807b4" Version="5.0.0" Language="en-US" Publisher="yysun" />
         <DisplayName>Git Tools 2022</DisplayName>
         <Description xml:space="preserve">This extension provides a git changes window, and menus to launch Git Bash, Git Extenstions and TortoiseGit.</Description>
         <MoreInfo>https://github.com/yysun/git-tools</MoreInfo>
@@ -24,5 +24,6 @@
     </Prerequisites>
     <Assets>
         <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" d:VsixSubPath="DiffClassifier" Path="|%CurrentProject%|" />
     </Assets>
 </PackageManifest>
