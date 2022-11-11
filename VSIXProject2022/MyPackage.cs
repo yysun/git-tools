@@ -11,6 +11,7 @@ using System;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,21 +20,51 @@ using Process = System.Diagnostics.Process;
 using SolutionEvents = Microsoft.VisualStudio.Shell.Events.SolutionEvents;
 using Task = System.Threading.Tasks.Task;
 
-namespace VSIXProject2019
+namespace VSIXProject2022
 {
+    /// <summary>
+    /// This is the class that implements the package exposed by this assembly.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The minimum requirement for a class to be considered a valid package for Visual Studio
+    /// is to implement the IVsPackage interface and register itself with the shell.
+    /// This package uses the helper classes defined inside the Managed Package Framework (MPF)
+    /// to do it: it derives from the Package class that provides the implementation of the
+    /// IVsPackage interface and uses the registration attributes defined in the framework to
+    /// register itself and its components with the shell. These attributes tell the pkgdef creation
+    /// utility what data to put into .pkgdef file.
+    /// </para>
+    /// <para>
+    /// To get loaded into VS, the package must be referred by &lt;Asset Type="Microsoft.VisualStudio.VsPackage" ...&gt; in .vsixmanifest file.
+    /// </para>
+    /// </remarks>
     [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("Git Tools 2022", "This extension provides a git changes window, and menus to launch Git Bash, Git Extenstions and TortoiseGit.", "5.0.0")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [Guid("9C86573C-CB62-45D0-9C1A-DAD967BBBDC4")] // must match GUID in the .vsct file
+    [Guid(MyPackage.PackageGuidString)]
     [ProvideToolWindow(typeof(GitChangesWindow))]
     public sealed class MyPackage : AsyncPackage
     {
+        /// <summary>
+        /// MyPackage GUID string. Must match GUID in the .vsct file.
+        /// </summary>
+        public const string PackageGuidString = "9C86573C-CB62-45D0-9C1A-DAD967BBBDC4";
+
         static DTE2 dte;
         static string CurrentGitWorkingDirectory;
         internal GitTracker tracker;
 
-        // This method is run automatically the first time the command is being executed
+        #region Package Members
+
+        /// <summary>
+        /// Initialization of the package; this method is called right after the package is sited, so this is the place
+        /// where you can put all the initialization code that rely on services provided by VisualStudio.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token to monitor for initialization cancellation, which can occur when VS is shutting down.</param>
+        /// <param name="progress">A provider for progress updates.</param>
+        /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
             GitBash.GitExePath = GitSccOptions.Current.GitBashPath;
@@ -45,6 +76,8 @@ namespace VSIXProject2019
             SolutionEvents.OnAfterOpenFolder += (o, e) => OpenRepository();
             SolutionEvents.OnAfterCloseFolder += (o, e) => CloseRepository();
 
+            // When initialized asynchronously, the current thread may be a background thread at this point.
+            // Do any initialization that requires the UI thread after switching to the UI thread.
             await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             dte = await GetServiceAsync(typeof(DTE)) as DTE2;
             Assumes.Present(dte);
@@ -72,7 +105,7 @@ namespace VSIXProject2019
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandInit);
             menu = new OleMenuCommand(OnInitCommand, cmd);
-            menu.BeforeQueryStatus += (s, e) => { ((OleMenuCommand)s).Visible = tracker!= null && !IsSolutionGitControlled;  };
+            menu.BeforeQueryStatus += (s, e) => { ((OleMenuCommand)s).Visible = tracker != null && !IsSolutionGitControlled; };
             commandService.AddCommand(menu);
 
             cmd = new CommandID(GuidList.guidVsGitToolsPackageCmdSet, PkgCmdIDList.icmdSccCommandEditIgnore);
@@ -117,7 +150,6 @@ namespace VSIXProject2019
             menu = new OleMenuCommand(OnSettings, cmd);
             commandService.AddCommand(menu);
             #endregion
-
         }
 
         private async Task<bool> IsSolutionLoadedAsync()
@@ -204,7 +236,7 @@ namespace VSIXProject2019
                 EditorAdapter = editorAdapter
             };
         }
-        #endregion
+        #endregion open tool window
 
         #region command event handlers
         private static void RunDetatched(string cmd, string arguments)
@@ -323,7 +355,7 @@ namespace VSIXProject2019
         {
             _ = RefreshAsync(tracker);
         }
-        #endregion
+        #endregion command event handlers
 
         #region git ignore
 
@@ -583,6 +615,8 @@ paket-files/
 *.sln.iml
 ";
 
-        #endregion
+        #endregion git ignore
+
+        #endregion Package Members
     }
 }

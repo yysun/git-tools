@@ -3,12 +3,11 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Timers;
-
-namespace VSIXProject2019
+namespace VSIXProject2022
 {
     public delegate void ChangedEventHandler(GitTracker tracker);
 
-    public class GitTracker: IDisposable
+    public class GitTracker : IDisposable
     {
         public static bool NoRefresh = false;
 
@@ -27,7 +26,7 @@ namespace VSIXProject2019
         public void Dispose()
         {
             Debug.WriteLine("GT ==== Dispose ");
-            if (timer != null ) timer.Stop();
+            if (timer != null) timer.Stop();
             UnWatchFileChanges();
         }
 
@@ -67,7 +66,7 @@ namespace VSIXProject2019
         {
             if (!NoRefresh
                 && !(e.Name.EndsWith(".git") && e.ChangeType == WatcherChangeTypes.Changed)
-                && !e.Name.EndsWith(".lock") 
+                && !e.Name.EndsWith(".lock")
                 && !this.Repository.IsIgnored(e.FullPath))
             {
                 Debug.WriteLine("GT ==== File system changed [" + e.ChangeType.ToString() + "]" + e.FullPath);

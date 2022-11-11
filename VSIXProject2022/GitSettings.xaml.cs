@@ -15,7 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace VSIXProject2019
+namespace VSIXProject2022
 {
     /// <summary>
     /// Interaction logic for GitSettings.xaml

@@ -2,7 +2,7 @@
 // MUST match guids.h
 using System;
 
-namespace VSIXProject2019
+namespace VSIXProject2022
 {
     static class GuidList
     {

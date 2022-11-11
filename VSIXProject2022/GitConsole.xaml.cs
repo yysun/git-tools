@@ -17,7 +17,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace VSIXProject2019
+namespace VSIXProject2022
 {
     /// <summary>
     /// Interaction logic for GitConsole.xaml
