@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="GitTools2019.369a6a45-ea16-42d2-ba84-10faed6dd1e7" Version="3.1.2" Language="en-US" Publisher="yysun" />
+        <DisplayName>Git Tools 2019</DisplayName>
+        <Description xml:space="preserve">This extension provides a git changes window, and menus to launch Git Bash, Git Extenstions and TortoiseGit.</Description>
+        <MoreInfo>https://github.com/yysun/git-tools</MoreInfo>
+        <License>Resources\LICENSE.txt</License>
+        <Icon>Resources\Icon128x128.png</Icon>
+        <PreviewImage>Resources\Icon128x128.png</PreviewImage>
+        <Tags>sample, command</Tags>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[16.0, 17.0)" />
+        <InstallationTarget Version="[16.0, 17.0)" Id="Microsoft.VisualStudio.Pro" />
+        <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[16.0, 17.0)" />
+        <InstallationTarget Id="Microsoft.VisualStudio.IntegratedShell" Version="[16.0, 17.0)" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.7,)" />
+        <Dependency d:Source="Installed" Version="[16.0,17.0)" Id="Microsoft.VisualStudio.ProjectSystem" DisplayName="Visual Studio Common Project System" />
+    </Dependencies>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[16.0,17.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+        <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" d:VsixSubPath="DiffClassifier" Path="|%CurrentProject%|" />
+    </Assets>
+</PackageManifest>

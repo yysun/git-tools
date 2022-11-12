@@ -1,0 +1,373 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!--  This is the file that defines the actual layout and type of the commands.
+        It is divided in different sections (e.g. command definition, command
+        placement, ...), with each defining a specific set of properties.
+        See the comment before each section for more details about how to
+        use it. -->
+
+  <!--  The VSCT compiler (the tool that translates this file into the binary
+        format that VisualStudio will consume) has the ability to run a preprocessor
+        on the vsct file; this preprocessor is (usually) the C++ preprocessor, so
+        it is possible to define includes and macros with the same syntax used
+        in C++ files. Using this ability of the compiler here, we include some files
+        defining some of the constants that we will use inside the file. -->
+
+  <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
+  <Extern href="stdidcmd.h" />
+
+  <!--This header contains the command ids for the menus provided by the shell. -->
+  <Extern href="vsshlids.h" />
+
+  <!-- Adds a reference to the KnownMonikers in the ImageCatalog for use in the <button> elements -->
+  <Include href="KnownImageIds.vsct" />
+
+  <!--The Commands section is where commands, menus, and menu groups are defined.
+      This section uses a Guid to identify the package that provides the command defined inside it. -->
+  <Commands package="guidVsGitToolsPackagePkg">
+
+    <!-- Inside this section we have different sub-sections: one for the menus, another
+    for the menu groups, one for the buttons (the actual commands), one for the combos
+    and the last one for the bitmaps used. Each element is identified by a command id that
+    is a unique pair of guid and numeric identifier; the guid part of the identifier is usually
+    called "command set" and is used to group different command inside a logically related
+    group; your package should define its own command set in order to avoid collisions
+    with command ids defined by other packages. -->
+    
+    <Menus>
+
+      <Menu guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenu" priority="0x100" type="Menu">
+        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+        <Strings>
+          <ButtonText>Git Tools</ButtonText>
+          <CommandName>GitTools</CommandName>
+        </Strings>
+      </Menu>
+
+      <Menu guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbar" priority="0x0000" type="Toolbar">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbar" />
+        <CommandFlag>DefaultDocked</CommandFlag>
+        <Strings>
+          <CommandName>Git Tools</CommandName>
+          <ButtonText>Git Tools Toolbar</ButtonText>
+        </Strings>
+      </Menu>
+
+      <Menu guid="guidVsGitToolsPackageCmdSet" id="imnuGitExtMenu" priority="0x0200" type="MenuController">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenuGroup" />
+        <CommandFlag>IconAndText</CommandFlag>
+        <Strings>
+          <ButtonText>Git Extensions</ButtonText>
+          <CommandName>Git Extensions</CommandName>
+        </Strings>
+      </Menu>
+
+      <Menu guid="guidVsGitToolsPackageCmdSet" id="imnuGitTorMenu" priority="0x0300" type="MenuController">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenuGroup" />
+        <CommandFlag>IconAndText</CommandFlag>
+        <Strings>
+          <ButtonText>TortoiseGit</ButtonText>
+          <CommandName>TortoiseGit</CommandName>
+        </Strings>
+      </Menu>
+
+      <Menu guid="guidVsGitToolsPackageCmdSet" id="imnuGitChangesToolWindowToolbarMenu" priority="0x0100" type="ToolWindowToolbar">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="imnuGitChangesToolWindowToolbarMenu" />
+        <CommandFlag>TextChanges</CommandFlag>
+        <Strings>
+          <ButtonText>Git Changes</ButtonText>
+          <CommandName>GitChanges</CommandName>
+        </Strings>
+      </Menu>
+      
+    </Menus>
+
+    <!-- In this section you can define new menu groups. A menu group is a container for
+         other menus or buttons (commands); from a visual point of view you can see the
+         group as the part of a menu contained between two lines. The parent of a group
+         must be a menu. -->
+    <Groups>
+
+      <Group guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" priority="0x0100">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="imnuGitChangesToolWindowToolbarMenu" />
+      </Group>
+
+      <Group guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" priority="0x0600">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbar" />
+      </Group>
+
+      <Group guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenuGroup" priority="0x0600">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenu" />
+      </Group>
+
+      <Group guid="guidVsGitToolsPackageCmdSet" id="igrpGitExtCommands" priority="0x0100">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="imnuGitExtMenu" />
+      </Group>
+
+      <Group guid="guidVsGitToolsPackageCmdSet" id="igrpGitTorCommands" priority="0x0200">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="imnuGitTorMenu" />
+      </Group>
+      
+    </Groups>
+
+    <!--Buttons section. -->
+    <!--This section defines the elements the user can interact with, like a menu command or a button
+        or combo box in a toolbar. -->
+    <Buttons>
+      <!--To define a menu group you have to specify its ID, the parent menu and its display priority.
+          The command is visible and enabled by default. If you need to change the visibility, status, etc, you can use
+          the CommandFlag node.
+          You can add more than one CommandFlag node e.g.:
+              <CommandFlag>DefaultInvisible</CommandFlag>
+              <CommandFlag>DynamicVisibility</CommandFlag>
+          If you do not want an image next to your command, remove the Icon node /> -->
+
+      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandInit" priority="0x0101" type="Button">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenuGroup" />
+        <Icon guid="guidImages" id="iconGitInit" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>IconAndText</CommandFlag>
+        <Strings>
+          <ButtonText>Git Init</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidVsGitToolsPackageCmdSet" id="cmdidGitToolsWindow" priority="0x0102" type="Button">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenuGroup" />
+        <Icon guid="guidImages" id="iconCommit" />
+        <CommandFlag>IconAndText</CommandFlag>
+        <Strings>
+          <ButtonText>Git Changes</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandGitBash" priority="0x0103" type="Button">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenuGroup" />
+        <Icon guid="guidImages" id="iconGitBash" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <CommandFlag>IconAndText</CommandFlag>
+        <Strings>
+          <ButtonText>Git Bash</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandAbout" priority="0x0110" type="Button">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="TopLevelMenuGroup" />
+        <Icon guid="guidImages" id="iconCommit" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>IconAndText</CommandFlag>
+        <Strings>
+          <ButtonText>Github</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdGitExtCommand1" type="Button" priority="0x0101">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitExtCommands" />
+        <Icon guid="guidImages" id="iconGitExt" />
+        <CommandFlag>DynamicItemStart</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>FixMenuController</CommandFlag>
+        <Strings>
+          <CommandName>icmdGitExtCommand1</CommandName>
+          <ButtonText>Git Extensions</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdGitTorCommand1" type="Button" priority="0x0101">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitTorCommands" />
+        <Icon guid="guidImages" id="iconGitTor" />
+        <CommandFlag>DynamicItemStart</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>FixMenuController</CommandFlag>
+        <Strings>
+          <CommandName>icmdGitTorCommand1</CommandName>
+          <ButtonText>TortoiseGit</ButtonText>
+        </Strings>
+      </Button>
+
+      <!-- buttons on pending changes tool window's tool bar -->
+      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesCommit" priority="0x0002" type="Button">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
+        <Icon guid="guidImages" id="iconGitBash" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>IconAndText</CommandFlag>
+        <Strings>
+          <ButtonText>Commit</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandEditIgnore" priority="0x0006" type="Button">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
+        <Icon guid="guidImages" id="iconOpenIgnoreFile" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>IconAndText</CommandFlag>
+        <Strings>
+          <ButtonText>Open .gitignore</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesRefresh" priority="0x0007" type="Button">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
+        <Icon guid="guidSccProviderImageRefresh" id="1" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>IconAndText</CommandFlag>
+        <Strings>
+          <ButtonText>Refresh</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesSettings" priority="0x0120" type="Button">
+        <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
+        <Icon guid="guidSccProviderSettings" id="1" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>IconAndText</CommandFlag>
+        <Strings>
+          <ButtonText>Settings</ButtonText>
+        </Strings>
+      </Button>
+
+    </Buttons>
+
+    <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
+    <Bitmaps>
+      <!--  The bitmap id is defined in a way that is a little bit different from the others:
+            the declaration starts with a guid for the bitmap strip, then there is the resource id of the
+            bitmap strip containing the bitmaps and then there are the numeric ids of the elements used
+            inside a button definition. An important aspect of this declaration is that the element id
+            must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
+      <Bitmap guid="guidImages" href="Resources\Images.png" usedList="iconGitBash, iconGitExt, iconUncheckout, iconCommit, iconRefresh, iconOpenIgnoreFile, iconGitTor, iconGitInit" />
+      <Bitmap guid="guidSccProviderImageSwitch" href="Resources\Switch.png" />
+      <Bitmap guid="guidSccProviderImageHistory" href="Resources\History.png" />
+      <Bitmap guid="guidSccProviderImageRefresh" href="Resources\Refresh.png" />
+      <Bitmap guid="guidSccProviderImagePendingCheckins" href="Resources\PendingCheckins.png" />
+      <Bitmap guid="guidSccProviderImageCompare" href="Resources\Compare.png" />
+      <Bitmap guid="guidSccProviderImageUndoCheckout" href="Resources\UndoCheckout.png" />
+      <Bitmap guid="guidSccProviderSettings" href="Resources\Settings.png" />
+      <Bitmap guid="guidImages1" href="Resources\GitChangesWindowCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+    </Bitmaps>
+    
+  </Commands>
+
+  <CommandPlacements>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdPendingChangesRefresh" priority="0x0001">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="cmdidGitToolsWindow" priority="0x0002">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandGitBash" priority="0x0003">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="imnuGitExtMenu" priority="0x0108">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="imnuGitTorMenu" priority="0x0109">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="VSCTToolbarGroup" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandAbout" priority="0x0120">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="cmdidGitToolsWindow" priority="0x0">
+      <Parent guid="guidSHLMainMenu" id="IDG_VS_WNDO_OTRWNDWS0" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandInit" priority="0x0001">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="icmdSccCommandGitBash" priority="0x0008">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
+    </CommandPlacement>
+
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="imnuGitExtMenu" priority="0x0108">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidVsGitToolsPackageCmdSet" id="imnuGitTorMenu" priority="0x0109">
+      <Parent guid="guidVsGitToolsPackageCmdSet" id="igrpGitChangesToolWindowToolbarGroup" />
+    </CommandPlacement>
+
+  </CommandPlacements>
+
+  <Symbols>
+
+    <!-- This is the package guid. -->
+    <GuidSymbol name="guidVsGitToolsPackagePkg" value="{9C86573C-CB62-45D0-9C1A-DAD967BBBDC4}" />
+
+    <!-- This is the guid used to group the menu commands together -->
+    <GuidSymbol name="guidVsGitToolsPackageCmdSet" value="{31337E4B-26EB-4201-B411-80950E42165B}">
+      <IDSymbol name="cmdidGitToolsWindow" value="0x0101" />
+      <IDSymbol name="TopLevelMenu" value="0x0201" />
+      <IDSymbol name="TopLevelMenuGroup" value="0x0202" />
+      <IDSymbol name="VSCTToolbar" value="0x0203" />
+      <IDSymbol name="VSCTToolbarGroup" value="0x0204" />
+      <IDSymbol name="icmdSccCommandGitBash" value="0x102" />
+      <IDSymbol name="icmdSccCommandGitExtension" value="0x103" />
+      <IDSymbol name="icmdSccCommandInit" value="0x106" />
+      <IDSymbol name="icmdSccCommandPendingChanges" value="0x107" />
+      <IDSymbol name="icmdSccCommandHistory" value="0x108" />
+      <IDSymbol name="icmdSccCommandGitTortoise" value="0x109" />
+      <IDSymbol name="icmdSccCommandEditIgnore" value="0x110" />
+      <IDSymbol name="icmdPendingChangesCommit" value="0x111" />
+      <IDSymbol name="icmdPendingChangesAmend" value="0x112" />
+      <IDSymbol name="icmdPendingChangesCommitToBranch" value="0x113" />
+      <IDSymbol name="icmdPendingChangesRefresh" value="0x114" />
+      <IDSymbol name="icmdPendingChangesSettings" value="0x116" />
+      <IDSymbol name="icmdSccCommandAbout" value="0x119" />
+      <IDSymbol name="imnuGitChangesToolWindowToolbarMenu" value="0x302" />
+      <IDSymbol name="igrpGitChangesToolWindowToolbarGroup" value="0x303" />
+      <IDSymbol name="igrpGitExtCommands" value="0x800" />
+      <IDSymbol name="imnuGitExtMenu" value="0x801" />
+      <IDSymbol name="igrpGitTorCommands" value="0x900" />
+      <IDSymbol name="imnuGitTorMenu" value="0x901" />
+      <IDSymbol name="icmdGitExtCommand1" value="0x811" />
+      <IDSymbol name="icmdGitTorCommand1" value="0x911" />
+      <IDSymbol name="imnuPendingChangesToolWindowGitExt" value="0x951" />
+      <IDSymbol name="igrpPendingChangesToolWindowGitExt" value="0x952" />
+      <IDSymbol name="imnuPendingChangesToolWindowGitTor" value="0x961" />
+      <IDSymbol name="igrpPendingChangesToolWindowGitTor" value="0x962" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidImages" value="{ad81a5a9-a114-41eb-9d27-1bb8b8710e0c}">
+      <IDSymbol name="iconGitBash" value="1" />
+      <IDSymbol name="iconGitExt" value="2" />
+      <IDSymbol name="iconUncheckout" value="3" />
+      <IDSymbol name="iconCommit" value="4" />
+      <IDSymbol name="iconRefresh" value="5" />
+      <IDSymbol name="iconOpenIgnoreFile" value="6" />
+      <IDSymbol name="iconGitTor" value="7" />
+      <IDSymbol name="iconGitInit" value="8" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidSccProviderImageSwitch" value="{D29BF411-DEAC-4A50-8D84-389DE40DA2D4}" />
+    <GuidSymbol name="guidSccProviderImageHistory" value="{2544AC47-1DDF-41EF-8FD9-C1FCFAF16E7C}" />
+    <GuidSymbol name="guidSccProviderImageRefresh" value="{254C6918-2499-415F-BD52-5DA291333808}" />
+    <GuidSymbol name="guidSccProviderImagePendingCheckins" value="{8E7C0075-060A-4411-A90C-BE88E4370386}" />
+    <GuidSymbol name="guidSccProviderImageCompare" value="{89C2CE10-4265-462C-83B6-BEC12CF0CDD0}" />
+    <GuidSymbol name="guidSccProviderImageUndoCheckout" value="{78B4AED4-1FEC-4910-A3F7-8FE4022BED8B}" />
+    <GuidSymbol name="guidSccProviderSettings" value="{BD88778E-7AFE-4159-A903-C32EAFCB0026}" />
+
+    <GuidSymbol value="{724d9352-c388-4367-9835-c7a1fd7a169b}" name="guidImages1">
+      <IDSymbol name="bmpPic1" value="1" />
+      <IDSymbol name="bmpPic2" value="2" />
+      <IDSymbol name="bmpPicSearch" value="3" />
+      <IDSymbol name="bmpPicX" value="4" />
+      <IDSymbol name="bmpPicArrows" value="5" />
+      <IDSymbol name="bmpPicStrikethrough" value="6" />
+    </GuidSymbol>
+  </Symbols>
+  
+</CommandTable>

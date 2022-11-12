@@ -26,7 +26,7 @@ Visual Studio 2019 has a new asynchronous extension architecture. [Git Tools 201
 ![main-menu-2017](https://cloud.githubusercontent.com/assets/170547/23336421/281f2002-fb9e-11e6-9cec-77362e6a553c.png)
 
 ## Screenshot of Visual Studio 2019
-![main-menu-2019](https://github.com/yysun/git-tools/raw/VS2019/VSIXProject2019/art/main.png)
+![main-menu-2019](VSIXProject2019/art/main.png)
 
 For more information, please visit http://yysun.github.io/git-tools
 
