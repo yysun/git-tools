@@ -16,9 +16,7 @@
 Git Tools and Git Tools 2019 are the successors of [Git Source Control Provider](https://visualstudiogallery.msdn.microsoft.com/63a7e40d-4d71-4fbb-a23b-d262124b8f4c).
 
 
-[Git Source Control Provider](https://marketplace.visualstudio.com/items?itemName=yysun.GitSourceControlProvider) was the Visual Studio extension for Visual Studio 2008/2010. It integrates Git tools to Visual Studio as a source control provider since Visual Studio 2008 ([Github Project](https://github.com/yysun/Git-Source-Control-Provider)) ([InfoQ News](https://www.infoq.com/news/2010/06/Git-Visual-Studio)).
-
-Started in Visual Studio 2013, Microsoft has built the Microsoft Git provider into Visual Studio, but Visual Studio remains allowing only one active source control provider at a time. [Git Tools](https://marketplace.visualstudio.com/items?itemName=yysun.GitTools) is modified from the Git Source Control Provider to become a standalone extension. It is compatible with Microsoft Git and can run side by side with Microsoft Git.
+[Git Source Control Provider](https://marketplace.visualstudio.com/items?itemName=yysun.GitSourceControlProvider) was the Visual Studio extension for Visual Studio 2008/2010. It integrates Git tools to Visual Studio as a source control provider since Visual Studio 2008 ([Github Project](https://github.com/yysun/Git-Source-Control-Provider)) ([InfoQ News](https://www.infoq.com/news/2010/06/Git-Visual-Studio)). Starting in Visual Studio 2013, Microsoft has built the Microsoft Git provider into Visual Studio, but Visual Studio remains allowing only one active source control provider at a time. [Git Tools](https://marketplace.visualstudio.com/items?itemName=yysun.GitTools) is modified from the Git Source Control Provider to become a standalone extension. It is compatible with Microsoft Git and can run side by side with Microsoft Git.
 
 Visual Studio 2019 has a new asynchronous extension architecture. [Git Tools 2019](https://marketplace.visualstudio.com/items?itemName=yysun.git-tools-2019) is modified from Git Tools to adopt the new architecture. It is compiled from the VS2019 branch.
 
@@ -41,12 +39,17 @@ For more information, please visit http://yysun.github.io/git-tools
 ## Compile Source Code
 
 * Get source code: _git clone https://github.com/yysun/git-tools.git_
-* Open the solution and compile in Visual Studio 2017
+* Open the solution and compile it in Visual Studio 2017
 * Or checkout branch VS2019 and open the solution in Visual Studio 2019
 
 Pull requests are welcomed
 
 ## Change Logs
+
+### 5.0.0
+
+* Support Visual Studio 2022
+
 
 ### 3.0.0
 
@@ -56,7 +59,7 @@ Pull requests are welcomed
 
 * Added advanced mode: displays un-staged changes and staged changes as two lists
 * Added advanced mode: allows stage/un-stage/reset by selecting line(s)
-* Improved Git Console auto complete
+* Improved Git Console autocomplete
 * Support git commit.template settings
 
 ### 1.6.0
@@ -65,10 +68,10 @@ Pull requests are welcomed
 
 ### 1.5.0
 
-* Performance enhancement: Use background thread to refresh git changes
+* Performance enhancement: Use the background thread to refresh git changes
 * Performance enhancement: Use background thread to stage multiple files
 * Performance enhancement: Not to refresh if the changed files are ignored by git
-* Copy Dragon.exe to Documents folder instead of Temp folder
+* Copy Dragon.exe to the Documents folder instead of the temp folder
 * Support VS community and Enterprise Editions
 * Bug fixes
 
