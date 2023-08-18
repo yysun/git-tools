@@ -136,7 +136,7 @@ namespace VSIXProject2022
                 var mc = new OleMenuCommand(OnGitTorCommandExec, cmd);
                 mc.BeforeQueryStatus += (s, e) => {
                     var command = s as OleMenuCommand;
-                    command.Text = GitToolCommands.GitExtCommands[command.CommandID.ID - PkgCmdIDList.icmdGitTorCommand1].Name;
+                    command.Text = GitToolCommands.GitTorCommands[command.CommandID.ID - PkgCmdIDList.icmdGitTorCommand1].Name;
                     command.Enabled = File.Exists(GitSccOptions.Current.TortoiseGitPath);
                 };
                 commandService.AddCommand(mc);
