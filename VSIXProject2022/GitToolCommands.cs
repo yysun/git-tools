@@ -2,7 +2,7 @@
 
 namespace VSIXProject2022
 {
-    class GitToolCommand
+    internal class GitToolCommand
     {
         public CommandScope Scope { get; set; }
         public string Name { get; set; }
@@ -21,10 +21,11 @@ namespace VSIXProject2022
         File, Project
     }
 
-    static class GitToolCommands
+    internal static class GitToolCommands
     {
         internal static List<GitToolCommand> GitTorCommands = new List<GitToolCommand> {
             new GitToolCommand("TortoiseGit", "/command:log"),
+            new GitToolCommand("Push", "/command:push"),
             new GitToolCommand("Branch", "/command:branch"),
             new GitToolCommand("Commit", "/command:commit"),
             new GitToolCommand("Export", "/command:export"),
@@ -61,6 +62,5 @@ namespace VSIXProject2022
             new GitToolCommand("Settings", "settings"),
             new GitToolCommand("Solve Merge Conflicts", "mergeconflicts"),
         };
-
     }
 }
